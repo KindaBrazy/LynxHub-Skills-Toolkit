@@ -1,8 +1,7 @@
 @import 'tailwindcss';
 @import '@heroui/styles';
 
-@source '../**/*.{js,ts,jsx,tsx}';
-@source '../../../src/renderer/main_window/components/ToolsCard.tsx';
+@source './**/*.{js,ts,jsx,tsx}';
 
 @theme {
   --font-JetBrainsMono: JetBrainsMono, sans-serif;

@@ -8,7 +8,7 @@ To develop and test your extension locally:
 
 1. Clone this repository directly into the `/extension` directory at the root of the LynxHub host application:
    ```bash
-   git clone <your-repository-url> extension
+   git clone https://github.com/KindaBrazy/LynxHub-Extension-Template extension
    ```
 2. Run the host application in development mode:
    ```bash

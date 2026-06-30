@@ -6,6 +6,7 @@ import {
   Description,
   Label,
   ModalCloseTrigger,
+  ScrollShadow,
   Separator,
   Spinner,
   Tabs,
@@ -19,19 +20,6 @@ import {AuditReport, RegistrySkill} from '../types';
 
 const ipc = (window as any).electron.ipcRenderer;
 
-const SUPPORTED_AGENTS = [
-  'Antigravity',
-  'Claude Code',
-  'Cursor',
-  'GitHub Copilot',
-  'Cline',
-  'Codex',
-  'OpenCode',
-  'Gemini CLI',
-  'Windsurf',
-  'Trae',
-];
-
 interface SkillInstallerModalProps {
   selectedSkill: RegistrySkill | null;
   onClose: () => void;
@@ -41,7 +29,8 @@ interface SkillInstallerModalProps {
 export default function SkillInstallerModal({selectedSkill, onClose, onInstallSuccess}: SkillInstallerModalProps) {
   const [installScope, setInstallScope] = useState<'project' | 'global'>('project');
   const [installMethod, setInstallMethod] = useState<'symlink' | 'copy'>('symlink');
-  const [selectedAgents, setSelectedAgents] = useState<string[]>(['Antigravity']);
+  const [supportedAgents, setSupportedAgents] = useState<{name: string; displayName: string}[]>([]);
+  const [selectedAgents, setSelectedAgents] = useState<string[]>(['antigravity']);
   const [allAgents, setAllAgents] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [installResult, setInstallResult] = useState<{success: boolean; message: string} | null>(null);
@@ -51,10 +40,22 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
 
   useEffect(() => {
+    const loadAgents = async () => {
+      try {
+        const list = await ipc.invoke('skills-manager:get-agents');
+        setSupportedAgents(list);
+      } catch (err) {
+        console.error('Failed to load agents list:', err);
+      }
+    };
+    loadAgents();
+  }, []);
+
+  useEffect(() => {
     if (selectedSkill) {
       setInstallScope('project');
       setInstallMethod('symlink');
-      setSelectedAgents(['Antigravity']);
+      setSelectedAgents(['antigravity']);
       setAllAgents(false);
       setIsInstalling(false);
       setInstallResult(null);
@@ -178,22 +179,24 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
           </div>
 
           {!allAgents && (
-            <CheckboxGroup
-              value={selectedAgents}
-              onChange={setSelectedAgents}
-              aria-label="Target AI Agents"
-              className="grid grid-cols-2 gap-2 mt-1">
-              {SUPPORTED_AGENTS.map(agent => (
-                <Checkbox key={agent} value={agent} variant="secondary">
-                  <Checkbox.Content>
-                    <Checkbox.Control>
-                      <Checkbox.Indicator />
-                    </Checkbox.Control>
-                    <span className="text-xs">{agent}</span>
-                  </Checkbox.Content>
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
+            <ScrollShadow>
+              <CheckboxGroup
+                value={selectedAgents}
+                onChange={setSelectedAgents}
+                aria-label="Target AI Agents"
+                className="grid grid-cols-2 gap-2 mt-1">
+                {supportedAgents.map(agent => (
+                  <Checkbox key={agent.name} value={agent.name} variant="secondary">
+                    <Checkbox.Content>
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                      <span className="text-xs">{agent.displayName}</span>
+                    </Checkbox.Content>
+                  </Checkbox>
+                ))}
+              </CheckboxGroup>
+            </ScrollShadow>
           )}
         </div>
 

@@ -293,5 +293,87 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
         return {success: false, error: error.message || String(error)};
       }
     });
+
+    // Handler: Get available agents from cli.mjs
+    mainIpc.lynxIpc.handle('skills-manager:get-agents', async () => {
+      try {
+        const cliPath = getSkillsCliPath();
+        return parseAgentsFromCli(cliPath);
+      } catch (error) {
+        console.error('Error getting agents:', error);
+        return [];
+      }
+    });
   });
+}
+
+let cachedAgentsList: {name: string; displayName: string}[] | null = null;
+
+function parseAgentsFromCli(cliPath: string): {name: string; displayName: string}[] {
+  if (cachedAgentsList) {
+    return cachedAgentsList;
+  }
+
+  try {
+    const content = fs.readFileSync(cliPath, 'utf8');
+    const startKeyword = 'const agents = {';
+    const startIdx = content.indexOf(startKeyword);
+    if (startIdx === -1) return [];
+
+    let braceCount = 1;
+    let i = startIdx + startKeyword.length;
+    let agentsBlock = '';
+
+    while (i < content.length && braceCount > 0) {
+      const char = content[i];
+      if (char === '{') {
+        braceCount++;
+      } else if (char === '}') {
+        braceCount--;
+      }
+      if (braceCount > 0) {
+        agentsBlock += char;
+      }
+      i++;
+    }
+
+    const agents: {name: string; displayName: string}[] = [];
+    let currentAgentBlock = '';
+    let level = 0;
+
+    for (let j = 0; j < agentsBlock.length; j++) {
+      const char = agentsBlock[j];
+      if (char === '{') {
+        level++;
+        if (level === 1) {
+          currentAgentBlock = '';
+          continue;
+        }
+      } else if (char === '}') {
+        level--;
+        if (level === 0) {
+          const nameMatch = currentAgentBlock.match(/name:\s*["']([^"']+)["']/);
+          const displayNameMatch = currentAgentBlock.match(/displayName:\s*["']([^"']+)["']/);
+          if (nameMatch && displayNameMatch) {
+            agents.push({
+              name: nameMatch[1],
+              displayName: displayNameMatch[1],
+            });
+          }
+        }
+      }
+      if (level >= 1) {
+        currentAgentBlock += char;
+      }
+    }
+
+    // Sort agents alphabetically by displayName
+    agents.sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+    cachedAgentsList = agents;
+    return agents;
+  } catch (error) {
+    console.error('Failed to parse agents from cli.mjs:', error);
+    return [];
+  }
 }

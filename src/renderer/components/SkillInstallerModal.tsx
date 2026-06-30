@@ -249,7 +249,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
         </div>
 
         {/* Security Audits */}
-        <div className="flex flex-col gap-1.5 mt-2 bg-black/10 border border-border-secondary/40 p-3 rounded-lg">
+        <div className="flex flex-col gap-1.5 mt-2 bg-black/10 border border-border-secondary/40 p-3 rounded-xl">
           <Label className="text-xs font-semibold text-semi-muted flex items-center gap-1">
             <ShieldCheck className="size-4 text-LynxPurple" />
             Security & Safety Audits
@@ -274,7 +274,8 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
                   return (
                     <div
                       className={
-                        'flex flex-col justify-between p-2 rounded bg-black/20' + ' border border-border-secondary/30'
+                        'flex flex-col justify-between p-2 rounded-lg bg-black/20' +
+                        ' border border-border-secondary/30'
                       }
                       key={audit.provider}
                       title={`${audit.provider}: ${audit.summary}`}>
@@ -316,7 +317,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
 
         {installResult && (
           <div
-            className={`flex items-start gap-2 p-3 rounded-lg text-xs ${
+            className={`flex items-start gap-2 p-3 rounded-xl text-xs ${
               installResult.success ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
             }`}>
             {installResult.success ? (

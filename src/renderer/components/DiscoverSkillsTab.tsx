@@ -418,7 +418,18 @@ export default function DiscoverSkillsTab({
                           </div>
 
                           <div className="flex flex-col gap-2 mt-2">
-                            <Typography className="text-xs font-semibold text-semi-muted">Featured Skills:</Typography>
+                            <div className="flex flex-row justify-between items-center">
+                              <Typography className="text-xs font-semibold text-semi-muted">
+                                Featured Skills:
+                              </Typography>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-xs"
+                                onPress={() => setSelectedOwnerForSkills(owner)}>
+                                View All
+                              </Button>
+                            </div>
                             <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
                               {owner.repos.flatMap(r =>
                                 r.skills.slice(0, 3).map(skill => {
@@ -462,14 +473,11 @@ export default function DiscoverSkillsTab({
                               )}
                               {totalSkills > shownSkillsCount && (
                                 <Button
-                                  className={
-                                    'w-full text-[11px] text-semi-muted hover:text-foreground font-semibold ' +
-                                    'py-1.5 h-auto min-h-0 hover:bg-foreground/5 rounded-lg border ' +
-                                    'border-transparent hover:border-border/40'
-                                  }
                                   size="sm"
-                                  variant="ghost"
-                                  onPress={() => setSelectedOwnerForSkills(owner)}>
+                                  variant="tertiary"
+                                  className="shrink-0 text-xs"
+                                  onPress={() => setSelectedOwnerForSkills(owner)}
+                                  fullWidth>
                                   + {totalSkills - shownSkillsCount} more skills
                                 </Button>
                               )}
@@ -546,18 +554,12 @@ export default function DiscoverSkillsTab({
 
       {/* View All Skills Modal for Official Creator */}
       <TabModal
-        size="md"
+        size="lg"
         isOpen={!!selectedOwnerForSkills}
         onOpenChange={open => !open && setSelectedOwnerForSkills(null)}
         isDismissable>
-        <Modal.CloseTrigger
-          className={
-            'absolute top-4 right-4 rounded-full p-1 hover:bg-white/10 ' +
-            'text-semi-muted hover:text-foreground transition cursor-pointer'
-          }
-          onPress={() => setSelectedOwnerForSkills(null)}
-        />
-        <div className="p-5 font-Nunito flex flex-col max-h-[80vh]">
+        <Modal.CloseTrigger onPress={() => setSelectedOwnerForSkills(null)} />
+        <div className="font-Nunito flex flex-col max-h-[80vh]">
           <div className="pb-3 border-b border-border/50 flex items-center gap-3">
             <img
               onError={e => {

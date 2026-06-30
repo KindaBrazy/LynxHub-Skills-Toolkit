@@ -98,7 +98,9 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
     setInstallResult(null);
 
     const source = selectedSkill.source
-      ? `${selectedSkill.source}/${selectedSkill.name}`
+      ? selectedSkill.source.includes('/')
+        ? `${selectedSkill.source}@${selectedSkill.name}`
+        : `${selectedSkill.source}/${selectedSkill.name}`
       : selectedSkill.id || selectedSkill.name;
 
     const agent = allAgents ? '*' : selectedAgents.join(' ');

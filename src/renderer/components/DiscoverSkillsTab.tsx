@@ -428,7 +428,8 @@ export default function DiscoverSkillsTab({
                                   return (
                                     <div
                                       className={
-                                        'flex items-center justify-between p-2 rounded bg-black/20 transition border ' +
+                                        'flex items-center justify-between p-2 rounded-xl bg-surface/70 transition' +
+                                        ' border ' +
                                         (installed
                                           ? 'border-success/30 bg-success/5'
                                           : 'border-border-secondary/40 hover:border-foreground/10')
@@ -443,8 +444,8 @@ export default function DiscoverSkillsTab({
                                       <Button
                                         size="sm"
                                         variant="ghost"
-                                        className="h-7 min-h-7 px-2"
-                                        onPress={() => onSelectSkill(registrySkill)}>
+                                        onPress={() => onSelectSkill(registrySkill)}
+                                        isIconOnly>
                                         {installed ? (
                                           <SettingsMinimalistic className="size-3.5" />
                                         ) : (

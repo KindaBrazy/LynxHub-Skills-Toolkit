@@ -91,7 +91,7 @@ export default function SkillsManagerModal() {
   return (
     <>
       <TabModal size="cover" isOpen={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex flex-col">
+        <Modal.Body className="flex flex-col px-0">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
@@ -109,7 +109,10 @@ export default function SkillsManagerModal() {
           <Separator className="mb-6 opacity-20" />
 
           {/* Navigation Tabs */}
-          <Tabs className="mb-6" selectedKey={activeTab} onSelectionChange={key => setActiveTab(String(key))}>
+          <Tabs
+            selectedKey={activeTab}
+            className="pb-4 overflow-hidden"
+            onSelectionChange={key => setActiveTab(String(key))}>
             <Tabs.ListContainer className="w-fit">
               <Tabs.List>
                 <Tabs.Tab id="installed">
@@ -124,7 +127,7 @@ export default function SkillsManagerModal() {
             </Tabs.ListContainer>
 
             {/* Installed Skills Panel */}
-            <Tabs.Panel id="installed" className="flex-1 flex flex-col min-h-0">
+            <Tabs.Panel id="installed" className="flex-1 flex flex-col overflow-hidden">
               <InstalledSkillsTab
                 installedSkills={installedSkills}
                 isLoadingInstalled={isLoadingInstalled}
@@ -133,7 +136,7 @@ export default function SkillsManagerModal() {
             </Tabs.Panel>
 
             {/* Discover Skills Panel */}
-            <Tabs.Panel id="discover" className="flex-1 flex flex-col min-h-0">
+            <Tabs.Panel id="discover" className="flex-1 flex flex-col overflow-hidden">
               <DiscoverSkillsTab
                 onSearch={handleSearch}
                 searchQuery={searchQuery}
@@ -146,7 +149,7 @@ export default function SkillsManagerModal() {
               />
             </Tabs.Panel>
           </Tabs>
-        </div>
+        </Modal.Body>
       </TabModal>
 
       {/* Installer Options Modal */}

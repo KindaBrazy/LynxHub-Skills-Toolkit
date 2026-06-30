@@ -1,16 +1,21 @@
 import {
+  Autocomplete,
   Button,
   Checkbox,
-  CheckboxGroup,
   Chip,
   Description,
+  EmptyState,
   Label,
+  ListBox,
   ModalCloseTrigger,
-  ScrollShadow,
+  SearchField,
   Separator,
   Spinner,
   Tabs,
+  Tag,
+  TagGroup,
   Typography,
+  useFilter,
 } from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
 import {CheckCircle, CloudStorage, InfoCircle, ShieldCheck} from '@solar-icons/react-perf/BoldDuotone';
@@ -27,6 +32,8 @@ interface SkillInstallerModalProps {
 }
 
 export default function SkillInstallerModal({selectedSkill, onClose, onInstallSuccess}: SkillInstallerModalProps) {
+  const {contains} = useFilter({sensitivity: 'base'});
+
   const [installScope, setInstallScope] = useState<'project' | 'global'>('project');
   const [installMethod, setInstallMethod] = useState<'symlink' | 'copy'>('symlink');
   const [supportedAgents, setSupportedAgents] = useState<{name: string; displayName: string}[]>([]);
@@ -34,6 +41,10 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   const [allAgents, setAllAgents] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [installResult, setInstallResult] = useState<{success: boolean; message: string} | null>(null);
+
+  const onRemoveTags = useCallback((keys: Set<any>) => {
+    setSelectedAgents(prev => prev.filter(key => !keys.has(key)));
+  }, []);
 
   // Security Audits state
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
@@ -179,24 +190,61 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
           </div>
 
           {!allAgents && (
-            <ScrollShadow>
-              <CheckboxGroup
-                value={selectedAgents}
-                onChange={setSelectedAgents}
-                aria-label="Target AI Agents"
-                className="grid grid-cols-2 gap-2 mt-1">
-                {supportedAgents.map(agent => (
-                  <Checkbox key={agent.name} value={agent.name} variant="secondary">
-                    <Checkbox.Content>
-                      <Checkbox.Control>
-                        <Checkbox.Indicator />
-                      </Checkbox.Control>
-                      <span className="text-xs">{agent.displayName}</span>
-                    </Checkbox.Content>
-                  </Checkbox>
-                ))}
-              </CheckboxGroup>
-            </ScrollShadow>
+            <Autocomplete
+              variant="secondary"
+              value={selectedAgents}
+              selectionMode="multiple"
+              placeholder="Select target agents"
+              onChange={(keys: any) => setSelectedAgents(keys as string[])}
+              fullWidth>
+              <Autocomplete.Trigger>
+                <Autocomplete.Value>
+                  {({defaultChildren, isPlaceholder, state}: any) => {
+                    if (isPlaceholder || state.selectedItems.length === 0) {
+                      return defaultChildren;
+                    }
+
+                    const selectedItemsKeys = state.selectedItems.map((item: any) => item.key);
+
+                    return (
+                      <TagGroup size="sm" onRemove={onRemoveTags}>
+                        <TagGroup.List>
+                          {selectedItemsKeys.map((selectedItemKey: any) => {
+                            const agent = supportedAgents.find(s => s.name === selectedItemKey);
+                            if (!agent) return null;
+                            return (
+                              <Tag id={agent.name} key={agent.name}>
+                                {agent.displayName}
+                              </Tag>
+                            );
+                          })}
+                        </TagGroup.List>
+                      </TagGroup>
+                    );
+                  }}
+                </Autocomplete.Value>
+                <Autocomplete.Indicator />
+              </Autocomplete.Trigger>
+              <Autocomplete.Popover>
+                <Autocomplete.Filter filter={contains}>
+                  <SearchField name="search" variant="secondary">
+                    <SearchField.Group>
+                      <SearchField.SearchIcon />
+                      <SearchField.Input placeholder="Search agents..." />
+                      <SearchField.ClearButton />
+                    </SearchField.Group>
+                  </SearchField>
+                  <ListBox renderEmptyState={() => <EmptyState>No agents found</EmptyState>}>
+                    {supportedAgents.map(agent => (
+                      <ListBox.Item id={agent.name} key={agent.name} textValue={agent.displayName}>
+                        {agent.displayName}
+                        <ListBox.ItemIndicator />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </Autocomplete.Filter>
+              </Autocomplete.Popover>
+            </Autocomplete>
           )}
         </div>
 

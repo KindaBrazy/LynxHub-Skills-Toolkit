@@ -130,7 +130,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   }, [selectedSkill, installScope, installMethod, selectedAgents, allAgents, onInstallSuccess]);
 
   return (
-    <TabModal size="lg" isOpen={!!selectedSkill} onOpenChange={open => !open && onClose()}>
+    <TabModal size="lg" isOpen={!!selectedSkill} dialogClassName="max-w-3xl" onOpenChange={open => !open && onClose()}>
       <ModalCloseTrigger onPress={onClose} />
       <div className="flex flex-col gap-4 font-Nunito">
         <div className="flex items-center gap-2">

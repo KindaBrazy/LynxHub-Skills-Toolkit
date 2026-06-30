@@ -109,9 +109,9 @@ export default function DiscoverSkillsTab({
                 key={skill.id}
                 variant="secondary"
                 className="border border-border hover:border-foreground/10 transition flex flex-col justify-between">
-                <Card.Header className="flex justify-between items-start gap-2">
+                <Card.Header className="flex justify-between items-start gap-2 overflow-hidden">
                   <div className="min-w-0 flex-1">
-                    <Typography title={skill.name} className="font-bold text-base truncate">
+                    <Typography title={skill.name} className="font-bold text-base text-wrap line-clamp-2">
                       {skill.name}
                     </Typography>
                     <div className="flex items-center gap-1 mt-0.5">

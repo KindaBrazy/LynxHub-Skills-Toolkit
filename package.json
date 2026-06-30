@@ -1,11 +1,11 @@
 {
-  "name": "lynxhub-extension-template",
-  "version": "1.0.0",
+  "name": "lynxhub-skills-toolkit",
+  "version": "0.1.0",
   "author": {
-    "name": "Your Name",
-    "url": "https://github.com/your-username"
+    "name": "KindaBrazy",
+    "url": "https://github.com/KindaBrazy"
   },
-  "homepage": "https://github.com/your-username/lynxhub-extension-template",
-  "repository": "https://github.com/your-username/lynxhub-extension-template",
+  "homepage": "https://github.com/KindaBrazy/LynxHub-Skills-Toolkit",
+  "repository": "https://github.com/KindaBrazy/LynxHub-Skills-Toolkit",
   "type": "module"
 }

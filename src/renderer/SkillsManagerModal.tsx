@@ -90,8 +90,8 @@ export default function SkillsManagerModal() {
 
   return (
     <>
-      <TabModal size="cover" isOpen={isOpen} onOpenChange={setIsOpen} isDismissable>
-        <Modal.Body className="flex flex-col px-0 h-full max-h-full">
+      <TabModal size="cover" isOpen={isOpen} dialogClassName="pb-0" onOpenChange={setIsOpen} isDismissable>
+        <Modal.Body className="flex flex-col px-0 h-full max-h-full p-0">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-import {Description, Modal, Separator, Tabs, Typography} from '@heroui/react';
+import {Description, Modal, Tabs, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
 import {CloudStorage, Compass, Inbox} from '@solar-icons/react-perf/BoldDuotone';
 import {useCallback, useEffect, useState} from 'react';
@@ -105,8 +105,6 @@ export default function SkillsManagerModal() {
             </div>
             <Modal.CloseTrigger />
           </div>
-
-          <Separator className="mb-6 opacity-20" />
 
           {/* Navigation Tabs */}
           <Tabs

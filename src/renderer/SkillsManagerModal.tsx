@@ -90,12 +90,12 @@ export default function SkillsManagerModal() {
 
   return (
     <>
-      <TabModal size="cover" isOpen={isOpen} onOpenChange={setIsOpen}>
-        <Modal.Body className="flex flex-col px-0">
+      <TabModal size="cover" isOpen={isOpen} onOpenChange={setIsOpen} isDismissable>
+        <Modal.Body className="flex flex-col px-0 h-full max-h-full">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <CloudStorage className="size-8 text-LynxPurple" />
+              <CloudStorage aria-hidden="true" className="size-8 text-LynxPurple" />
               <div>
                 <Typography className="text-xl font-bold tracking-wide">Skills Manager</Typography>
                 <Description className="text-xs text-semi-muted mt-0.5">
@@ -111,8 +111,9 @@ export default function SkillsManagerModal() {
           {/* Navigation Tabs */}
           <Tabs
             selectedKey={activeTab}
-            className="pb-4 overflow-hidden"
-            onSelectionChange={key => setActiveTab(String(key))}>
+            aria-label="Skills Manager navigation"
+            onSelectionChange={key => setActiveTab(String(key))}
+            className="flex-1 flex flex-col min-h-0 pb-4 overflow-hidden">
             <Tabs.ListContainer className="w-fit">
               <Tabs.List>
                 <Tabs.Tab id="installed">
@@ -127,8 +128,9 @@ export default function SkillsManagerModal() {
             </Tabs.ListContainer>
 
             {/* Installed Skills Panel */}
-            <Tabs.Panel id="installed" className="flex-1 flex flex-col overflow-hidden">
+            <Tabs.Panel id="installed" className="flex-1 flex flex-col overflow-hidden min-h-0">
               <InstalledSkillsTab
+                onSwitchTab={setActiveTab}
                 installedSkills={installedSkills}
                 isLoadingInstalled={isLoadingInstalled}
                 onRefreshInstalled={loadInstalledSkills}
@@ -136,7 +138,7 @@ export default function SkillsManagerModal() {
             </Tabs.Panel>
 
             {/* Discover Skills Panel */}
-            <Tabs.Panel id="discover" className="flex-1 flex flex-col overflow-hidden">
+            <Tabs.Panel id="discover" className="flex-1 flex flex-col overflow-hidden min-h-0">
               <DiscoverSkillsTab
                 onSearch={handleSearch}
                 searchQuery={searchQuery}

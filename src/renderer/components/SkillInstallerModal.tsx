@@ -114,6 +114,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
                 <Tabs
                   className="w-full"
                   selectedKey={installScope}
+                  aria-label="Installation Scope"
                   onSelectionChange={key => setInstallScope(key as any)}>
                   <Tabs.ListContainer>
                     <Tabs.List className="w-full bg-white/5 p-1 rounded-lg">
@@ -130,6 +131,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
                 <Tabs
                   className="w-full"
                   selectedKey={installMethod}
+                  aria-label="Installation Method"
                   onSelectionChange={key => setInstallMethod(key as any)}>
                   <Tabs.ListContainer>
                     <Tabs.List className="w-full bg-white/5 p-1 rounded-lg">
@@ -153,6 +155,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
                   <CheckboxGroup
                     value={selectedAgents}
                     onChange={setSelectedAgents}
+                    aria-label="Target AI Agents"
                     className="grid grid-cols-2 gap-2 mt-1">
                     {SUPPORTED_AGENTS.map(agent => (
                       <Checkbox key={agent} value={agent}>

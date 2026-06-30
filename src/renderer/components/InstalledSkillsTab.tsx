@@ -1,6 +1,8 @@
 import {Button, Chip, Description, ScrollShadow, Spinner, Table, Typography} from '@heroui/react';
+import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {InfoCircle, TrashBinMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
 import {Refresh} from '@solar-icons/react-perf/Linear';
+import {ExternalLink} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {InstalledSkill} from '../types';
@@ -11,12 +13,14 @@ interface InstalledSkillsTabProps {
   installedSkills: InstalledSkill[];
   isLoadingInstalled: boolean;
   onRefreshInstalled: () => Promise<void>;
+  onSwitchTab?: (tabKey: string) => void;
 }
 
 export default function InstalledSkillsTab({
   installedSkills,
   isLoadingInstalled,
   onRefreshInstalled,
+  onSwitchTab,
 }: InstalledSkillsTabProps) {
   const [updatingSkills, setUpdatingSkills] = useState<Record<string, boolean>>({});
   const [deletingSkills, setDeletingSkills] = useState<Record<string, boolean>>({});
@@ -28,12 +32,14 @@ export default function InstalledSkillsTab({
       try {
         const res = await ipc.invoke('skills-manager:update', name, isGlobal);
         if (res.success) {
+          bottomToast.success(`Successfully updated skill "${name}"!`);
           await onRefreshInstalled();
         } else {
-          alert(`Failed to update skill: ${res.error}`);
+          bottomToast.danger(`Failed to update skill: ${res.error}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Update error:', err);
+        bottomToast.danger(`Update error: ${err.message || String(err)}`);
       } finally {
         setUpdatingSkills(prev => ({...prev, [name]: false}));
       }
@@ -56,12 +62,14 @@ export default function InstalledSkillsTab({
       try {
         const res = await ipc.invoke('skills-manager:remove', name, isGlobal);
         if (res.success) {
+          bottomToast.success(`Successfully removed skill "${name}".`);
           await onRefreshInstalled();
         } else {
-          alert(`Failed to remove skill: ${res.error}`);
+          bottomToast.danger(`Failed to remove skill: ${res.error}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Remove error:', err);
+        bottomToast.danger(`Remove error: ${err.message || String(err)}`);
       } finally {
         setDeletingSkills(prev => ({...prev, [name]: false}));
         setConfirmDelete(prev => ({...prev, [name]: false}));
@@ -86,11 +94,19 @@ export default function InstalledSkillsTab({
           'flex flex-col items-center justify-center py-20 border' +
           ' border-dashed border-white/10 rounded-2xl bg-white/5'
         }>
-        <InfoCircle className="size-10 text-semi-muted mb-3" />
+        <InfoCircle aria-hidden="true" className="size-10 text-semi-muted mb-3" />
         <Typography className="text-sm font-semibold">No skills installed yet</Typography>
         <Description className="text-xs text-semi-muted mt-1">
           Head over to the 'Discover Skills' tab to install capabilities for your agents.
         </Description>
+        {onSwitchTab && (
+          <Button
+            size="sm"
+            onPress={() => onSwitchTab('discover')}
+            className="mt-4 bg-LynxPurple text-white px-5 hover:opacity-90 transition">
+            Browse Skills
+          </Button>
+        )}
       </div>
     );
   }
@@ -136,8 +152,27 @@ export default function InstalledSkillsTab({
                         )}
                       </div>
                     </Table.Cell>
-                    <Table.Cell className="font-JetBrainsMono text-xs text-semi-muted max-w-50 truncate">
-                      {skill.path}
+                    <Table.Cell className="max-w-xs">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span title={skill.path} className="font-JetBrainsMono text-xs text-semi-muted truncate flex-1">
+                          {skill.path}
+                        </span>
+                        <span title="Open folder in Explorer">
+                          <Button
+                            className={
+                              'h-6 w-6 min-w-6 p-0 hover:bg-white/10' +
+                              ' opacity-60 hover:opacity-100 transition' +
+                              ' rounded-md shrink-0 flex items-center justify-center'
+                            }
+                            size="sm"
+                            variant="ghost"
+                            aria-label="Open folder in Explorer"
+                            onPress={() => ipc.send('app:openPath', skill.path)}
+                            isIconOnly>
+                            <ExternalLink className="size-3 text-semi-muted" />
+                          </Button>
+                        </span>
+                      </div>
                     </Table.Cell>
                     <Table.Cell className="text-right">
                       <div className="inline-flex gap-2">

@@ -112,7 +112,7 @@ export default function InstalledSkillsTab({
 
   return (
     <div className="size-full overflow-hidden">
-      <ScrollShadow className="size-full overflow-y-auto">
+      <ScrollShadow className="size-full overflow-y-auto px-2">
         <Table className="w-full">
           <Table.ScrollContainer>
             <Table.Content>

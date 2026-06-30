@@ -114,7 +114,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
             aria-label="Installation Scope"
             onSelectionChange={key => setInstallScope(key as any)}>
             <Tabs.ListContainer>
-              <Tabs.List className="w-full bg-white/5 p-1 rounded-lg">
+              <Tabs.List>
                 <Tabs.Tab id="project">Project-scoped</Tabs.Tab>
                 <Tabs.Tab id="global">Global (User-level)</Tabs.Tab>
               </Tabs.List>
@@ -131,7 +131,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
             aria-label="Installation Method"
             onSelectionChange={key => setInstallMethod(key as any)}>
             <Tabs.ListContainer>
-              <Tabs.List className="w-full bg-white/5 p-1 rounded-lg">
+              <Tabs.List>
                 <Tabs.Tab id="symlink">Symlink (Recommended)</Tabs.Tab>
                 <Tabs.Tab id="copy">Copy Files</Tabs.Tab>
               </Tabs.List>

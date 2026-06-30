@@ -99,7 +99,7 @@ export default function DiscoverSkillsTab({
         <ScrollShadow
           className={
             'grid grid-cols-1 gap-4 overflow-y-auto flex-1 min-h-0 pb-4' +
-            ' sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ' sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-2'
           }>
           {searchResults.map(skill => {
             const installed = isSkillInstalled(skill.name);

@@ -408,7 +408,7 @@ export default function DiscoverSkillsTab({
                               <Typography className="font-bold text-base leading-tight">{owner.owner}</Typography>
                               <Description className="text-[11px] text-semi-muted font-JetBrainsMono mt-0.5">
                                 {totalSkills} {totalSkills === 1 ? 'skill' : 'skills'} · {formatInstalls(totalInstalls)}
-                                installs
+                                {' Installs'}
                               </Description>
                             </div>
                           </div>

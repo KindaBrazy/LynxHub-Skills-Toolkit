@@ -45,7 +45,7 @@ const formatInstalls = (num: number): string => {
   if (num < 1000) {
     return num.toString();
   }
-  const suffixes = ['k', 'm', 'b', 't'];
+  const suffixes = ['K', 'M', 'B', 'T'];
   const magnitude = Math.min(Math.floor(Math.log10(num) / 3) - 1, suffixes.length - 1);
   if (magnitude < 0) return num.toString();
   const scaled = num / Math.pow(10, (magnitude + 1) * 3);
@@ -128,7 +128,7 @@ function SkillCard({skill, rank, installed, onSelect, activeSubTab}: SkillCardPr
       <Card.Content className="pb-3 pt-1 mt-auto">
         <div className="flex items-center gap-1.5 text-xs text-semi-muted font-JetBrainsMono">
           <Icon className={`size-3.5 ${iconClass}`} />
-          <span>{skill.installs > 0 ? `${formatInstalls(skill.installs)} downloads` : 'New skill'}</span>
+          <span>{skill.installs > 0 ? `${formatInstalls(skill.installs)} Downloads` : 'New skill'}</span>
         </div>
       </Card.Content>
 

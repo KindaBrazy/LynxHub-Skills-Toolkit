@@ -1,6 +1,6 @@
 import {Description, Modal, Separator, Tabs, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
-import {CloudStorage} from '@solar-icons/react-perf/BoldDuotone';
+import {CloudStorage, Compass, Inbox} from '@solar-icons/react-perf/BoldDuotone';
 import {useCallback, useEffect, useState} from 'react';
 
 import DiscoverSkillsTab from './components/DiscoverSkillsTab';
@@ -116,11 +116,13 @@ export default function SkillsManagerModal() {
             className="flex-1 flex flex-col min-h-0 pb-4 overflow-hidden">
             <Tabs.ListContainer className="w-fit">
               <Tabs.List>
-                <Tabs.Tab id="installed">
+                <Tabs.Tab id="installed" className="flex items-center gap-2">
+                  <Inbox className="size-4" />
                   Installed
                   <Tabs.Indicator />
                 </Tabs.Tab>
-                <Tabs.Tab id="discover">
+                <Tabs.Tab id="discover" className="flex items-center gap-2">
+                  <Compass className="size-4" />
                   Discover
                   <Tabs.Indicator />
                 </Tabs.Tab>

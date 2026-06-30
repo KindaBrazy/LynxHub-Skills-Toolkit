@@ -1,8 +1,7 @@
-import {Button, Chip, Description, ScrollShadow, Spinner, Table, Typography} from '@heroui/react';
+import {Button, Chip, Description, ScrollShadow, Spinner, Table, Tooltip, Typography} from '@heroui/react';
 import {bottomToast} from '@lynx/layouts/ToastProviders';
-import {InfoCircle, TrashBinMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
+import {InfoCircle, TrashBin2} from '@solar-icons/react-perf/BoldDuotone';
 import {Refresh} from '@solar-icons/react-perf/Linear';
-import {ExternalLink} from 'lucide-react';
 import {useCallback, useState} from 'react';
 
 import {InstalledSkill} from '../types';
@@ -140,62 +139,88 @@ export default function InstalledSkillsTab({
                       </Chip>
                     </Table.Cell>
                     <Table.Cell>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 items-center max-w-44">
                         {skill.agents && skill.agents.length > 0 ? (
-                          skill.agents.map(agent => (
-                            <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5">
-                              {agent}
-                            </Chip>
-                          ))
+                          skill.agents.length <= 2 ? (
+                            skill.agents.map(agent => (
+                              <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5 shrink-0">
+                                {agent}
+                              </Chip>
+                            ))
+                          ) : (
+                            <>
+                              {skill.agents.slice(0, 2).map(agent => (
+                                <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5 shrink-0">
+                                  {agent}
+                                </Chip>
+                              ))}
+                              <Tooltip delay={300}>
+                                <Tooltip.Trigger>
+                                  <Chip
+                                    className={
+                                      'bg-white/5 hover:bg-white/15 text-white/70' +
+                                      ' text-[10px] h-5 py-0.5 cursor-pointer shrink-0'
+                                    }>
+                                    +{skill.agents.length - 2} more
+                                  </Chip>
+                                </Tooltip.Trigger>
+                                <Tooltip.Content showArrow>
+                                  <Tooltip.Arrow />
+                                  <div className="flex flex-col gap-1 p-1">
+                                    {skill.agents.slice(2).map(agent => (
+                                      <span key={agent} className="text-xs font-semibold">
+                                        {agent}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </>
+                          )
                         ) : (
                           <span className="text-xs text-semi-muted">None</span>
                         )}
                       </div>
                     </Table.Cell>
-                    <Table.Cell className="max-w-xs">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span title={skill.path} className="font-JetBrainsMono text-xs text-semi-muted truncate flex-1">
-                          {skill.path}
-                        </span>
-                        <span title="Open folder in Explorer">
+                    <Table.Cell className="">
+                      <Tooltip delay={300}>
+                        <Tooltip.Trigger>
                           <Button
                             className={
-                              'h-6 w-6 min-w-6 p-0 hover:bg-white/10' +
-                              ' opacity-60 hover:opacity-100 transition' +
-                              ' rounded-md shrink-0 flex items-center justify-center'
+                              'font-JetBrainsMono text-xs text-semi-muted hover:text-LynxBlue' +
+                              ' cursor-pointer h-auto justify-start border-none' +
+                              ' hover:bg-transparent font-normal text-left text-wrap line-clamp-1'
                             }
                             size="sm"
                             variant="ghost"
-                            aria-label="Open folder in Explorer"
-                            onPress={() => ipc.send('app:openPath', skill.path)}
-                            isIconOnly>
-                            <ExternalLink className="size-3 text-semi-muted" />
+                            onPress={() => ipc.send('app:openPath', skill.path)}>
+                            {skill.path}
                           </Button>
-                        </span>
-                      </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content showArrow>
+                          <Tooltip.Arrow />
+                          {skill.path}
+                        </Tooltip.Content>
+                      </Tooltip>
                     </Table.Cell>
                     <Table.Cell className="text-right">
                       <div className="inline-flex gap-2">
                         <Button
                           size="sm"
-                          variant="ghost"
-                          className="h-8 px-3 text-xs"
+                          variant="tertiary"
+                          className="text-xs"
                           onPress={() => handleUpdate(skill.name, skill.scope === 'global')}
                           isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name]}>
-                          {updatingSkills[skill.name] ? <Spinner size="sm" /> : <Refresh className="size-4 mr-1.5" />}
+                          {updatingSkills[skill.name] ? <Spinner size="sm" /> : <Refresh />}
                           Update
                         </Button>
                         <Button
                           size="sm"
-                          variant="ghost"
+                          className="text-xs"
+                          variant="danger-soft"
                           onPress={() => handleDelete(skill.name, skill.scope === 'global')}
-                          isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name]}
-                          className="h-8 px-3 text-xs border-danger/20 hover:bg-danger/20 hover:text-white">
-                          {deletingSkills[skill.name] ? (
-                            <Spinner size="sm" />
-                          ) : (
-                            <TrashBinMinimalistic className="size-4 mr-1.5" />
-                          )}
+                          isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name]}>
+                          {deletingSkills[skill.name] ? <Spinner size="sm" /> : <TrashBin2 />}
                           {confirmDelete[skill.name] ? 'Confirm?' : 'Remove'}
                         </Button>
                       </div>

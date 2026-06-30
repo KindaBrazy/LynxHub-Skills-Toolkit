@@ -30,6 +30,16 @@ export default defineConfig({
           } else {
             console.error('Could not find skills dist folder at', srcDir);
           }
+
+          const yamlSrcDir = resolve(__dirname, 'node_modules/yaml');
+          const yamlDestDir = resolve(__dirname, '../extension_out/main/skills/node_modules/yaml');
+          if (existsSync(yamlSrcDir)) {
+            mkdirSync(yamlDestDir, {recursive: true});
+            cpSync(yamlSrcDir, yamlDestDir, {recursive: true});
+            console.log('Successfully copied yaml dependency to extension_out/main/skills/node_modules/yaml');
+          } else {
+            console.error('Could not find yaml folder at', yamlSrcDir);
+          }
         },
       },
     ],

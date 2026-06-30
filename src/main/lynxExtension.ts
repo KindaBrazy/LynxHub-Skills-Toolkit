@@ -1,17 +1,63 @@
 import {MainIpcApi} from '@lynx_main/plugins/extensions/ipcWrapper';
 import {ExtensionMainApi, MainExtensionUtils} from '@lynx_main/plugins/extensions/types';
 import {exec} from 'child_process';
+import {app} from 'electron';
+import fs from 'fs';
+import path from 'path';
 import {promisify} from 'util';
 
 const execAsync = promisify(exec);
+
+function getSkillsCliPath(): string {
+  // Option 1: Production compiled path inside the plugin folder
+  // __dirname points to the scripts/main folder where mainEntry.cjs runs
+  if (typeof __dirname !== 'undefined') {
+    const prodPath = path.join(__dirname, 'skills', 'cli.mjs');
+    if (fs.existsSync(prodPath)) {
+      return prodPath;
+    }
+  }
+
+  // Option 2: Dev path inside workspace extension folder (e.g. extension/node_modules/skills/dist/cli.mjs)
+  const devPaths = [
+    path.join(process.cwd(), 'extension', 'node_modules', 'skills', 'dist', 'cli.mjs'),
+    path.join(app.getAppPath(), 'extension', 'node_modules', 'skills', 'dist', 'cli.mjs'),
+    ...(typeof __dirname !== 'undefined'
+      ? [
+          path.resolve(__dirname, '..', '..', 'node_modules', 'skills', 'dist', 'cli.mjs'),
+          path.resolve(__dirname, '..', '..', '..', 'node_modules', 'skills', 'dist', 'cli.mjs'),
+        ]
+      : []),
+  ];
+
+  for (const p of devPaths) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+
+  throw new Error('Could not find skills CLI script in dev or production directories.');
+}
+
+async function runSkillsCommand(args: string) {
+  const cliPath = getSkillsCliPath();
+  const cmd = `"${process.execPath}" "${cliPath}" ${args}`;
+  return execAsync(cmd, {
+    cwd: process.cwd(),
+    env: {
+      ...process.env,
+      ELECTRON_RUN_AS_NODE: '1',
+    },
+  });
+}
 
 export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainExtensionUtils, mainIpc: MainIpcApi) {
   lynxApi.listenForChannels(() => {
     // Handler: List installed skills (local or global)
     mainIpc.lynxIpc.handle('skills-manager:list', async (isGlobal: boolean) => {
       try {
-        const cmd = isGlobal ? 'npx skills list -g --json' : 'npx skills list --json';
-        const {stdout} = await execAsync(cmd, {cwd: process.cwd()});
+        const args = isGlobal ? 'list -g --json' : 'list --json';
+        const {stdout} = await runSkillsCommand(args);
         const jsonStart = stdout.indexOf('[');
         if (jsonStart === -1) return [];
         const jsonStr = stdout.slice(jsonStart);
@@ -40,12 +86,12 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
       'skills-manager:add',
       async (pkg: string, isGlobal: boolean, agent: string, copy: boolean) => {
         try {
-          let cmd = `npx skills add "${pkg}" -y`;
-          if (isGlobal) cmd += ' -g';
-          if (agent && agent !== '*') cmd += ` -a "${agent}"`;
-          if (copy) cmd += ' --copy';
+          let args = `add "${pkg}" -y`;
+          if (isGlobal) args += ' -g';
+          if (agent && agent !== '*') args += ` -a "${agent}"`;
+          if (copy) args += ' --copy';
 
-          const {stdout, stderr} = await execAsync(cmd, {cwd: process.cwd()});
+          const {stdout, stderr} = await runSkillsCommand(args);
           return {success: true, stdout, stderr};
         } catch (error: any) {
           console.error('Error adding skill:', error);
@@ -57,10 +103,10 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     // Handler: Remove/Uninstall a skill
     mainIpc.lynxIpc.handle('skills-manager:remove', async (name: string, isGlobal: boolean) => {
       try {
-        let cmd = `npx skills remove "${name}" -y`;
-        if (isGlobal) cmd += ' -g';
+        let args = `remove "${name}" -y`;
+        if (isGlobal) args += ' -g';
 
-        const {stdout, stderr} = await execAsync(cmd, {cwd: process.cwd()});
+        const {stdout, stderr} = await runSkillsCommand(args);
         return {success: true, stdout, stderr};
       } catch (error: any) {
         console.error('Error removing skill:', error);
@@ -71,10 +117,10 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     // Handler: Update a skill
     mainIpc.lynxIpc.handle('skills-manager:update', async (name: string, isGlobal: boolean) => {
       try {
-        let cmd = `npx skills update "${name}" -y`;
-        if (isGlobal) cmd += ' -g';
+        let args = `update "${name}" -y`;
+        if (isGlobal) args += ' -g';
 
-        const {stdout, stderr} = await execAsync(cmd, {cwd: process.cwd()});
+        const {stdout, stderr} = await runSkillsCommand(args);
         return {success: true, stdout, stderr};
       } catch (error: any) {
         console.error('Error updating skill:', error);

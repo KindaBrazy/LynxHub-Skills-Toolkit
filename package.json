@@ -7,5 +7,8 @@
   },
   "homepage": "https://github.com/KindaBrazy/LynxHub-Skills-Toolkit",
   "repository": "https://github.com/KindaBrazy/LynxHub-Skills-Toolkit",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "skills": "^1.5.14"
+  }
 }

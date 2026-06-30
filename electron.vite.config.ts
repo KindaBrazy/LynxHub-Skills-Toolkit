@@ -1,3 +1,5 @@
+import {cpSync, existsSync, mkdirSync} from 'node:fs';
+
 import federation from '@originjs/vite-plugin-federation';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -15,6 +17,22 @@ export default defineConfig({
         output: {entryFileNames: 'mainEntry.cjs', format: 'cjs'},
       },
     },
+    plugins: [
+      {
+        name: 'copy-skills',
+        closeBundle() {
+          const srcDir = resolve(__dirname, 'node_modules/skills/dist');
+          const destDir = resolve(__dirname, '../extension_out/main/skills');
+          if (existsSync(srcDir)) {
+            mkdirSync(destDir, {recursive: true});
+            cpSync(srcDir, destDir, {recursive: true});
+            console.log('Successfully copied skills CLI to extension_out/main/skills');
+          } else {
+            console.error('Could not find skills dist folder at', srcDir);
+          }
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@lynx_common': resolve(__dirname, '..', 'src/common'),

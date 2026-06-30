@@ -117,7 +117,7 @@ export default function SkillsManagerModal() {
             <Tabs.ListContainer className="w-fit">
               <Tabs.List>
                 <Tabs.Tab id="installed" className="flex items-center gap-2">
-                  <Inbox className="size-4" />
+                  <Inbox className="size-3.5" />
                   Installed
                   <Tabs.Indicator />
                 </Tabs.Tab>

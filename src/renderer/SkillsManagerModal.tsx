@@ -230,7 +230,7 @@ export default function SkillsManagerModal() {
   return (
     <>
       <TabModal size="cover" isOpen={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex flex-col h-full bg-LynxRaisinBlack text-white p-6 font-Nunito">
+        <div className="flex flex-col">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
@@ -242,28 +242,21 @@ export default function SkillsManagerModal() {
                 </Description>
               </div>
             </div>
-            <Button
-              onPress={() => {
-                setIsOpen(false);
-              }}
-              variant="ghost"
-              className="text-xs">
-              Close
-            </Button>
+            <Modal.CloseTrigger />
           </div>
 
           <Separator className="mb-6 opacity-20" />
 
           {/* Navigation Tabs */}
-          <Tabs selectedKey={activeTab} className="w-full mb-6" onSelectionChange={key => setActiveTab(String(key))}>
-            <Tabs.ListContainer>
-              <Tabs.List className="w-fit bg-white/5 p-1 rounded-xl">
+          <Tabs className="mb-6" selectedKey={activeTab} onSelectionChange={key => setActiveTab(String(key))}>
+            <Tabs.ListContainer className="w-fit">
+              <Tabs.List>
                 <Tabs.Tab id="installed">
-                  Installed Skills
+                  Installed
                   <Tabs.Indicator />
                 </Tabs.Tab>
                 <Tabs.Tab id="discover">
-                  Discover Skills
+                  Discover
                   <Tabs.Indicator />
                 </Tabs.Tab>
               </Tabs.List>
@@ -448,7 +441,7 @@ export default function SkillsManagerModal() {
       {/* Installer Options Modal */}
       <Modal isOpen={!!selectedSkill} onOpenChange={open => !open && setSelectedSkill(null)}>
         <Modal.Backdrop>
-          <Modal.Container size="md" className="bg-LynxRaisinBlack text-white rounded-2xl border border-white/10 p-6">
+          <Modal.Container size="md">
             <Modal.Dialog>
               <div className="flex flex-col gap-4 font-Nunito">
                 <div className="flex items-center gap-2">

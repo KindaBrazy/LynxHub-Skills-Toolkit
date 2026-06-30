@@ -24,6 +24,17 @@ const getGithubUrl = (source: string) => {
   return null;
 };
 
+const formatInstalls = (num: number): string => {
+  if (num < 1000) {
+    return num.toString();
+  }
+  const suffixes = ['k', 'm', 'b', 't'];
+  const magnitude = Math.min(Math.floor(Math.log10(num) / 3) - 1, suffixes.length - 1);
+  if (magnitude < 0) return num.toString();
+  const scaled = num / Math.pow(10, (magnitude + 1) * 3);
+  return `${Math.floor(scaled)}${suffixes[magnitude]}`;
+};
+
 export default function DiscoverSkillsTab({
   searchQuery,
   onSearchQueryChange,
@@ -128,7 +139,7 @@ export default function DiscoverSkillsTab({
                 </Card.Header>
                 <Card.Content className="pb-3 pt-1">
                   <Typography className="text-xs text-semi-muted">
-                    {skill.installs > 0 ? `${skill.installs.toLocaleString()} downloads` : 'New skill'}
+                    {skill.installs > 0 ? `${formatInstalls(skill.installs)} downloads` : 'New skill'}
                   </Typography>
                 </Card.Content>
                 <Card.Footer className="flex justify-end gap-2 border-t border-border-secondary/50 pt-3">

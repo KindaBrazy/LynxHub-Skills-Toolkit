@@ -1,5 +1,5 @@
 import {ToolsCard} from '@lynx/components/ToolsCard';
-import {Cpu} from '@solar-icons/react-perf/BoldDuotone';
+import {BookOpen} from 'lucide-react';
 
 export default function ToolsPage() {
   return (
@@ -8,7 +8,7 @@ export default function ToolsPage() {
         window.dispatchEvent(new CustomEvent('open-skills-manager'));
       }}
       title="Skills Manager"
-      icon={<Cpu className="size-6 text-white" />}
+      icon={<BookOpen className="size-6 text-emerald-400" />}
       description="Discover, install, update, and manage agent skills from the Vercel Labs registry."
     />
   );

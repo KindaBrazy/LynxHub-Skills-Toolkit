@@ -25,23 +25,23 @@ export function CreatorSkillsModal({
   return (
     <TabModal size="lg" isOpen={!!selectedOwnerForSkills} onOpenChange={open => !open && onClose()} isDismissable>
       <Modal.CloseTrigger onPress={onClose} />
-      <div className="font-Nunito flex flex-col max-h-[80vh]">
-        <div className="pb-3 border-b border-border/50 flex items-center gap-3">
-          <img
-            onError={e => {
-              (e.target as HTMLImageElement).src = 'https://github.com/github.png';
-            }}
-            alt={selectedOwnerForSkills?.owner}
-            className="size-10 rounded-full border border-border bg-black"
-            src={`https://github.com/${selectedOwnerForSkills?.owner}.png`}
-          />
-          <div>
-            <Typography className="text-lg font-bold">{selectedOwnerForSkills?.owner}</Typography>
-            <Description className="text-xs text-semi-muted font-JetBrainsMono">All Available Skills</Description>
-          </div>
+      <Modal.Header className="pb-3 border-b border-border/50 flex items-center gap-3 font-Nunito">
+        <img
+          onError={e => {
+            (e.target as HTMLImageElement).src = 'https://github.com/github.png';
+          }}
+          alt={selectedOwnerForSkills?.owner}
+          className="size-10 rounded-full border border-border bg-black"
+          src={`https://github.com/${selectedOwnerForSkills?.owner}.png`}
+        />
+        <div>
+          <Modal.Heading className="text-lg font-bold">{selectedOwnerForSkills?.owner}</Modal.Heading>
+          <Description className="text-xs text-semi-muted font-JetBrainsMono">All Available Skills</Description>
         </div>
+      </Modal.Header>
 
-        <ScrollShadow className="flex-1 overflow-y-auto pr-1 py-4 flex flex-col gap-4 mt-2">
+      <Modal.Body className="font-Nunito flex flex-col max-h-[70vh] pr-1 py-4">
+        <ScrollShadow className="flex-1 overflow-y-auto flex flex-col gap-4 mt-2">
           {selectedOwnerForSkills?.repos.map(r => (
             <div key={r.repo} className="flex flex-col gap-2">
               <Typography
@@ -108,7 +108,7 @@ export function CreatorSkillsModal({
             </div>
           ))}
         </ScrollShadow>
-      </div>
+      </Modal.Body>
     </TabModal>
   );
 }

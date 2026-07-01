@@ -7,7 +7,7 @@ import {
   EmptyState,
   Label,
   ListBox,
-  ModalCloseTrigger,
+  Modal,
   SearchField,
   Select,
   Separator,
@@ -15,7 +15,6 @@ import {
   Tabs,
   Tag,
   TagGroup,
-  Typography,
   useFilter,
 } from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
@@ -206,30 +205,30 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
   return (
     <TabModal
       size="lg"
-      dialogClassName="max-w-3xl"
       isOpen={selectedSkills.length > 0}
+      dialogClassName="max-w-3xl pb-3 px-1"
       onOpenChange={open => !open && onClose()}>
-      <ModalCloseTrigger onPress={onClose} />
-      <div className="flex flex-col gap-4">
+      <Modal.CloseTrigger onPress={onClose} />
+      <Modal.Header className="flex flex-col gap-y-1 px-4">
         <div className="flex items-center gap-2">
           <CloudStorage className="size-6 text-LynxPurple" />
-          <Typography className="text-lg font-bold">
+          <Modal.Heading className="text-lg font-bold">
             {selectedSkills.length > 1
               ? `Install ${selectedSkills.length} Skills`
               : `Install ${selectedSkills[0]?.name}`}
-          </Typography>
+          </Modal.Heading>
         </div>
         <Description className="text-xs text-semi-muted">
           {selectedSkills.length > 1
             ? `Configure target agents and scope for the ${selectedSkills.length} selected skills.`
             : 'Configure target agents and scope for this skill.'}
         </Description>
+      </Modal.Header>
 
+      <Modal.Body className="flex flex-col gap-4 px-4">
         {selectedSkills.length > 1 && (
           <div
-            className={
-              'flex flex-wrap gap-1.5 p-2 bg-surface-secondary' + ' rounded-2xl' + ' max-h-24 overflow-y-auto'
-            }>
+            className={'flex flex-wrap gap-1.5 p-2 bg-surface-secondary rounded-2xl max-h-24 overflow-y-auto shrink-0'}>
             {selectedSkills.map(s => (
               <Chip size="sm" key={s.id} variant="secondary" className="bg-surface px-1.5">
                 {s.name}
@@ -387,8 +386,6 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
         {/* Security Audits component */}
         <SecurityAudits auditReports={auditReports} isLoadingAudit={isLoadingAudit} />
 
-        <Separator className="opacity-10" />
-
         {/* Installation Result / Logger */}
         {isInstalling && (
           <div className="flex items-center gap-2 py-2">
@@ -412,22 +409,23 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
             <span className="break-all">{installResult.message}</span>
           </div>
         )}
+      </Modal.Body>
 
-        {/* Actions */}
-        <div className="flex justify-end">
-          <Button
-            isDisabled={
-              isInstalling ||
-              (!allAgents && selectedAgents.length === 0) ||
-              (installScope === 'project' && !selectedProjectCwd)
-            }
-            size="sm"
-            onPress={handleStartInstall}
-            className="bg-LynxPurple text-white px-5">
-            {selectedSkills.length > 1 ? `Install ${selectedSkills.length} Skills` : 'Install Skill'}
-          </Button>
-        </div>
-      </div>
+      <Separator className="opacity-10" />
+
+      <Modal.Footer className="pt-3">
+        <Button
+          isDisabled={
+            isInstalling ||
+            (!allAgents && selectedAgents.length === 0) ||
+            (installScope === 'project' && !selectedProjectCwd)
+          }
+          size="sm"
+          onPress={handleStartInstall}
+          className="bg-LynxPurple text-white px-5">
+          {selectedSkills.length > 1 ? `Install ${selectedSkills.length} Skills` : 'Install Skill'}
+        </Button>
+      </Modal.Footer>
     </TabModal>
   );
 }

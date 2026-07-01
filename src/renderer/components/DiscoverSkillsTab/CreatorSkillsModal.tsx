@@ -26,12 +26,18 @@ export function CreatorSkillsModal({
   onToggleSelectSkill,
 }: CreatorSkillsModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [limit, setLimit] = useState(30);
 
   useEffect(() => {
     if (selectedOwnerForSkills) {
       setSearchQuery('');
+      setLimit(30);
     }
   }, [selectedOwnerForSkills]);
+
+  useEffect(() => {
+    setLimit(30);
+  }, [searchQuery]);
 
   const filteredRepos =
     selectedOwnerForSkills?.repos
@@ -47,6 +53,25 @@ export function CreatorSkillsModal({
         };
       })
       .filter(r => r.skills.length > 0) || [];
+
+  const totalCount = filteredRepos.reduce((acc, r) => acc + r.skills.length, 0);
+
+  // Take only the first `limit` skills across all filtered repos
+  let renderedCount = 0;
+  const reposToRender: typeof filteredRepos = [];
+  for (const r of filteredRepos) {
+    if (renderedCount >= limit) break;
+    const skillsToTake = r.skills.slice(0, limit - renderedCount);
+    if (skillsToTake.length > 0) {
+      reposToRender.push({
+        ...r,
+        skills: skillsToTake,
+      });
+      renderedCount += skillsToTake.length;
+    }
+  }
+
+  const hasMore = totalCount > renderedCount;
 
   return (
     <TabModal
@@ -114,78 +139,95 @@ export function CreatorSkillsModal({
               <Description className="text-xs">Try searching for a different keyword or name</Description>
             </div>
           ) : (
-            filteredRepos.map(r => (
-              <div key={r.repo} className="flex flex-col gap-3">
-                <Typography
-                  className={
-                    'text-xs font-semibold text-semi-muted font-JetBrainsMono ' +
-                    'bg-foreground/5 px-2.5 py-1 rounded-lg w-fit border border-border-secondary/20'
-                  }>
-                  {r.repo}
-                </Typography>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pl-1">
-                  {r.skills.map(skill => {
-                    const registrySkill: RegistrySkill = {
-                      id: `${r.repo}/${skill.name}`,
-                      name: skill.name,
-                      installs: skill.installs,
-                      source: r.repo,
-                    };
-                    const installed = isSkillInstalled(skill.name);
-                    const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
-                    return (
-                      <div
-                        className={
-                          'flex items-center gap-3 p-3 rounded-2xl bg-surface/30 transition-all duration-200' +
-                          ' border cursor-pointer hover:shadow-md hover:shadow-black/5 active:scale-[0.99] ' +
-                          (installed
-                            ? 'border-success/30 bg-success/5 hover:bg-success/10'
-                            : 'border-border-secondary/40 hover:border-foreground/10 hover:bg-foreground/5')
-                        }
-                        key={`${r.repo}-${skill.name}`}
-                        onClick={() => onToggleSelectSkill(registrySkill)}>
-                        <Checkbox
-                          variant="secondary"
-                          isSelected={isSelected}
-                          aria-label={`Select ${skill.name}`}
-                          onChange={() => onToggleSelectSkill(registrySkill)}>
-                          <Checkbox.Content>
-                            <Checkbox.Control>
-                              <Checkbox.Indicator />
-                            </Checkbox.Control>
-                          </Checkbox.Content>
-                        </Checkbox>
-                        <div className="flex-1 min-w-0 pr-1">
-                          <Typography className="text-sm font-bold truncate text-foreground">{skill.name}</Typography>
-                          <Typography className="text-xs text-semi-muted truncate font-JetBrainsMono mt-0.5">
-                            {formatInstalls(skill.installs)} installs
-                          </Typography>
-                        </div>
-                        <Button
-                          onPress={() => {
-                            onClose();
-                            onSelectSkill(registrySkill);
-                          }}
+            <>
+              {reposToRender.map(r => (
+                <div key={r.repo} className="flex flex-col gap-3">
+                  <Typography
+                    className={
+                      'text-xs font-semibold text-semi-muted font-JetBrainsMono ' +
+                      'bg-foreground/5 px-2.5 py-1 rounded-lg w-fit border border-border-secondary/20'
+                    }>
+                    {r.repo}
+                  </Typography>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pl-1">
+                    {r.skills.map(skill => {
+                      const registrySkill: RegistrySkill = {
+                        id: `${r.repo}/${skill.name}`,
+                        name: skill.name,
+                        installs: skill.installs,
+                        source: r.repo,
+                      };
+                      const installed = isSkillInstalled(skill.name);
+                      const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
+                      return (
+                        <div
                           className={
-                            'h-8 w-8 min-w-8 hover:bg-foreground/10 rounded-xl' +
-                            ' flex items-center justify-center shrink-0'
+                            'flex items-center gap-3 p-3 rounded-2xl bg-surface/30 transition-all duration-200' +
+                            ' border cursor-pointer hover:shadow-md hover:shadow-black/5 active:scale-[0.99] ' +
+                            (installed
+                              ? 'border-success/30 bg-success/5 hover:bg-success/10'
+                              : 'border-border-secondary/40 hover:border-foreground/10 hover:bg-foreground/5')
                           }
-                          size="sm"
-                          variant="ghost"
-                          onClick={e => e.stopPropagation()}
-                          isIconOnly>
-                          {installed ? (
-                            <SettingsMinimalistic className="size-4 text-semi-muted" />
-                          ) : (
-                            <Download className="size-4 text-foreground" />
-                          )}
-                        </Button>
-                      </div>
-                    );
-                  })}
+                          key={`${r.repo}-${skill.name}`}
+                          onClick={() => onToggleSelectSkill(registrySkill)}>
+                          <Checkbox
+                            variant="secondary"
+                            isSelected={isSelected}
+                            aria-label={`Select ${skill.name}`}
+                            onChange={() => onToggleSelectSkill(registrySkill)}>
+                            <Checkbox.Content>
+                              <Checkbox.Control>
+                                <Checkbox.Indicator />
+                              </Checkbox.Control>
+                            </Checkbox.Content>
+                          </Checkbox>
+                          <div className="flex-1 min-w-0 pr-1">
+                            <Typography className="text-sm font-bold truncate text-foreground">{skill.name}</Typography>
+                            <Typography className="text-xs text-semi-muted truncate font-JetBrainsMono mt-0.5">
+                              {formatInstalls(skill.installs)} installs
+                            </Typography>
+                          </div>
+                          <Button
+                            onPress={() => {
+                              onClose();
+                              onSelectSkill(registrySkill);
+                            }}
+                            className={
+                              'h-8 w-8 min-w-8 hover:bg-foreground/10 rounded-xl' +
+                              ' flex items-center justify-center shrink-0'
+                            }
+                            size="sm"
+                            variant="ghost"
+                            onClick={e => e.stopPropagation()}
+                            isIconOnly>
+                            {installed ? (
+                              <SettingsMinimalistic className="size-4 text-semi-muted" />
+                            ) : (
+                              <Download className="size-4 text-foreground" />
+                            )}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+
+              {hasMore && (
+                <div className="flex justify-center mt-4 pb-6">
+                  <Button
+                    className={
+                      'px-8 py-2 font-bold text-xs bg-foreground/5 hover:bg-foreground/10' +
+                      ' border border-border-secondary/30 rounded-xl hover:border-LynxBlue/30' +
+                      ' text-foreground transition-all duration-200'
+                    }
+                    variant="secondary"
+                    onPress={() => setLimit(prev => prev + 30)}>
+                    Load More Skills (Showing {renderedCount} of {totalCount})
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </ScrollShadow>
       </Modal.Body>

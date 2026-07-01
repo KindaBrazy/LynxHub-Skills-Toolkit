@@ -1,8 +1,10 @@
 import type {Selection} from '@heroui/react';
 import {
+  Accordion,
   Button,
   Checkbox,
   Chip,
+  cn,
   Description,
   Dropdown,
   Label,
@@ -18,7 +20,7 @@ import {
 } from '@heroui/react';
 import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {CloudStorage, Folder, InfoCircle, Laptop, TrashBin2, User} from '@solar-icons/react-perf/BoldDuotone';
-import {Refresh, Settings} from '@solar-icons/react-perf/Linear';
+import {AltArrowDown, Refresh, Settings} from '@solar-icons/react-perf/Linear';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {InstalledSkill} from '../types';
@@ -42,6 +44,7 @@ export default function InstalledSkillsTab({
   const [deletingSkills, setDeletingSkills] = useState<Record<string, boolean>>({});
   const [confirmDelete, setConfirmDelete] = useState<Record<string, boolean>>({});
   const [groupBy, setGroupBy] = useState<string>('all');
+  const [expandedKeys, setExpandedKeys] = useState<Set<any>>(new Set());
 
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set<any>());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
@@ -392,6 +395,15 @@ export default function InstalledSkillsTab({
     if (groupBy === 'agents') return agentGroups;
     return [];
   }, [groupBy, folderGroups, scopeGroups, agentGroups]);
+
+  // Expand the first group and collapse others by default when currentGroups changes
+  useEffect(() => {
+    if (currentGroups.length > 0) {
+      setExpandedKeys(new Set([currentGroups[0].id]));
+    } else {
+      setExpandedKeys(new Set());
+    }
+  }, [currentGroups]);
 
   const handleUpdate = useCallback(
     async (name: string, isGlobal: boolean, path?: string) => {
@@ -774,11 +786,11 @@ export default function InstalledSkillsTab({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Folder className="size-4 text-LynxBlue" />
-                        <span className="text-xs font-semibold text-white/90">Project Folders</span>
+                        <span className="text-xs font-semibold text-foreground/90">Project Folders</span>
                         <Chip
                           size="sm"
                           variant="secondary"
-                          className="bg-white/10 text-white/80 text-[10px] h-5 px-1.5 py-0">
+                          className="bg-foreground/10 text-foreground/80 text-[10px] h-5 px-1.5 py-0">
                           {projectDirs.length}
                         </Chip>
                       </div>
@@ -787,7 +799,7 @@ export default function InstalledSkillsTab({
                     <div
                       className={
                         'flex flex-col gap-1.5 max-h-48 overflow-y-auto' +
-                        ' bg-surface-secondary border border-white/5 rounded-2xl p-2'
+                        ' bg-surface-secondary border border-foreground/5 rounded-2xl p-2'
                       }>
                       {projectDirs.length === 0 ? (
                         <span className="text-xs text-semi-muted text-center py-4">No project folders registered</span>
@@ -798,17 +810,21 @@ export default function InstalledSkillsTab({
                             <div
                               className={
                                 'flex items-center justify-between text-xs' +
-                                ' py-1 px-2 hover:bg-white/2 rounded-lg group'
+                                ' py-1 px-2 hover:bg-foreground/5 rounded-lg group'
                               }
                               key={dir}>
                               <div className="flex items-center gap-2 truncate">
-                                <span title={dir} className="font-JetBrainsMono text-[10px] text-white/70 truncate">
+                                <span
+                                  title={dir}
+                                  className="font-JetBrainsMono text-[10px] text-foreground/70 truncate">
                                   {dir}
                                 </span>
                                 <Chip
+                                  className={
+                                    'bg-foreground/5 text-foreground/50 text-[9px]' + ' h-4.5 py-0 px-1 shrink-0 ml-1.5'
+                                  }
                                   size="sm"
-                                  variant="secondary"
-                                  className="bg-white/5 text-white/50 text-[9px] h-4.5 py-0 px-1 shrink-0 ml-1.5">
+                                  variant="secondary">
                                   {count} skill{count === 1 ? '' : 's'}
                                 </Chip>
                               </div>
@@ -848,36 +864,70 @@ export default function InstalledSkillsTab({
             {groupBy === 'all' ? (
               renderSkillsTable(installedSkills)
             ) : (
-              <div className="flex flex-col gap-6">
+              <Accordion
+                expandedKeys={expandedKeys}
+                className="flex flex-col gap-6 w-full"
+                onExpandedChange={keys => setExpandedKeys(keys as Set<any>)}
+                hideSeparator
+                allowsMultipleExpanded>
                 {currentGroups.map(group => (
-                  <div key={group.id} className="border border-white/5 rounded-xl bg-white/2 p-4 flex flex-col gap-3">
-                    <div className="flex items-center gap-2 px-1">
-                      {group.icon}
-                      <Typography
-                        title={group.title}
-                        className="text-sm font-semibold text-white/90 font-JetBrainsMono truncate max-w-[60%]">
-                        {group.title}
-                      </Typography>
-                      <Chip size="sm" variant="secondary" className="bg-white/10 text-white/80 text-[10px] h-5 py-0">
-                        {group.skills.length}
-                      </Chip>
-                      {groupBy === 'folder' && (
-                        <Button
-                          className={
-                            'text-[10px] text-semi-muted hover:text-LynxBlue' +
-                            ' h-auto p-0 border-none bg-transparent min-w-0 ml-auto cursor-pointer hover:bg-transparent'
-                          }
-                          size="sm"
-                          variant="ghost"
-                          onPress={() => ipc.send('app:openPath', group.id)}>
-                          Open Folder
-                        </Button>
-                      )}
-                    </div>
-                    {renderSkillsTable(group.skills)}
-                  </div>
+                  <Accordion.Item
+                    id={group.id}
+                    key={group.id}
+                    className="border border-foreground/5 rounded-2xl bg-foreground/2 p-4 flex flex-col gap-3">
+                    <Accordion.Heading>
+                      <Accordion.Trigger
+                        className={
+                          'flex items-center justify-between px-1 cursor-pointer select-none w-full text-left' +
+                          ' bg-transparent hover:bg-transparent border-none p-0 focus:outline-none'
+                        }>
+                        <div className="flex items-center gap-2 truncate">
+                          <AltArrowDown
+                            className={cn(
+                              'size-4 text-semi-muted transition-transform duration-200 shrink-0',
+                              !expandedKeys.has(group.id) && '-rotate-90',
+                            )}
+                          />
+                          {group.icon}
+                          <Typography
+                            className={cn(
+                              'font-semibold font-JetBrainsMono truncate',
+                              groupBy === 'folder'
+                                ? 'text-[12px] text-foreground/90'
+                                : 'text-[13px] text-foreground/95',
+                            )}
+                            title={group.title}>
+                            {group.title}
+                          </Typography>
+                          <Chip
+                            size="sm"
+                            variant="secondary"
+                            className="bg-foreground/10 text-semi-muted text-[10px] h-5 py-0">
+                            {group.skills.length}
+                          </Chip>
+                        </div>
+                        {groupBy === 'folder' && (
+                          <div className="ml-auto" onClick={e => e.stopPropagation()}>
+                            <Button
+                              className={
+                                'text-[10px] text-semi-muted hover:text-LynxBlue' +
+                                ' h-auto p-0 border-none bg-transparent min-w-0 cursor-pointer hover:bg-transparent'
+                              }
+                              size="sm"
+                              variant="ghost"
+                              onPress={() => ipc.send('app:openPath', group.id)}>
+                              Open Folder
+                            </Button>
+                          </div>
+                        )}
+                      </Accordion.Trigger>
+                    </Accordion.Heading>
+                    <Accordion.Panel>
+                      <Accordion.Body className="pt-3">{renderSkillsTable(group.skills)}</Accordion.Body>
+                    </Accordion.Panel>
+                  </Accordion.Item>
                 ))}
-              </div>
+              </Accordion>
             )}
           </ScrollShadow>
         </div>

@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  Checkbox,
   Description,
   InputGroup,
   Label,
@@ -32,6 +33,7 @@ interface DiscoverSkillsTabProps {
   onSearch: () => Promise<void>;
   isSkillInstalled: (name: string) => boolean;
   onSelectSkill: (skill: RegistrySkill) => void;
+  onSelectSkills: (skills: RegistrySkill[]) => void;
 }
 
 export default function DiscoverSkillsTab({
@@ -43,6 +45,7 @@ export default function DiscoverSkillsTab({
   onSearch,
   isSkillInstalled,
   onSelectSkill,
+  onSelectSkills,
 }: DiscoverSkillsTabProps) {
   const [activeSubTab, setActiveSubTab] = useState<'all-time' | 'trending' | 'hot' | 'official'>('all-time');
   const [discoverSkills, setDiscoverSkills] = useState<RegistrySkill[]>([]);
@@ -51,6 +54,23 @@ export default function DiscoverSkillsTab({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [selectedOwnerForSkills, setSelectedOwnerForSkills] = useState<OfficialOwner | null>(null);
+
+  const [selectedSkills, setSelectedSkills] = useState<RegistrySkill[]>([]);
+
+  useEffect(() => {
+    setSelectedSkills([]);
+  }, [activeSubTab, searchQuery]);
+
+  const toggleSelectSkill = useCallback((skill: RegistrySkill) => {
+    setSelectedSkills(prev => {
+      const exists = prev.some(s => s.id === skill.id);
+      if (exists) {
+        return prev.filter(s => s.id !== skill.id);
+      } else {
+        return [...prev, skill];
+      }
+    });
+  }, []);
 
   const loadDiscoverData = useCallback(async (tab: typeof activeSubTab) => {
     setIsLoadingDiscover(true);
@@ -97,6 +117,19 @@ export default function DiscoverSkillsTab({
 
   const startIndex = (effectivePage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
+
+  const currentSkills = isSearching
+    ? searchResults.slice(startIndex, endIndex)
+    : activeSubTab === 'official'
+      ? []
+      : discoverSkills.slice(startIndex, endIndex);
+
+  const isAllSelected =
+    currentSkills.length > 0 && currentSkills.every(s => selectedSkills.some(selected => selected.id === s.id));
+  const isSomeSelected =
+    currentSkills.length > 0 &&
+    !isAllSelected &&
+    currentSkills.some(s => selectedSkills.some(selected => selected.id === s.id));
 
   const getPageNumbers = () => {
     const pages: (number | 'ellipsis')[] = [];
@@ -157,6 +190,31 @@ export default function DiscoverSkillsTab({
         </Button>
       </div>
 
+      {/* Bulk selection toolbar */}
+      {selectedSkills.length > 0 && (
+        <div
+          className={
+            'flex items-center justify-between px-3 py-2 mb-4 rounded-2xl' +
+            ' bg-LynxBlue/15 border border-LynxBlue/25 animate-in fade-in' +
+            ' slide-in-from-top-2 duration-200'
+          }>
+          <div className="flex items-center gap-3">
+            <Typography className="text-sm font-semibold text-LynxBlue">
+              {selectedSkills.length} skill{selectedSkills.length === 1 ? '' : 's'} selected for installation
+            </Typography>
+            <Button size="sm" variant="ghost" className="text-xs text-semi-muted" onPress={() => setSelectedSkills([])}>
+              Clear Selection
+            </Button>
+          </div>
+          <Button
+            size="sm"
+            onPress={() => onSelectSkills(selectedSkills)}
+            className="bg-LynxPurple text-white px-5 font-semibold">
+            Install Selected ({selectedSkills.length})
+          </Button>
+        </div>
+      )}
+
       {isSearching ? (
         // Search Results View
         <div className="flex-1 flex flex-col min-h-0">
@@ -170,24 +228,101 @@ export default function DiscoverSkillsTab({
               No skills found matching "{searchQuery}". Try another keyword.
             </div>
           ) : (
-            <ScrollShadow
-              className={
-                'grid grid-cols-1 gap-4 overflow-y-auto flex-1 min-h-0 pb-4 content-start' +
-                ' sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-2'
-              }>
-              {searchResults.slice(startIndex, endIndex).map(skill => {
-                const installed = isSkillInstalled(skill.name);
-                return (
-                  <SkillCard
-                    skill={skill}
-                    key={skill.id}
-                    installed={installed}
-                    onSelect={onSelectSkill}
-                    activeSubTab={activeSubTab}
-                  />
-                );
-              })}
-            </ScrollShadow>
+            <>
+              <div className="flex justify-between items-center mb-3 px-2">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    onChange={checked => {
+                      if (checked) {
+                        setSelectedSkills(prev => {
+                          const next = [...prev];
+                          currentSkills.forEach(s => {
+                            if (!next.some(existing => existing.id === s.id)) {
+                              next.push(s);
+                            }
+                          });
+                          return next;
+                        });
+                      } else {
+                        setSelectedSkills(prev => prev.filter(s => !currentSkills.some(c => c.id === s.id)));
+                      }
+                    }}
+                    variant="secondary"
+                    isSelected={isAllSelected}
+                    isIndeterminate={isSomeSelected}>
+                    <Checkbox.Content>
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                      <span className="text-xs text-semi-muted font-medium">Select Page</span>
+                    </Checkbox.Content>
+                  </Checkbox>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-semi-muted font-medium text-nowrap">Items per page:</span>
+                  <Select
+                    onChange={val => {
+                      if (val !== null && val !== undefined) {
+                        setItemsPerPage(Number(val));
+                        setCurrentPage(1);
+                      }
+                    }}
+                    className="w-30"
+                    variant="secondary"
+                    value={String(itemsPerPage)}
+                    placeholder={String(itemsPerPage)}>
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox>
+                        <ListBox.Item id="12" textValue="12">
+                          <ListBox.ItemIndicator />
+                          <Label>12</Label>
+                        </ListBox.Item>
+                        <ListBox.Item id="24" textValue="24">
+                          <ListBox.ItemIndicator />
+                          <Label>24</Label>
+                        </ListBox.Item>
+                        <ListBox.Item id="48" textValue="48">
+                          <ListBox.ItemIndicator />
+                          <Label>48</Label>
+                        </ListBox.Item>
+                        <ListBox.Item id="96" textValue="96">
+                          <ListBox.ItemIndicator />
+                          <Label>96</Label>
+                        </ListBox.Item>
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+                  <span className="text-xs text-semi-muted font-JetBrainsMono ml-2 text-nowrap">
+                    Showing {startIndex + 1}–{Math.min(endIndex, totalItems)} of {totalItems}
+                  </span>
+                </div>
+              </div>
+              <ScrollShadow
+                className={
+                  'grid grid-cols-1 gap-4 overflow-y-auto flex-1 min-h-0 pb-4 content-start' +
+                  ' sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-2'
+                }>
+                {searchResults.slice(startIndex, endIndex).map(skill => {
+                  const installed = isSkillInstalled(skill.name);
+                  const isSelected = selectedSkills.some(s => s.id === skill.id);
+                  return (
+                    <SkillCard
+                      skill={skill}
+                      key={skill.id}
+                      installed={installed}
+                      isSelected={isSelected}
+                      onSelect={onSelectSkill}
+                      activeSubTab={activeSubTab}
+                      onToggleSelect={toggleSelectSkill}
+                    />
+                  );
+                })}
+              </ScrollShadow>
+            </>
           )}
         </div>
       ) : (
@@ -224,6 +359,35 @@ export default function DiscoverSkillsTab({
                 </Tabs.List>
               </Tabs.ListContainer>
               <div className="flex items-center gap-2">
+                {activeSubTab !== 'official' && (
+                  <Checkbox
+                    onChange={checked => {
+                      if (checked) {
+                        setSelectedSkills(prev => {
+                          const next = [...prev];
+                          currentSkills.forEach(s => {
+                            if (!next.some(existing => existing.id === s.id)) {
+                              next.push(s);
+                            }
+                          });
+                          return next;
+                        });
+                      } else {
+                        setSelectedSkills(prev => prev.filter(s => !currentSkills.some(c => c.id === s.id)));
+                      }
+                    }}
+                    className="mr-4"
+                    variant="secondary"
+                    isSelected={isAllSelected}
+                    isIndeterminate={isSomeSelected}>
+                    <Checkbox.Content>
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                      <span className="text-xs text-semi-muted font-medium">Select Page</span>
+                    </Checkbox.Content>
+                  </Checkbox>
+                )}
                 <span className="text-xs text-semi-muted font-medium text-nowrap">Items per page:</span>
                 <Select
                   onChange={val => {
@@ -330,17 +494,30 @@ export default function DiscoverSkillsTab({
                                     source: r.repo,
                                   };
                                   const installed = isSkillInstalled(skill.name);
+                                  const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
                                   return (
                                     <div
                                       className={
-                                        'flex items-center justify-between p-2 rounded-xl bg-surface/70 transition' +
-                                        ' border ' +
+                                        'flex items-center gap-2 p-2 rounded-xl bg-surface/70 transition' +
+                                        ' border cursor-pointer ' +
                                         (installed
                                           ? 'border-success/30 bg-success/5'
                                           : 'border-border-secondary/40 hover:border-foreground/10')
                                       }
-                                      key={`${r.repo}-${skill.name}`}>
-                                      <div className="min-w-0 pr-2">
+                                      key={`${r.repo}-${skill.name}`}
+                                      onClick={() => toggleSelectSkill(registrySkill)}>
+                                      <Checkbox
+                                        variant="secondary"
+                                        isSelected={isSelected}
+                                        aria-label={`Select ${skill.name}`}
+                                        onChange={() => toggleSelectSkill(registrySkill)}>
+                                        <Checkbox.Content>
+                                          <Checkbox.Control>
+                                            <Checkbox.Indicator />
+                                          </Checkbox.Control>
+                                        </Checkbox.Content>
+                                      </Checkbox>
+                                      <div className="flex-1 min-w-0 pr-2">
                                         <Typography className="text-xs font-bold truncate">{skill.name}</Typography>
                                         <Typography className="text-[10px] text-semi-muted truncate font-JetBrainsMono">
                                           {r.repo.split('/')[1]} · {formatInstalls(skill.installs)}
@@ -349,6 +526,7 @@ export default function DiscoverSkillsTab({
                                       <Button
                                         size="sm"
                                         variant="ghost"
+                                        onClick={e => e.stopPropagation()}
                                         onPress={() => onSelectSkill(registrySkill)}
                                         isIconOnly>
                                         {installed ? (
@@ -388,14 +566,17 @@ export default function DiscoverSkillsTab({
                 }>
                 {discoverSkills.slice(startIndex, endIndex).map((skill, index) => {
                   const installed = isSkillInstalled(skill.name);
+                  const isSelected = selectedSkills.some(s => s.id === skill.id);
                   return (
                     <SkillCard
                       skill={skill}
                       key={skill.id}
                       installed={installed}
+                      isSelected={isSelected}
                       onSelect={onSelectSkill}
                       activeSubTab={activeSubTab}
                       rank={startIndex + index + 1}
+                      onToggleSelect={toggleSelectSkill}
                     />
                   );
                 })}
@@ -445,7 +626,9 @@ export default function DiscoverSkillsTab({
       {/* View All Skills Modal for Official Creator */}
       <CreatorSkillsModal
         onSelectSkill={onSelectSkill}
+        selectedSkills={selectedSkills}
         isSkillInstalled={isSkillInstalled}
+        onToggleSelectSkill={toggleSelectSkill}
         selectedOwnerForSkills={selectedOwnerForSkills}
         onClose={() => setSelectedOwnerForSkills(null)}
       />

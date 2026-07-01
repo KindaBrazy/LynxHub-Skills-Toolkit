@@ -1,4 +1,4 @@
-import {Button, Card, Chip, Typography} from '@heroui/react';
+import {Button, Card, Checkbox, Chip, Typography} from '@heroui/react';
 import {Download, Fire, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
 import {ExternalLink, TrendingUp} from 'lucide-react';
 
@@ -29,9 +29,19 @@ interface SkillCardProps {
   installed: boolean;
   onSelect: (skill: RegistrySkill) => void;
   activeSubTab: string;
+  isSelected: boolean;
+  onToggleSelect: (skill: RegistrySkill) => void;
 }
 
-export function SkillCard({skill, rank, installed, onSelect, activeSubTab}: SkillCardProps) {
+export function SkillCard({
+  skill,
+  rank,
+  installed,
+  onSelect,
+  activeSubTab,
+  isSelected,
+  onToggleSelect,
+}: SkillCardProps) {
   const githubUrl = getGithubUrl(skill.source);
 
   let Icon = Download;
@@ -52,9 +62,17 @@ export function SkillCard({skill, rank, installed, onSelect, activeSubTab}: Skil
       }
       variant="secondary">
       <Card.Header className="flex flex-col gap-2 pb-2">
-        {(rank !== undefined || installed) && (
-          <div className="flex items-center justify-between w-full min-h-6">
-            {rank !== undefined ? (
+        <div className="flex items-center justify-between w-full min-h-6">
+          <Checkbox isSelected={isSelected} aria-label={`Select ${skill.name}`} onChange={() => onToggleSelect(skill)}>
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+            </Checkbox.Content>
+          </Checkbox>
+
+          <div className="flex items-center gap-1.5 ml-auto">
+            {rank !== undefined && (
               <span
                 className={
                   'flex items-center justify-center text-[10px] font-extrabold px-1.5 py-0.5 rounded-lg' +
@@ -62,8 +80,6 @@ export function SkillCard({skill, rank, installed, onSelect, activeSubTab}: Skil
                 }>
                 #{rank}
               </span>
-            ) : (
-              <div />
             )}
             {installed && (
               <Chip variant="secondary" className="bg-success-soft text-success text-[10px] h-5 shrink-0">
@@ -71,7 +87,7 @@ export function SkillCard({skill, rank, installed, onSelect, activeSubTab}: Skil
               </Chip>
             )}
           </div>
-        )}
+        </div>
 
         <div className="min-w-0 w-full mt-1">
           <Typography title={skill.name} className="font-bold text-base text-wrap line-clamp-2 leading-snug">

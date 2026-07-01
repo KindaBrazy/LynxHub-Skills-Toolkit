@@ -24,8 +24,8 @@ export default function SkillsManagerModal() {
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Selected Skill for Installer Modal
-  const [selectedSkill, setSelectedSkill] = useState<RegistrySkill | null>(null);
+  // Selected Skills for Installer Modal
+  const [selectedSkills, setSelectedSkills] = useState<RegistrySkill[]>([]);
 
   // Event listener to open modal from window event
   useEffect(() => {
@@ -144,10 +144,11 @@ export default function SkillsManagerModal() {
                 searchQuery={searchQuery}
                 hasSearched={hasSearched}
                 searchResults={searchResults}
-                onSelectSkill={setSelectedSkill}
                 isLoadingSearch={isLoadingSearch}
+                onSelectSkills={setSelectedSkills}
                 isSkillInstalled={isSkillInstalled}
                 onSearchQueryChange={setSearchQuery}
+                onSelectSkill={skill => setSelectedSkills([skill])}
               />
             </Tabs.Panel>
           </Tabs>
@@ -156,8 +157,8 @@ export default function SkillsManagerModal() {
 
       {/* Installer Options Modal */}
       <SkillInstallerModal
-        selectedSkill={selectedSkill}
-        onClose={() => setSelectedSkill(null)}
+        selectedSkills={selectedSkills}
+        onClose={() => setSelectedSkills([])}
         onInstallSuccess={loadInstalledSkills}
       />
     </>

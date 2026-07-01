@@ -1,4 +1,4 @@
-import {Button, Description, Modal, ScrollShadow, Typography} from '@heroui/react';
+import {Button, Checkbox, Description, Modal, ScrollShadow, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
 import {Download, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
 
@@ -10,6 +10,8 @@ interface CreatorSkillsModalProps {
   onClose: () => void;
   isSkillInstalled: (name: string) => boolean;
   onSelectSkill: (skill: RegistrySkill) => void;
+  selectedSkills: RegistrySkill[];
+  onToggleSelectSkill: (skill: RegistrySkill) => void;
 }
 
 export function CreatorSkillsModal({
@@ -17,6 +19,8 @@ export function CreatorSkillsModal({
   onClose,
   isSkillInstalled,
   onSelectSkill,
+  selectedSkills,
+  onToggleSelectSkill,
 }: CreatorSkillsModalProps) {
   return (
     <TabModal size="lg" isOpen={!!selectedOwnerForSkills} onOpenChange={open => !open && onClose()} isDismissable>
@@ -56,17 +60,30 @@ export function CreatorSkillsModal({
                     source: r.repo,
                   };
                   const installed = isSkillInstalled(skill.name);
+                  const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
                   return (
                     <div
                       className={
-                        'flex items-center justify-between p-2.5 rounded-xl bg-surface/40 transition' +
-                        ' border ' +
+                        'flex items-center gap-3 p-2.5 rounded-xl bg-surface/40 transition' +
+                        ' border cursor-pointer ' +
                         (installed
                           ? 'border-success/30 bg-success/5'
                           : 'border-border-secondary/40 hover:border-foreground/10')
                       }
-                      key={`${r.repo}-${skill.name}`}>
-                      <div className="min-w-0 pr-2">
+                      key={`${r.repo}-${skill.name}`}
+                      onClick={() => onToggleSelectSkill(registrySkill)}>
+                      <Checkbox
+                        variant="secondary"
+                        isSelected={isSelected}
+                        aria-label={`Select ${skill.name}`}
+                        onChange={() => onToggleSelectSkill(registrySkill)}>
+                        <Checkbox.Content>
+                          <Checkbox.Control>
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                        </Checkbox.Content>
+                      </Checkbox>
+                      <div className="flex-1 min-w-0 pr-2">
                         <Typography className="text-xs font-bold truncate">{skill.name}</Typography>
                         <Typography className="text-[10px] text-semi-muted truncate font-JetBrainsMono mt-0.5">
                           {formatInstalls(skill.installs)} installs
@@ -80,6 +97,7 @@ export function CreatorSkillsModal({
                         size="sm"
                         variant="ghost"
                         className="h-8 w-8 min-w-8"
+                        onClick={e => e.stopPropagation()}
                         isIconOnly>
                         {installed ? <SettingsMinimalistic className="size-3.5" /> : <Download className="size-3.5" />}
                       </Button>

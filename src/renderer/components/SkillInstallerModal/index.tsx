@@ -2,6 +2,7 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  Chip,
   Description,
   EmptyState,
   Label,
@@ -27,12 +28,12 @@ import {SecurityAudits} from './SecurityAudits';
 const ipc = (window as any).electron.ipcRenderer;
 
 interface SkillInstallerModalProps {
-  selectedSkill: RegistrySkill | null;
+  selectedSkills: RegistrySkill[];
   onClose: () => void;
   onInstallSuccess: () => Promise<void>;
 }
 
-export default function SkillInstallerModal({selectedSkill, onClose, onInstallSuccess}: SkillInstallerModalProps) {
+export default function SkillInstallerModal({selectedSkills, onClose, onInstallSuccess}: SkillInstallerModalProps) {
   const {contains} = useFilter({sensitivity: 'base'});
 
   const [installScope, setInstallScope] = useState<'project' | 'global'>('project');
@@ -41,6 +42,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   const [selectedAgents, setSelectedAgents] = useState<string[]>(['antigravity']);
   const [allAgents, setAllAgents] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [installProgressMessage, setInstallProgressMessage] = useState<string>('');
   const [installResult, setInstallResult] = useState<{success: boolean; message: string} | null>(null);
 
   // Projects list state
@@ -83,23 +85,52 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   }, [loadProjects]);
 
   useEffect(() => {
-    if (selectedSkill) {
+    if (selectedSkills.length > 0) {
       setInstallScope('project');
       setInstallMethod('symlink');
       setSelectedAgents(['antigravity']);
       setAllAgents(false);
       setIsInstalling(false);
+      setInstallProgressMessage('');
       setInstallResult(null);
       setAuditReport(null);
 
-      const loadAudit = async () => {
+      const loadAudits = async () => {
         setIsLoadingAudit(true);
         try {
-          const source = selectedSkill.source || selectedSkill.id?.split('/').slice(0, 2).join('/');
-          const skillName = selectedSkill.name;
-          if (source && skillName) {
-            const res = await ipc.invoke('skills-manager:get-audit', source, skillName);
-            setAuditReport(res);
+          const allAudits: AuditReport[] = [];
+          await Promise.all(
+            selectedSkills.map(async skill => {
+              const source = skill.source || skill.id?.split('/').slice(0, 2).join('/');
+              const skillName = skill.name;
+              if (source && skillName) {
+                const res = await ipc.invoke('skills-manager:get-audit', source, skillName);
+                if (res) {
+                  allAudits.push(res);
+                }
+              }
+            }),
+          );
+
+          if (allAudits.length > 0) {
+            const aggregatedAudits: any[] = [];
+            allAudits.forEach(report => {
+              const skillName = report.slug.split('/').pop() || report.source;
+              report.audits?.forEach(audit => {
+                aggregatedAudits.push({
+                  ...audit,
+                  provider: `${audit.provider} (${skillName})`,
+                });
+              });
+            });
+            setAuditReport({
+              id: 'aggregated',
+              source: 'aggregated',
+              slug: 'aggregated',
+              audits: aggregatedAudits,
+            });
+          } else {
+            setAuditReport(null);
           }
         } catch (err) {
           console.error('Failed to fetch security audits:', err);
@@ -107,10 +138,10 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
           setIsLoadingAudit(false);
         }
       };
-      loadAudit();
+      loadAudits();
       loadProjects();
     }
-  }, [selectedSkill, loadProjects]);
+  }, [selectedSkills, loadProjects]);
 
   const handleProjectSelectChange = useCallback(async (key: string) => {
     if (key === 'add-new') {
@@ -130,54 +161,104 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   }, []);
 
   const handleStartInstall = useCallback(async () => {
-    if (!selectedSkill) return;
+    if (selectedSkills.length === 0) return;
     setIsInstalling(true);
     setInstallResult(null);
-
-    const source = selectedSkill.source
-      ? selectedSkill.source.includes('/')
-        ? `${selectedSkill.source}@${selectedSkill.name}`
-        : `${selectedSkill.source}/${selectedSkill.name}`
-      : selectedSkill.id || selectedSkill.name;
 
     const agent = allAgents ? '*' : selectedAgents.join(' ');
     const isGlobal = installScope === 'global';
     const isCopy = installMethod === 'copy';
     const targetCwd = isGlobal ? undefined : selectedProjectCwd;
 
-    try {
-      const res = await ipc.invoke('skills-manager:add', source, isGlobal, agent, isCopy, targetCwd);
-      if (res.success) {
-        setInstallResult({
-          success: true,
-          message: `Successfully installed ${selectedSkill.name}!`,
-        });
-        await onInstallSuccess();
-      } else {
-        setInstallResult({
-          success: false,
-          message: res.error || 'Failed to install skill.',
-        });
+    let successCount = 0;
+    let failCount = 0;
+    const errors: string[] = [];
+
+    for (let i = 0; i < selectedSkills.length; i++) {
+      const skill = selectedSkills[i];
+      setInstallProgressMessage(`Installing skill ${i + 1} of ${selectedSkills.length}: "${skill.name}"...`);
+
+      const source = skill.source
+        ? skill.source.includes('/')
+          ? `${skill.source}@${skill.name}`
+          : `${skill.source}/${skill.name}`
+        : skill.id || skill.name;
+
+      try {
+        const res = await ipc.invoke('skills-manager:add', source, isGlobal, agent, isCopy, targetCwd);
+        if (res.success) {
+          successCount++;
+        } else {
+          failCount++;
+          errors.push(`"${skill.name}": ${res.error || 'Failed to install'}`);
+        }
+      } catch (err: any) {
+        failCount++;
+        errors.push(`"${skill.name}": ${err.message || String(err)}`);
       }
-    } catch (err: any) {
+    }
+
+    if (failCount === 0) {
+      setInstallResult({
+        success: true,
+        message:
+          selectedSkills.length > 1
+            ? `Successfully installed all ${successCount} skills!`
+            : `Successfully installed ${selectedSkills[0].name}!`,
+      });
+      await onInstallSuccess();
+    } else if (successCount === 0) {
       setInstallResult({
         success: false,
-        message: err.message || String(err),
+        message: `Failed to install skills:\n${errors.join('\n')}`,
       });
-    } finally {
-      setIsInstalling(false);
+    } else {
+      setInstallResult({
+        success: false,
+        message: `Installed ${successCount} skill(s), ${failCount} failed:\n${errors.join('\n')}`,
+      });
+      await onInstallSuccess();
     }
-  }, [selectedSkill, installScope, installMethod, selectedAgents, allAgents, onInstallSuccess, selectedProjectCwd]);
+
+    setIsInstalling(false);
+  }, [selectedSkills, installScope, installMethod, selectedAgents, allAgents, onInstallSuccess, selectedProjectCwd]);
 
   return (
-    <TabModal size="lg" isOpen={!!selectedSkill} dialogClassName="max-w-3xl" onOpenChange={open => !open && onClose()}>
+    <TabModal
+      size="lg"
+      dialogClassName="max-w-3xl"
+      isOpen={selectedSkills.length > 0}
+      onOpenChange={open => !open && onClose()}>
       <ModalCloseTrigger onPress={onClose} />
       <div className="flex flex-col gap-4 font-Nunito">
         <div className="flex items-center gap-2">
           <CloudStorage className="size-6 text-LynxPurple" />
-          <Typography className="text-lg font-bold">Install {selectedSkill?.name}</Typography>
+          <Typography className="text-lg font-bold">
+            {selectedSkills.length > 1
+              ? `Install ${selectedSkills.length} Skills`
+              : `Install ${selectedSkills[0]?.name}`}
+          </Typography>
         </div>
-        <Description className="text-xs text-semi-muted">Configure target agents and scope for this skill.</Description>
+        <Description className="text-xs text-semi-muted">
+          {selectedSkills.length > 1
+            ? `Configure target agents and scope for the ${selectedSkills.length} selected skills.`
+            : 'Configure target agents and scope for this skill.'}
+        </Description>
+
+        {selectedSkills.length > 1 && (
+          <div
+            className={
+              'flex flex-wrap gap-1.5 p-2 bg-black/10' +
+              ' border border-border-secondary/30 rounded-xl' +
+              ' max-h-24 overflow-y-auto'
+            }>
+            {selectedSkills.map(s => (
+              <Chip size="sm" key={s.id} variant="secondary" className="bg-foreground/5 text-foreground/80 font-medium">
+                {s.name}
+              </Chip>
+            ))}
+          </div>
+        )}
 
         <Separator className="opacity-10" />
 
@@ -334,7 +415,9 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
         {isInstalling && (
           <div className="flex items-center gap-2 py-2">
             <Spinner size="sm" />
-            <span className="text-xs text-semi-muted">Installing skill package via CLI...</span>
+            <span className="text-xs text-semi-muted">
+              {selectedSkills.length > 1 ? installProgressMessage : 'Installing skill package via CLI...'}
+            </span>
           </div>
         )}
 
@@ -363,7 +446,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
             size="sm"
             onPress={handleStartInstall}
             className="bg-LynxPurple text-white px-5">
-            Install Skill
+            {selectedSkills.length > 1 ? `Install ${selectedSkills.length} Skills` : 'Install Skill'}
           </Button>
         </div>
       </div>

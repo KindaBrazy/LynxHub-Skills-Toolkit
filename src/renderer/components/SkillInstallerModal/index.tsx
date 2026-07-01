@@ -54,7 +54,7 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
   }, []);
 
   // Security Audits state
-  const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
+  const [auditReports, setAuditReports] = useState<AuditReport[]>([]);
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
 
   const loadProjects = useCallback(async () => {
@@ -93,7 +93,7 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
       setIsInstalling(false);
       setInstallProgressMessage('');
       setInstallResult(null);
-      setAuditReport(null);
+      setAuditReports([]);
 
       const loadAudits = async () => {
         setIsLoadingAudit(true);
@@ -111,27 +111,7 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
               }
             }),
           );
-
-          if (allAudits.length > 0) {
-            const aggregatedAudits: any[] = [];
-            allAudits.forEach(report => {
-              const skillName = report.slug.split('/').pop() || report.source;
-              report.audits?.forEach(audit => {
-                aggregatedAudits.push({
-                  ...audit,
-                  provider: `${audit.provider} (${skillName})`,
-                });
-              });
-            });
-            setAuditReport({
-              id: 'aggregated',
-              source: 'aggregated',
-              slug: 'aggregated',
-              audits: aggregatedAudits,
-            });
-          } else {
-            setAuditReport(null);
-          }
+          setAuditReports(allAudits);
         } catch (err) {
           console.error('Failed to fetch security audits:', err);
         } finally {
@@ -407,7 +387,7 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
         </div>
 
         {/* Security Audits component */}
-        <SecurityAudits auditReport={auditReport} isLoadingAudit={isLoadingAudit} />
+        <SecurityAudits auditReports={auditReports} isLoadingAudit={isLoadingAudit} />
 
         <Separator className="opacity-10" />
 

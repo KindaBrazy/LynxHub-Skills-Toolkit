@@ -5,12 +5,13 @@ import {AuditReport} from '../../types';
 
 interface SecurityAuditsProps {
   isLoadingAudit: boolean;
-  auditReport: AuditReport | null;
+  auditReport?: AuditReport | null;
+  auditReports?: AuditReport[];
 }
 
-export function SecurityAudits({isLoadingAudit, auditReport}: SecurityAuditsProps) {
+export function SecurityAudits({isLoadingAudit, auditReport, auditReports = []}: SecurityAuditsProps) {
   return (
-    <div className="flex flex-col gap-1.5 mt-2 bg-black/10 border border-border-secondary/40 p-3 rounded-xl">
+    <div className="flex flex-col gap-1.5 mt-2 bg-surface-secondary border border-border p-3 rounded-2xl">
       <Label className="text-xs font-semibold text-semi-muted flex items-center gap-1">
         <ShieldCheck className="size-4 text-LynxPurple" />
         Security & Safety Audits
@@ -21,35 +22,65 @@ export function SecurityAudits({isLoadingAudit, auditReport}: SecurityAuditsProp
           <Spinner size="sm" />
           <span className="text-xs text-semi-muted">Querying security reports...</span>
         </div>
-      ) : auditReport && auditReport.audits && auditReport.audits.length > 0 ? (
-        <div className="flex flex-col gap-1.5 mt-1">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {auditReport.audits.map(audit => {
-              const isFail = audit.status === 'fail';
-              const isWarn = audit.status === 'warn';
+      ) : auditReports.length > 0 || (auditReport && auditReport.audits && auditReport.audits.length > 0) ? (
+        <div className="flex flex-col gap-3 mt-1">
+          {/* Grouped reports view */}
+          {(() => {
+            const reports = auditReports.length > 0 ? auditReports : auditReport ? [auditReport] : [];
 
-              let badgeColor = 'bg-success-soft text-success';
-              if (isWarn) badgeColor = 'bg-warning-soft text-warning';
-              if (isFail) badgeColor = 'bg-danger-soft text-danger';
+            return reports.map(report => {
+              const skillName = report.slug.split('/').pop() || report.source;
+              const hasAudits = report.audits && report.audits.length > 0;
 
               return (
-                <div
-                  className={
-                    'flex flex-col justify-between p-2 rounded-lg bg-black/20' + ' border border-border-secondary/30'
-                  }
-                  key={audit.provider}
-                  title={`${audit.provider}: ${audit.summary}`}>
-                  <span className="text-[10px] font-bold text-semi-muted truncate">{audit.provider}</span>
-                  <div className="flex items-center justify-between gap-1.5 mt-1">
-                    <Chip className={`${badgeColor} text-[9px] h-4.5 px-1 shrink-0`}>{audit.status.toUpperCase()}</Chip>
-                    {audit.riskLevel && (
-                      <span className="text-[8px] text-semi-muted font-JetBrainsMono truncate">{audit.riskLevel}</span>
-                    )}
-                  </div>
+                <div key={report.id || report.slug} className="flex flex-col gap-1.5">
+                  {reports.length > 1 && (
+                    <Typography className="text-xs font-bold text-LynxBlue font-JetBrainsMono mt-1">
+                      {skillName}
+                    </Typography>
+                  )}
+                  {hasAudits ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {report.audits.map(audit => {
+                        const isFail = audit.status === 'fail';
+                        const isWarn = audit.status === 'warn';
+
+                        let badgeColor = 'bg-success-soft text-success';
+                        if (isWarn) badgeColor = 'bg-warning-soft text-warning';
+                        if (isFail) badgeColor = 'bg-danger-soft text-danger';
+
+                        return (
+                          <div
+                            className={
+                              'flex items-center justify-between px-3 py-1.5 rounded-xl bg-surface border border-border'
+                            }
+                            key={audit.provider}
+                            title={`${audit.provider}: ${audit.summary}`}>
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="text-[10px] font-bold text-semi-muted truncate">{audit.provider}</span>
+                              <Chip size="sm" className={`${badgeColor} text-[8px] h-4 shrink-0`}>
+                                {audit.status.toUpperCase()}
+                              </Chip>
+                            </div>
+                            {audit.riskLevel && (
+                              <span className="text-[8px] text-semi-muted font-JetBrainsMono truncate">
+                                {audit.riskLevel}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <Typography className="text-[10px] text-semi-muted italic mt-0.5">
+                      No security audit records found for this skill.
+                    </Typography>
+                  )}
                 </div>
               );
-            })}
-          </div>
+            });
+          })()}
+
           <Typography className="text-[10px] text-semi-muted mt-1 leading-normal">
             Verdicts provided by Gen Agent Trust Hub, Socket, Snyk, Runlayer, ZeroLeaks.
           </Typography>

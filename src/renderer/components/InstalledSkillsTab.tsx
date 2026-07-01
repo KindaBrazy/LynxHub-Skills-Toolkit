@@ -866,7 +866,7 @@ export default function InstalledSkillsTab({
             ) : (
               <Accordion
                 expandedKeys={expandedKeys}
-                className="flex flex-col gap-6 w-full"
+                className="flex flex-col gap-4 w-full"
                 onExpandedChange={keys => setExpandedKeys(keys as Set<any>)}
                 hideSeparator
                 allowsMultipleExpanded>
@@ -874,12 +874,12 @@ export default function InstalledSkillsTab({
                   <Accordion.Item
                     id={group.id}
                     key={group.id}
-                    className="border border-foreground/5 rounded-2xl bg-foreground/2 p-4 flex flex-col gap-3">
+                    className="border border-foreground/5 rounded-2xl bg-foreground/2 pt-2 flex flex-col gap-3">
                     <Accordion.Heading>
                       <Accordion.Trigger
                         className={
-                          'flex items-center justify-between px-1 cursor-pointer select-none w-full text-left' +
-                          ' bg-transparent hover:bg-transparent border-none p-0 focus:outline-none'
+                          'flex items-center justify-between cursor-pointer select-none w-full text-left' +
+                          ' bg-transparent hover:bg-transparent border-none p-0 px-4 focus:outline-none'
                         }>
                         <div className="flex items-center gap-2 truncate">
                           <AltArrowDown

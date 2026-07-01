@@ -13,7 +13,7 @@ import {
   Tabs,
   Typography,
 } from '@heroui/react';
-import {Download, Fire, SettingsMinimalistic, Star, VerifiedCheck} from '@solar-icons/react-perf/BoldDuotone';
+import {Fire, Star, VerifiedCheck} from '@solar-icons/react-perf/BoldDuotone';
 import {Magnifier} from '@solar-icons/react-perf/Linear';
 import {TrendingUp, X} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
@@ -443,114 +443,65 @@ export default function DiscoverSkillsTab({
                   {officialOwners.slice(startIndex, endIndex).map(owner => {
                     const totalInstalls = owner.repos.reduce((acc, r) => acc + r.totalInstalls, 0);
                     const totalSkills = owner.repos.reduce((acc, r) => acc + r.skills.length, 0);
-                    const shownSkillsCount = owner.repos.reduce((acc, r) => acc + Math.min(3, r.skills.length), 0);
                     return (
                       <Card
                         className={
-                          'border border-border hover:border-foreground/10' +
-                          ' transition p-4 flex flex-col justify-between'
+                          'border border-border hover:border-LynxBlue/40 cursor-pointer' +
+                          ' transition-all duration-300 flex flex-row items-center justify-between' +
+                          ' hover:bg-LynxBlue/5 hover:shadow-lg hover:shadow-LynxBlue/5 active:scale-[0.98] group'
                         }
                         key={owner.owner}
-                        variant="secondary">
-                        <div>
-                          <div className="flex items-center gap-3 mb-4">
-                            <img
-                              onError={e => {
-                                (e.target as HTMLImageElement).src = 'https://github.com/github.png';
-                              }}
-                              alt={owner.owner}
-                              src={`https://github.com/${owner.owner}.png`}
-                              className="size-10 rounded-full border border-border bg-black"
-                            />
-                            <div>
-                              <Typography className="font-bold text-base leading-tight">{owner.owner}</Typography>
-                              <Description className="text-[11px] text-semi-muted font-JetBrainsMono mt-0.5">
-                                {totalSkills} {totalSkills === 1 ? 'skill' : 'skills'} · {formatInstalls(totalInstalls)}
-                                {' Installs'}
-                              </Description>
-                            </div>
+                        variant="secondary"
+                        onClick={() => setSelectedOwnerForSkills(owner)}>
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <img
+                            onError={e => {
+                              (e.target as HTMLImageElement).src = 'https://github.com/github.png';
+                            }}
+                            className={
+                              'size-12 rounded-full border border-border/80 bg-black' +
+                              ' group-hover:scale-105 transition-transform duration-300 shrink-0'
+                            }
+                            alt={owner.owner}
+                            src={`https://github.com/${owner.owner}.png`}
+                          />
+                          <div className="min-w-0">
+                            <Typography
+                              className={
+                                'font-bold text-base leading-tight' +
+                                ' group-hover:text-LynxBlue transition-colors duration-300'
+                              }>
+                              {owner.owner}
+                            </Typography>
+                            <Description
+                              className={
+                                'text-xs text-semi-muted font-JetBrainsMono mt-1.5' + ' flex items-center gap-1.5'
+                              }>
+                              <span className="font-semibold">
+                                {totalSkills} {totalSkills === 1 ? 'skill' : 'skills'}
+                              </span>
+                              <span className="text-border/60">•</span>
+                              <span>{formatInstalls(totalInstalls)} installs</span>
+                            </Description>
                           </div>
+                        </div>
 
-                          <div className="flex flex-col gap-2 mt-2">
-                            <div className="flex flex-row justify-between items-center">
-                              <Typography className="text-xs font-semibold text-semi-muted">
-                                Featured Skills:
-                              </Typography>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="text-xs"
-                                onPress={() => setSelectedOwnerForSkills(owner)}>
-                                View All
-                              </Button>
-                            </div>
-                            <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
-                              {owner.repos.flatMap(r =>
-                                r.skills.slice(0, 3).map(skill => {
-                                  const registrySkill: RegistrySkill = {
-                                    id: `${r.repo}/${skill.name}`,
-                                    name: skill.name,
-                                    installs: skill.installs,
-                                    source: r.repo,
-                                  };
-                                  const installed = isSkillInstalled(skill.name);
-                                  const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
-                                  return (
-                                    <div
-                                      className={
-                                        'flex items-center gap-2 p-2 rounded-xl bg-surface/70 transition' +
-                                        ' border cursor-pointer ' +
-                                        (installed
-                                          ? 'border-success/30 bg-success/5'
-                                          : 'border-border-secondary/40 hover:border-foreground/10')
-                                      }
-                                      key={`${r.repo}-${skill.name}`}
-                                      onClick={() => toggleSelectSkill(registrySkill)}>
-                                      <Checkbox
-                                        variant="secondary"
-                                        isSelected={isSelected}
-                                        aria-label={`Select ${skill.name}`}
-                                        onChange={() => toggleSelectSkill(registrySkill)}>
-                                        <Checkbox.Content>
-                                          <Checkbox.Control>
-                                            <Checkbox.Indicator />
-                                          </Checkbox.Control>
-                                        </Checkbox.Content>
-                                      </Checkbox>
-                                      <div className="flex-1 min-w-0 pr-2">
-                                        <Typography className="text-xs font-bold truncate">{skill.name}</Typography>
-                                        <Typography className="text-[10px] text-semi-muted truncate font-JetBrainsMono">
-                                          {r.repo.split('/')[1]} · {formatInstalls(skill.installs)}
-                                        </Typography>
-                                      </div>
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={e => e.stopPropagation()}
-                                        onPress={() => onSelectSkill(registrySkill)}
-                                        isIconOnly>
-                                        {installed ? (
-                                          <SettingsMinimalistic className="size-3.5" />
-                                        ) : (
-                                          <Download className="size-3.5" />
-                                        )}
-                                      </Button>
-                                    </div>
-                                  );
-                                }),
-                              )}
-                              {totalSkills > shownSkillsCount && (
-                                <Button
-                                  size="sm"
-                                  variant="tertiary"
-                                  className="shrink-0 text-xs"
-                                  onPress={() => setSelectedOwnerForSkills(owner)}
-                                  fullWidth>
-                                  + {totalSkills - shownSkillsCount} more skills
-                                </Button>
-                              )}
-                            </div>
-                          </div>
+                        {/* Modern Arrow Indicator */}
+                        <div
+                          className={
+                            'flex items-center justify-center size-8 rounded-full bg-foreground/5' +
+                            ' group-hover:bg-LynxBlue group-hover:text-white' +
+                            ' transition-all duration-300 shrink-0'
+                          }>
+                          <svg
+                            className={
+                              'size-4 stroke-current group-hover:translate-x-0.5' + ' transition-transform duration-300'
+                            }
+                            fill="none"
+                            strokeWidth="2.5"
+                            viewBox="0 0 24 24">
+                            <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
                         </div>
                       </Card>
                     );

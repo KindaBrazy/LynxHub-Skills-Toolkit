@@ -9,6 +9,7 @@ import {
   ListBox,
   ModalCloseTrigger,
   SearchField,
+  Select,
   Separator,
   Spinner,
   Tabs,
@@ -42,6 +43,10 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   const [isInstalling, setIsInstalling] = useState(false);
   const [installResult, setInstallResult] = useState<{success: boolean; message: string} | null>(null);
 
+  // Projects list state
+  const [projectDirs, setProjectDirs] = useState<string[]>([]);
+  const [selectedProjectCwd, setSelectedProjectCwd] = useState<string>('');
+
   const onRemoveTags = useCallback((keys: Set<any>) => {
     setSelectedAgents(prev => prev.filter(key => !keys.has(key)));
   }, []);
@@ -49,6 +54,20 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
   // Security Audits state
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      const dirs = await ipc.invoke('skills-manager:get-project-dirs');
+      setProjectDirs(dirs || []);
+      if (dirs && dirs.length > 0) {
+        setSelectedProjectCwd(prev => (dirs.includes(prev) ? prev : dirs[0]));
+      } else {
+        setSelectedProjectCwd('');
+      }
+    } catch (err) {
+      console.error('Failed to load project dirs:', err);
+    }
+  }, []);
 
   useEffect(() => {
     const loadAgents = async () => {
@@ -60,7 +79,8 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
       }
     };
     loadAgents();
-  }, []);
+    loadProjects();
+  }, [loadProjects]);
 
   useEffect(() => {
     if (selectedSkill) {
@@ -87,10 +107,27 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
           setIsLoadingAudit(false);
         }
       };
-
       loadAudit();
+      loadProjects();
     }
-  }, [selectedSkill]);
+  }, [selectedSkill, loadProjects]);
+
+  const handleProjectSelectChange = useCallback(async (key: string) => {
+    if (key === 'add-new') {
+      try {
+        const dir = await ipc.invoke('skills-manager:select-project-dir');
+        if (dir) {
+          const updated = await ipc.invoke('skills-manager:add-project-dir', dir);
+          setProjectDirs(updated || []);
+          setSelectedProjectCwd(dir);
+        }
+      } catch (err) {
+        console.error('Failed to select directory:', err);
+      }
+    } else {
+      setSelectedProjectCwd(key);
+    }
+  }, []);
 
   const handleStartInstall = useCallback(async () => {
     if (!selectedSkill) return;
@@ -106,9 +143,10 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
     const agent = allAgents ? '*' : selectedAgents.join(' ');
     const isGlobal = installScope === 'global';
     const isCopy = installMethod === 'copy';
+    const targetCwd = isGlobal ? undefined : selectedProjectCwd;
 
     try {
-      const res = await ipc.invoke('skills-manager:add', source, isGlobal, agent, isCopy);
+      const res = await ipc.invoke('skills-manager:add', source, isGlobal, agent, isCopy, targetCwd);
       if (res.success) {
         setInstallResult({
           success: true,
@@ -129,7 +167,7 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
     } finally {
       setIsInstalling(false);
     }
-  }, [selectedSkill, installScope, installMethod, selectedAgents, allAgents, onInstallSuccess]);
+  }, [selectedSkill, installScope, installMethod, selectedAgents, allAgents, onInstallSuccess, selectedProjectCwd]);
 
   return (
     <TabModal size="lg" isOpen={!!selectedSkill} dialogClassName="max-w-3xl" onOpenChange={open => !open && onClose()}>
@@ -159,6 +197,43 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
             </Tabs.ListContainer>
           </Tabs>
         </div>
+
+        {/* Project Destination Dropdown */}
+        {installScope === 'project' && (
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-semi-muted">Project Destination</Label>
+            <Select
+              className="w-full"
+              variant="secondary"
+              isDisabled={isInstalling}
+              value={selectedProjectCwd}
+              placeholder="Select project destination"
+              onChange={val => handleProjectSelectChange(val as string)}>
+              <Select.Trigger>
+                <Select.Value>{selectedProjectCwd || 'Select a project folder...'}</Select.Value>
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {projectDirs.map(dir => (
+                    <ListBox.Item id={dir} key={dir} textValue={dir} className="font-JetBrainsMono text-xs">
+                      {dir}
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                  {projectDirs.length > 0 && <Separator className="my-1 opacity-10" />}
+                  <ListBox.Item
+                    id="add-new"
+                    className="text-LynxBlue font-medium"
+                    textValue="+ Register new project directory...">
+                    + Register new project directory...
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                </ListBox>
+              </Select.Popover>
+            </Select>
+          </div>
+        )}
 
         {/* Install Method */}
         <div className="flex flex-col gap-1.5">
@@ -334,10 +409,14 @@ export default function SkillInstallerModal({selectedSkill, onClose, onInstallSu
         {/* Actions */}
         <div className="flex justify-end">
           <Button
+            isDisabled={
+              isInstalling ||
+              (!allAgents && selectedAgents.length === 0) ||
+              (installScope === 'project' && !selectedProjectCwd)
+            }
             size="sm"
             onPress={handleStartInstall}
-            className="bg-LynxPurple text-white px-5"
-            isDisabled={isInstalling || (!allAgents && selectedAgents.length === 0)}>
+            className="bg-LynxPurple text-white px-5">
             Install Skill
           </Button>
         </div>

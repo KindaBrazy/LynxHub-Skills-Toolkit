@@ -1,7 +1,7 @@
 import {MainIpcApi} from '@lynx_main/plugins/extensions/ipcWrapper';
 import {ExtensionMainApi, MainExtensionUtils} from '@lynx_main/plugins/extensions/types';
 import {exec} from 'child_process';
-import {app} from 'electron';
+import {app, dialog} from 'electron';
 import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
@@ -39,11 +39,11 @@ function getSkillsCliPath(): string {
   throw new Error('Could not find skills CLI script in dev or production directories.');
 }
 
-async function runSkillsCommand(args: string) {
+async function runSkillsCommand(args: string, cwd?: string) {
   const cliPath = getSkillsCliPath();
   const cmd = `"${process.execPath}" "${cliPath}" ${args}`;
   return execAsync(cmd, {
-    cwd: process.cwd(),
+    cwd: cwd || process.cwd(),
     env: {
       ...process.env,
       ELECTRON_RUN_AS_NODE: '1',
@@ -188,16 +188,53 @@ async function fetchAndParseDiscoverPage(type: 'all-time' | 'trending' | 'hot' |
 }
 
 export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainExtensionUtils, mainIpc: MainIpcApi) {
+  let storageManager: any = null;
+  try {
+    storageManager = await _utils.getStorageManager();
+  } catch (err) {
+    console.error('Failed to get storage manager:', err);
+  }
+
+  const getProjectDirs = (): string[] => {
+    if (!storageManager) return [];
+    return storageManager.getCustomData('skills-project-dirs') || [];
+  };
+
+  const saveProjectDirs = (dirs: string[]) => {
+    if (!storageManager) return;
+    storageManager.setCustomData('skills-project-dirs', dirs);
+  };
+
   lynxApi.listenForChannels(() => {
     // Handler: List installed skills (local or global)
     mainIpc.lynxIpc.handle('skills-manager:list', async (isGlobal: boolean) => {
       try {
-        const args = isGlobal ? 'list -g --json' : 'list --json';
-        const {stdout} = await runSkillsCommand(args);
-        const jsonStart = stdout.indexOf('[');
-        if (jsonStart === -1) return [];
-        const jsonStr = stdout.slice(jsonStart);
-        return JSON.parse(jsonStr);
+        if (isGlobal) {
+          const args = 'list -g --json';
+          const {stdout} = await runSkillsCommand(args);
+          const jsonStart = stdout.indexOf('[');
+          if (jsonStart === -1) return [];
+          const jsonStr = stdout.slice(jsonStart);
+          return JSON.parse(jsonStr);
+        } else {
+          let combinedSkills: any[] = [];
+          const dirs = getProjectDirs();
+          for (const dir of dirs) {
+            if (!fs.existsSync(dir)) continue;
+            try {
+              const {stdout} = await runSkillsCommand('list --json', dir);
+              const jsonStart = stdout.indexOf('[');
+              if (jsonStart !== -1) {
+                const jsonStr = stdout.slice(jsonStart);
+                const parsed = JSON.parse(jsonStr);
+                combinedSkills = [...combinedSkills, ...parsed];
+              }
+            } catch (err) {
+              console.error(`Error listing skills in custom directory ${dir}:`, err);
+            }
+          }
+          return combinedSkills;
+        }
       } catch (error) {
         console.error('Error listing skills:', error);
         return [];
@@ -250,14 +287,14 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     // Handler: Add/Install a skill
     mainIpc.lynxIpc.handle(
       'skills-manager:add',
-      async (pkg: string, isGlobal: boolean, agent: string, copy: boolean) => {
+      async (pkg: string, isGlobal: boolean, agent: string, copy: boolean, targetCwd?: string) => {
         try {
           let args = `add "${pkg}" -y`;
           if (isGlobal) args += ' -g';
           if (agent && agent !== '*') args += ` -a "${agent}"`;
           if (copy) args += ' --copy';
 
-          const {stdout, stderr} = await runSkillsCommand(args);
+          const {stdout, stderr} = await runSkillsCommand(args, targetCwd);
           return {success: true, stdout, stderr};
         } catch (error: any) {
           console.error('Error adding skill:', error);
@@ -267,12 +304,24 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     );
 
     // Handler: Remove/Uninstall a skill
-    mainIpc.lynxIpc.handle('skills-manager:remove', async (name: string, isGlobal: boolean) => {
+    mainIpc.lynxIpc.handle('skills-manager:remove', async (name: string, isGlobal: boolean, skillPath?: string) => {
       try {
         let args = `remove "${name}" -y`;
         if (isGlobal) args += ' -g';
 
-        const {stdout, stderr} = await runSkillsCommand(args);
+        let targetCwd = '';
+        if (!isGlobal && skillPath) {
+          const dirs = getProjectDirs();
+          const normSkillPath = path.normalize(skillPath).toLowerCase();
+          const matched = dirs.find(d => normSkillPath.startsWith(path.normalize(d).toLowerCase()));
+          if (matched) {
+            targetCwd = matched;
+          } else if (dirs.length > 0) {
+            targetCwd = dirs[0];
+          }
+        }
+
+        const {stdout, stderr} = await runSkillsCommand(args, targetCwd);
         return {success: true, stdout, stderr};
       } catch (error: any) {
         console.error('Error removing skill:', error);
@@ -281,17 +330,69 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     });
 
     // Handler: Update a skill
-    mainIpc.lynxIpc.handle('skills-manager:update', async (name: string, isGlobal: boolean) => {
+    mainIpc.lynxIpc.handle('skills-manager:update', async (name: string, isGlobal: boolean, skillPath?: string) => {
       try {
         let args = `update "${name}" -y`;
         if (isGlobal) args += ' -g';
 
-        const {stdout, stderr} = await runSkillsCommand(args);
+        let targetCwd = '';
+        if (!isGlobal && skillPath) {
+          const dirs = getProjectDirs();
+          const normSkillPath = path.normalize(skillPath).toLowerCase();
+          const matched = dirs.find(d => normSkillPath.startsWith(path.normalize(d).toLowerCase()));
+          if (matched) {
+            targetCwd = matched;
+          } else if (dirs.length > 0) {
+            targetCwd = dirs[0];
+          }
+        }
+
+        const {stdout, stderr} = await runSkillsCommand(args, targetCwd);
         return {success: true, stdout, stderr};
       } catch (error: any) {
         console.error('Error updating skill:', error);
         return {success: false, error: error.message || String(error)};
       }
+    });
+
+    // Handler: Open native directory selection dialog
+    mainIpc.lynxIpc.handle('skills-manager:select-project-dir', async () => {
+      try {
+        const result = await dialog.showOpenDialog({
+          properties: ['openDirectory'],
+        });
+        if (result.canceled || result.filePaths.length === 0) {
+          return null;
+        }
+        return result.filePaths[0];
+      } catch (error) {
+        console.error('Error selecting project dir:', error);
+        return null;
+      }
+    });
+
+    // Handler: Get custom projects list
+    mainIpc.lynxIpc.handle('skills-manager:get-project-dirs', async () => {
+      return getProjectDirs();
+    });
+
+    // Handler: Add project directory
+    mainIpc.lynxIpc.handle('skills-manager:add-project-dir', async (dir: string) => {
+      const dirs = getProjectDirs();
+      if (!dirs.includes(dir)) {
+        const updated = [...dirs, dir];
+        saveProjectDirs(updated);
+        return updated;
+      }
+      return dirs;
+    });
+
+    // Handler: Remove project directory
+    mainIpc.lynxIpc.handle('skills-manager:remove-project-dir', async (dir: string) => {
+      const dirs = getProjectDirs();
+      const updated = dirs.filter(d => d !== dir);
+      saveProjectDirs(updated);
+      return updated;
     });
 
     // Handler: Get available agents from cli.mjs

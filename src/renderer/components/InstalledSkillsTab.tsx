@@ -48,6 +48,60 @@ export default function InstalledSkillsTab({
 
   const confirmBulkDeleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [projectDirs, setProjectDirs] = useState<string[]>([]);
+
+  const loadProjects = useCallback(async () => {
+    try {
+      const dirs = await ipc.invoke('skills-manager:get-project-dirs');
+      setProjectDirs(dirs || []);
+    } catch (err) {
+      console.error('Failed to load project dirs:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  const handleAddProjectDir = useCallback(async () => {
+    try {
+      const dir = await ipc.invoke('skills-manager:select-project-dir');
+      if (dir) {
+        const updated = await ipc.invoke('skills-manager:add-project-dir', dir);
+        setProjectDirs(updated || []);
+        bottomToast.success('Project folder registered successfully!');
+        await onRefreshInstalled();
+      }
+    } catch (err) {
+      console.error('Failed to add project folder:', err);
+    }
+  }, [onRefreshInstalled]);
+
+  const handleRemoveProjectDir = useCallback(
+    async (dir: string) => {
+      try {
+        const updated = await ipc.invoke('skills-manager:remove-project-dir', dir);
+        setProjectDirs(updated || []);
+        bottomToast.success('Project folder unregistered.');
+        await onRefreshInstalled();
+      } catch (err) {
+        console.error('Failed to remove project folder:', err);
+      }
+    },
+    [onRefreshInstalled],
+  );
+
+  const getSkillsCountForDir = useCallback(
+    (dir: string) => {
+      const normDir = dir.replace(/\\/g, '/').toLowerCase();
+      return installedSkills.filter(s => {
+        const normPath = s.path.replace(/\\/g, '/').toLowerCase();
+        return normPath.startsWith(normDir);
+      }).length;
+    },
+    [installedSkills],
+  );
+
   // Clean up confirmation timer on unmount
   useEffect(() => {
     return () => {
@@ -137,7 +191,7 @@ export default function InstalledSkillsTab({
         const skill = skillsToUpdate[i];
         setBulkLoadingStatus(`Updating skill ${i + 1} of ${skillsToUpdate.length}: "${skill.name}"...`);
         try {
-          const res = await ipc.invoke('skills-manager:update', skill.name, skill.scope === 'global');
+          const res = await ipc.invoke('skills-manager:update', skill.name, skill.scope === 'global', skill.path);
           if (res.success) {
             successCount++;
           } else {
@@ -177,7 +231,7 @@ export default function InstalledSkillsTab({
         const skill = skillsToRemove[i];
         setBulkLoadingStatus(`Removing skill ${i + 1} of ${skillsToRemove.length}: "${skill.name}"...`);
         try {
-          const res = await ipc.invoke('skills-manager:remove', skill.name, skill.scope === 'global');
+          const res = await ipc.invoke('skills-manager:remove', skill.name, skill.scope === 'global', skill.path);
           if (res.success) {
             successCount++;
           } else {
@@ -339,10 +393,10 @@ export default function InstalledSkillsTab({
   }, [groupBy, folderGroups, scopeGroups, agentGroups]);
 
   const handleUpdate = useCallback(
-    async (name: string, isGlobal: boolean) => {
+    async (name: string, isGlobal: boolean, path?: string) => {
       setUpdatingSkills(prev => ({...prev, [name]: true}));
       try {
-        const res = await ipc.invoke('skills-manager:update', name, isGlobal);
+        const res = await ipc.invoke('skills-manager:update', name, isGlobal, path);
         if (res.success) {
           bottomToast.success(`Successfully updated skill "${name}"!`);
           await onRefreshInstalled();
@@ -360,7 +414,7 @@ export default function InstalledSkillsTab({
   );
 
   const handleDelete = useCallback(
-    async (name: string, isGlobal: boolean) => {
+    async (name: string, isGlobal: boolean, path?: string) => {
       if (!confirmDelete[name]) {
         setConfirmDelete(prev => ({...prev, [name]: true}));
         // Reset after 3 seconds if not confirmed
@@ -372,7 +426,7 @@ export default function InstalledSkillsTab({
 
       setDeletingSkills(prev => ({...prev, [name]: true}));
       try {
-        const res = await ipc.invoke('skills-manager:remove', name, isGlobal);
+        const res = await ipc.invoke('skills-manager:remove', name, isGlobal, path);
         if (res.success) {
           bottomToast.success(`Successfully removed skill "${name}".`);
           await onRefreshInstalled();
@@ -511,7 +565,7 @@ export default function InstalledSkillsTab({
                           size="sm"
                           variant="tertiary"
                           className="text-xs"
-                          onPress={() => handleUpdate(skill.name, skill.scope === 'global')}
+                          onPress={() => handleUpdate(skill.name, skill.scope === 'global', skill.path)}
                           isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name] || !!bulkLoadingStatus}>
                           {updatingSkills[skill.name] ? <Spinner size="sm" /> : <Refresh />}
                           Update
@@ -520,7 +574,7 @@ export default function InstalledSkillsTab({
                           size="sm"
                           className="text-xs"
                           variant="danger-soft"
-                          onPress={() => handleDelete(skill.name, skill.scope === 'global')}
+                          onPress={() => handleDelete(skill.name, skill.scope === 'global', skill.path)}
                           isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name] || !!bulkLoadingStatus}>
                           {deletingSkills[skill.name] ? <Spinner size="sm" /> : <TrashBin2 />}
                           {confirmDelete[skill.name] ? 'Confirm?' : 'Remove'}
@@ -556,195 +610,253 @@ export default function InstalledSkillsTab({
     );
   }
 
-  if (installedSkills.length === 0) {
-    return (
-      <div
-        className={
-          'flex flex-col items-center justify-center py-20 border' +
-          ' border-dashed border-white/10 rounded-2xl bg-white/5'
-        }>
-        <InfoCircle aria-hidden="true" className="size-10 text-semi-muted mb-3" />
-        <Typography className="text-sm font-semibold">No skills installed yet</Typography>
-        <Description className="text-xs text-semi-muted mt-1">
-          Head over to the 'Discover Skills' tab to install capabilities for your agents.
-        </Description>
-        {onSwitchTab && (
-          <Button
-            size="sm"
-            onPress={() => onSwitchTab('discover')}
-            className="mt-4 bg-LynxPurple text-white px-5 hover:opacity-90 transition">
-            Browse Skills
-          </Button>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="size-full flex flex-col overflow-hidden">
-      {/* Bulk operation progress banner */}
-      {bulkLoadingStatus && (
+      {/* Project Folders Manager */}
+      <div className="mb-4 px-2">
+        <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
+          <div className="flex items-center gap-2">
+            <Folder className="size-4 text-LynxBlue" />
+            <span className="text-xs font-semibold text-white/90">Project Folders</span>
+            <Chip size="sm" variant="secondary" className="bg-white/10 text-white/80 text-[10px] h-5 px-1.5 py-0">
+              {projectDirs.length}
+            </Chip>
+          </div>
+          <Button
+            size="sm"
+            variant="secondary"
+            onPress={handleAddProjectDir}
+            className="text-[11px] h-7 bg-LynxBlue/20 text-LynxBlue border-none hover:bg-LynxBlue/30 shrink-0">
+            + Add Project Folder
+          </Button>
+        </div>
+
         <div
           className={
-            'flex items-center gap-3 px-3 py-2.5 bg-LynxBlue/15 border' +
-            ' border-LynxBlue/25 rounded-xl mb-4 text-xs text-white/95 animate-pulse'
+            'flex flex-col gap-1.5 mt-2 bg-black/10 border' + ' border-white/5 rounded-xl p-2 max-h-32 overflow-y-auto'
           }>
-          <Spinner size="sm" />
-          <span className="font-medium">{bulkLoadingStatus}</span>
-        </div>
-      )}
-
-      {/* Top Bar for controls */}
-      <div className="flex justify-between items-center mb-4 gap-4 px-2">
-        {selectedSkillsList.length > 0 ? (
-          <div className="flex items-center gap-3">
-            <Typography className="text-sm font-semibold text-LynxBlue">
-              {selectedSkillsList.length} skill{selectedSkillsList.length === 1 ? '' : 's'} selected
-            </Typography>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                className="text-xs"
-                isDisabled={!!bulkLoadingStatus}
-                onPress={() => handleBulkUpdate(selectedSkillsList)}>
-                <Refresh className="size-3.5 animate-spin-slow" />
-                Update Selected
-              </Button>
-              <Button
-                size="sm"
-                className="text-xs"
-                variant="danger-soft"
-                onPress={onPressBulkRemove}
-                isDisabled={!!bulkLoadingStatus}>
-                <TrashBin2 className="size-3.5" />
-                {confirmBulkDelete ? 'Confirm Remove?' : 'Remove Selected'}
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                isDisabled={!!bulkLoadingStatus}
-                onPress={() => setSelectedKeys(new Set())}
-                className="text-xs text-semi-muted hover:text-white">
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Typography className="text-sm text-semi-muted">
-              Showing {installedSkills.length} installed skill{installedSkills.length === 1 ? '' : 's'}
-            </Typography>
-            <Dropdown>
-              <Dropdown.Trigger>
-                <Button size="sm" variant="secondary" className="text-xs" isDisabled={!!bulkLoadingStatus}>
-                  <Refresh className="size-3.5" />
-                  Update All...
+          {projectDirs.map(dir => {
+            const count = getSkillsCountForDir(dir);
+            return (
+              <div
+                key={dir}
+                className="flex items-center justify-between text-xs py-1 px-2 hover:bg-white/2 rounded-lg group">
+                <div className="flex items-center gap-2 truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-LynxBlue/60 shrink-0" />
+                  <span title={dir} className="font-JetBrainsMono text-[11px] text-white/70 truncate">
+                    {dir}
+                  </span>
+                  <Chip
+                    size="sm"
+                    variant="secondary"
+                    className="bg-white/5 text-white/50 text-[9px] h-4.5 py-0 px-1 shrink-0 ml-1.5">
+                    {count} skill{count === 1 ? '' : 's'}
+                  </Chip>
+                </div>
+                <Button
+                  className={
+                    'h-5 min-w-0 p-0 text-semi-muted hover:text-danger' + ' cursor-pointer border-none bg-transparent'
+                  }
+                  size="sm"
+                  variant="ghost"
+                  onPress={() => handleRemoveProjectDir(dir)}>
+                  <TrashBin2 className="size-3.5" />
                 </Button>
-              </Dropdown.Trigger>
-              <Dropdown.Popover className="min-w-50">
-                <Dropdown.Menu onAction={handleBulkActionOption}>
-                  <Dropdown.Item id="all" textValue="Update All">
-                    <Label>Update All ({installedSkills.length})</Label>
-                  </Dropdown.Item>
-                  <Dropdown.Item id="project" textValue="Update Project Scope">
-                    <Label>Update Project Scope ({installedSkills.filter(s => s.scope === 'project').length})</Label>
-                  </Dropdown.Item>
-                  <Dropdown.Item id="global" textValue="Update Global Scope">
-                    <Label>Update Global Scope ({installedSkills.filter(s => s.scope === 'global').length})</Label>
-                  </Dropdown.Item>
-
-                  {uniqueAgents.length > 0 && <Separator className="my-1" />}
-
-                  {uniqueAgents.map(agent => {
-                    const agentCount = installedSkills.filter(s => s.agents && s.agents.includes(agent)).length;
-                    return (
-                      <Dropdown.Item key={agent} id={`agent-${agent}`} textValue={`Update Agent: ${agent}`}>
-                        <Label>
-                          Update Agent: {agent} ({agentCount})
-                        </Label>
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Menu>
-              </Dropdown.Popover>
-            </Dropdown>
-          </div>
-        )}
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-semi-muted whitespace-nowrap">Group by:</span>
-          <Select
-            value={groupBy}
-            className="w-56"
-            variant="secondary"
-            placeholder="All Skills"
-            isDisabled={!!bulkLoadingStatus}
-            onChange={val => setGroupBy((val as string) || 'all')}>
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                <ListBox.Item id="all" textValue="All Skills">
-                  All Skills
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-                <ListBox.Item id="folder" textValue="Folder">
-                  Folder
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-                <ListBox.Item id="scope" textValue="Scope">
-                  Scope
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-                <ListBox.Item id="agents" textValue="Target Agent">
-                  Target Agent
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              </ListBox>
-            </Select.Popover>
-          </Select>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <ScrollShadow className="flex-1 overflow-y-auto px-2">
-        {groupBy === 'all' ? (
-          renderSkillsTable(installedSkills)
-        ) : (
-          <div className="flex flex-col gap-6">
-            {currentGroups.map(group => (
-              <div key={group.id} className="border border-white/5 rounded-xl bg-white/2 p-4 flex flex-col gap-3">
-                <div className="flex items-center gap-2 px-1">
-                  {group.icon}
-                  <Typography
-                    title={group.title}
-                    className="text-sm font-semibold text-white/90 font-JetBrainsMono truncate max-w-[60%]">
-                    {group.title}
-                  </Typography>
-                  <Chip size="sm" variant="secondary" className="bg-white/10 text-white/80 text-[10px] h-5 py-0">
-                    {group.skills.length}
-                  </Chip>
-                  {groupBy === 'folder' && (
-                    <Button
-                      className={
-                        'text-[10px] text-semi-muted hover:text-LynxBlue' +
-                        ' h-auto p-0 border-none bg-transparent min-w-0 ml-auto cursor-pointer hover:bg-transparent'
-                      }
-                      size="sm"
-                      variant="ghost"
-                      onPress={() => ipc.send('app:openPath', group.id)}>
-                      Open Folder
-                    </Button>
-                  )}
+      {installedSkills.length === 0 ? (
+        <div
+          className={
+            'flex flex-col items-center justify-center py-20 border' +
+            ' border-dashed border-white/10 rounded-2xl bg-white/5 mx-2'
+          }>
+          <InfoCircle aria-hidden="true" className="size-10 text-semi-muted mb-3" />
+          <Typography className="text-sm font-semibold">No skills installed yet</Typography>
+          <Description className="text-xs text-semi-muted mt-1">
+            Head over to the 'Discover Skills' tab to install capabilities for your agents.
+          </Description>
+          {onSwitchTab && (
+            <Button
+              size="sm"
+              onPress={() => onSwitchTab('discover')}
+              className="mt-4 bg-LynxPurple text-white px-5 hover:opacity-90 transition">
+              Browse Skills
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+          {/* Bulk operation progress banner */}
+          {bulkLoadingStatus && (
+            <div
+              className={
+                'flex items-center gap-3 px-3 py-2.5 bg-LynxBlue/15 border' +
+                ' border-LynxBlue/25 rounded-xl mb-4 text-xs text-white/95 animate-pulse'
+              }>
+              <Spinner size="sm" />
+              <span className="font-medium">{bulkLoadingStatus}</span>
+            </div>
+          )}
+
+          {/* Top Bar for controls */}
+          <div className="flex justify-between items-center mb-4 gap-4 px-2">
+            {selectedSkillsList.length > 0 ? (
+              <div className="flex items-center gap-3">
+                <Typography className="text-sm font-semibold text-LynxBlue">
+                  {selectedSkillsList.length} skill{selectedSkillsList.length === 1 ? '' : 's'} selected
+                </Typography>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="text-xs"
+                    isDisabled={!!bulkLoadingStatus}
+                    onPress={() => handleBulkUpdate(selectedSkillsList)}>
+                    <Refresh className="size-3.5 animate-spin-slow" />
+                    Update Selected
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-xs"
+                    variant="danger-soft"
+                    onPress={onPressBulkRemove}
+                    isDisabled={!!bulkLoadingStatus}>
+                    <TrashBin2 className="size-3.5" />
+                    {confirmBulkDelete ? 'Confirm Remove?' : 'Remove Selected'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isDisabled={!!bulkLoadingStatus}
+                    onPress={() => setSelectedKeys(new Set())}
+                    className="text-xs text-semi-muted hover:text-white">
+                    Cancel
+                  </Button>
                 </div>
-                {renderSkillsTable(group.skills)}
               </div>
-            ))}
+            ) : (
+              <div className="flex items-center gap-3">
+                <Typography className="text-sm text-semi-muted">
+                  Showing {installedSkills.length} installed skill{installedSkills.length === 1 ? '' : 's'}
+                </Typography>
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <Button size="sm" variant="secondary" className="text-xs" isDisabled={!!bulkLoadingStatus}>
+                      <Refresh className="size-3.5" />
+                      Update All...
+                    </Button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Popover className="min-w-50">
+                    <Dropdown.Menu onAction={handleBulkActionOption}>
+                      <Dropdown.Item id="all" textValue="Update All">
+                        <Label>Update All ({installedSkills.length})</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="project" textValue="Update Project Scope">
+                        <Label>
+                          Update Project Scope ({installedSkills.filter(s => s.scope === 'project').length})
+                        </Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="global" textValue="Update Global Scope">
+                        <Label>Update Global Scope ({installedSkills.filter(s => s.scope === 'global').length})</Label>
+                      </Dropdown.Item>
+
+                      {uniqueAgents.length > 0 && <Separator className="my-1" />}
+
+                      {uniqueAgents.map(agent => {
+                        const agentCount = installedSkills.filter(s => s.agents && s.agents.includes(agent)).length;
+                        return (
+                          <Dropdown.Item key={agent} id={`agent-${agent}`} textValue={`Update Agent: ${agent}`}>
+                            <Label>
+                              Update Agent: {agent} ({agentCount})
+                            </Label>
+                          </Dropdown.Item>
+                        );
+                      })}
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-semi-muted whitespace-nowrap">Group by:</span>
+              <Select
+                value={groupBy}
+                className="w-56"
+                variant="secondary"
+                placeholder="All Skills"
+                isDisabled={!!bulkLoadingStatus}
+                onChange={val => setGroupBy((val as string) || 'all')}>
+                <Select.Trigger>
+                  <Select.Value />
+                  <Select.Indicator />
+                </Select.Trigger>
+                <Select.Popover>
+                  <ListBox>
+                    <ListBox.Item id="all" textValue="All Skills">
+                      All Skills
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                    <ListBox.Item id="folder" textValue="Folder">
+                      Folder
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                    <ListBox.Item id="scope" textValue="Scope">
+                      Scope
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                    <ListBox.Item id="agents" textValue="Target Agent">
+                      Target Agent
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
           </div>
-        )}
-      </ScrollShadow>
+
+          <ScrollShadow className="flex-1 overflow-y-auto px-2">
+            {groupBy === 'all' ? (
+              renderSkillsTable(installedSkills)
+            ) : (
+              <div className="flex flex-col gap-6">
+                {currentGroups.map(group => (
+                  <div key={group.id} className="border border-white/5 rounded-xl bg-white/2 p-4 flex flex-col gap-3">
+                    <div className="flex items-center gap-2 px-1">
+                      {group.icon}
+                      <Typography
+                        title={group.title}
+                        className="text-sm font-semibold text-white/90 font-JetBrainsMono truncate max-w-[60%]">
+                        {group.title}
+                      </Typography>
+                      <Chip size="sm" variant="secondary" className="bg-white/10 text-white/80 text-[10px] h-5 py-0">
+                        {group.skills.length}
+                      </Chip>
+                      {groupBy === 'folder' && (
+                        <Button
+                          className={
+                            'text-[10px] text-semi-muted hover:text-LynxBlue' +
+                            ' h-auto p-0 border-none bg-transparent min-w-0 ml-auto cursor-pointer hover:bg-transparent'
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() => ipc.send('app:openPath', group.id)}>
+                          Open Folder
+                        </Button>
+                      )}
+                    </div>
+                    {renderSkillsTable(group.skills)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollShadow>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import {Button, Checkbox, Description, InputGroup, Modal, ScrollShadow, Typograp
 import TabModal from '@lynx/components/TabModal';
 import {Download, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
 import {Magnifier} from '@solar-icons/react-perf/Linear';
+import {ArrowDown} from '@solar-icons/react-perf/LineDuotone';
 import {X} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
@@ -162,8 +163,9 @@ export function CreatorSkillsModal({
                       return (
                         <div
                           className={
-                            'flex items-center gap-3 p-3 rounded-2xl bg-surface/30 transition-all duration-200' +
-                            ' border cursor-pointer hover:shadow-md hover:shadow-black/5 active:scale-[0.99] ' +
+                            'flex items-center gap-2 px-2.5 py-2 rounded-xl' +
+                            ' bg-surface/30 transition-all duration-200 border cursor-pointer' +
+                            ' hover:shadow-sm active:scale-[0.99] ' +
                             (installed
                               ? 'border-success/30 bg-success/5 hover:bg-success/10'
                               : 'border-border-secondary/40 hover:border-foreground/10 hover:bg-foreground/5')
@@ -173,6 +175,7 @@ export function CreatorSkillsModal({
                           <Checkbox
                             variant="secondary"
                             isSelected={isSelected}
+                            className="scale-90 origin-left"
                             aria-label={`Select ${skill.name}`}
                             onChange={() => onToggleSelectSkill(registrySkill)}>
                             <Checkbox.Content>
@@ -181,11 +184,14 @@ export function CreatorSkillsModal({
                               </Checkbox.Control>
                             </Checkbox.Content>
                           </Checkbox>
-                          <div className="flex-1 min-w-0 pr-1">
-                            <Typography className="text-sm font-bold truncate text-foreground">{skill.name}</Typography>
-                            <Typography className="text-xs text-semi-muted truncate font-JetBrainsMono mt-0.5">
-                              {formatInstalls(skill.installs)} installs
-                            </Typography>
+                          <div className="flex-1 min-w-0 pr-1 flex flex-col gap-y-1">
+                            <span className="text-xs font-semibold truncate text-foreground">{skill.name}</span>
+                            <span
+                              className={
+                                'text-[10px] text-semi-muted truncate font-JetBrainsMono flex items-center gap-x-1'
+                              }>
+                              {formatInstalls(skill.installs)} <ArrowDown />
+                            </span>
                           </div>
                           <Button
                             onPress={() => {
@@ -193,7 +199,7 @@ export function CreatorSkillsModal({
                               onSelectSkill(registrySkill);
                             }}
                             className={
-                              'h-8 w-8 min-w-8 hover:bg-foreground/10 rounded-xl' +
+                              'size-7 min-w-7 hover:bg-foreground/10 rounded-lg' +
                               ' flex items-center justify-center shrink-0'
                             }
                             size="sm"
@@ -201,9 +207,9 @@ export function CreatorSkillsModal({
                             onClick={e => e.stopPropagation()}
                             isIconOnly>
                             {installed ? (
-                              <SettingsMinimalistic className="size-4 text-semi-muted" />
+                              <SettingsMinimalistic className="size-3.5 text-semi-muted" />
                             ) : (
-                              <Download className="size-4 text-foreground" />
+                              <Download className="size-3.5 text-foreground" />
                             )}
                           </Button>
                         </div>

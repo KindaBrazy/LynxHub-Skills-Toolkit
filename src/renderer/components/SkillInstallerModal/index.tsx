@@ -210,7 +210,7 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
       isOpen={selectedSkills.length > 0}
       onOpenChange={open => !open && onClose()}>
       <ModalCloseTrigger onPress={onClose} />
-      <div className="flex flex-col gap-4 font-Nunito">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <CloudStorage className="size-6 text-LynxPurple" />
           <Typography className="text-lg font-bold">
@@ -228,12 +228,10 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
         {selectedSkills.length > 1 && (
           <div
             className={
-              'flex flex-wrap gap-1.5 p-2 bg-black/10' +
-              ' border border-border-secondary/30 rounded-xl' +
-              ' max-h-24 overflow-y-auto'
+              'flex flex-wrap gap-1.5 p-2 bg-surface-secondary' + ' rounded-2xl' + ' max-h-24 overflow-y-auto'
             }>
             {selectedSkills.map(s => (
-              <Chip size="sm" key={s.id} variant="secondary" className="bg-foreground/5 text-foreground/80 font-medium">
+              <Chip size="sm" key={s.id} variant="secondary" className="bg-surface px-1.5">
                 {s.name}
               </Chip>
             ))}
@@ -264,12 +262,12 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-semi-muted">Project Destination</Label>
             <Select
-              className="w-full"
               variant="secondary"
               isDisabled={isInstalling}
               value={selectedProjectCwd}
               placeholder="Select project destination"
-              onChange={val => handleProjectSelectChange(val as string)}>
+              onChange={val => handleProjectSelectChange(val as string)}
+              fullWidth>
               <Select.Trigger>
                 <Select.Value>{selectedProjectCwd || 'Select a project folder...'}</Select.Value>
                 <Select.Indicator />

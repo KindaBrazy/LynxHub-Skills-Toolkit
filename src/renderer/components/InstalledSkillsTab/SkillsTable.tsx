@@ -80,7 +80,8 @@ export function SkillsTable({
                   ' rounded-xl border border-transparent transition-all duration-150',
                 isSelected && 'bg-foreground/3 border-foreground/10',
               )}
-              key={rowKey}>
+              key={rowKey}
+              onClick={() => toggleSelectSkill(rowKey)}>
               {/* Checkbox */}
               <div className="w-8 shrink-0 flex justify-center">
                 <Checkbox

@@ -78,7 +78,7 @@ export function SkillsTable({
               className={cn(
                 'group flex items-center gap-4 py-1.5 px-3 hover:bg-foreground/5' +
                   ' rounded-xl border border-transparent transition-all duration-150',
-                isSelected && 'bg-foreground/[0.03] border-foreground/10',
+                isSelected && 'bg-foreground/3 border-foreground/10',
               )}
               key={rowKey}>
               {/* Checkbox */}

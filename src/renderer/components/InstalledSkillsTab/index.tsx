@@ -1,4 +1,3 @@
-import type {Selection} from '@heroui/react';
 import {
   Accordion,
   Button,
@@ -16,14 +15,16 @@ import {
   Typography,
 } from '@heroui/react';
 import {bottomToast} from '@lynx/layouts/ToastProviders';
-import {CloudStorage, Folder, InfoCircle, Laptop, User} from '@solar-icons/react-perf/BoldDuotone';
+import {InfoCircle} from '@solar-icons/react-perf/BoldDuotone';
 import {AltArrowDown, Magnifier, Refresh} from '@solar-icons/react-perf/Linear';
 import {X} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {InstalledSkill} from '../../types';
 import {ProjectFoldersPopover} from './ProjectFoldersPopover';
 import {SkillsTable} from './SkillsTable';
+import {useBulkActions} from './useBulkActions';
+import {useSkillsGroups} from './useSkillsGroups';
 
 const ipc = (window as any).electron.ipcRenderer;
 
@@ -45,14 +46,27 @@ export default function InstalledSkillsTab({
   const [confirmDelete, setConfirmDelete] = useState<Record<string, boolean>>({});
   const [groupBy, setGroupBy] = useState<string>('all');
   const [expandedKeys, setExpandedKeys] = useState<Set<any>>(new Set());
-
-  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set<any>());
-  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
-  const [bulkLoadingStatus, setBulkLoadingStatus] = useState<string | null>(null);
-
-  const confirmBulkDeleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [filterQuery, setFilterQuery] = useState('');
 
   const [projectDirs, setProjectDirs] = useState<string[]>([]);
+
+  const {filteredSkills, currentGroups, uniqueAgents, getSkillsCountForDir} = useSkillsGroups(
+    installedSkills,
+    filterQuery,
+    groupBy,
+  );
+
+  const {
+    selectedKeys,
+    setSelectedKeys,
+    selectedSkillsList,
+    confirmBulkDelete,
+    bulkLoadingStatus,
+    handleBulkUpdate,
+    onPressBulkRemove,
+    handleBulkActionOption,
+    toggleSelectSkill,
+  } = useBulkActions(installedSkills, onRefreshInstalled);
 
   const loadProjects = useCallback(async () => {
     try {
@@ -94,309 +108,6 @@ export default function InstalledSkillsTab({
     },
     [onRefreshInstalled],
   );
-
-  const getSkillsCountForDir = useCallback(
-    (dir: string) => {
-      const normDir = dir.replace(/\\/g, '/').toLowerCase();
-      return installedSkills.filter(s => {
-        const normPath = s.path.replace(/\\/g, '/').toLowerCase();
-        return normPath.startsWith(normDir);
-      }).length;
-    },
-    [installedSkills],
-  );
-
-  // Clean up confirmation timer on unmount
-  useEffect(() => {
-    return () => {
-      if (confirmBulkDeleteTimeoutRef.current) {
-        clearTimeout(confirmBulkDeleteTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Clear selected keys that are no longer present in installedSkills
-  useEffect(() => {
-    setSelectedKeys(prev => {
-      if (prev === 'all') return prev;
-      const validKeys = new Set(installedSkills.map(s => `${s.name}-${s.scope}`));
-      const next = new Set<any>();
-      const prevSet = prev as Set<any>;
-      for (const k of prevSet) {
-        if (validKeys.has(String(k))) {
-          next.add(k);
-        }
-      }
-      if (next.size !== prevSet.size) {
-        return next;
-      }
-      return prev;
-    });
-  }, [installedSkills]);
-
-  const selectedSkillsList = useMemo(() => {
-    if (selectedKeys === 'all') {
-      return installedSkills;
-    }
-    const keysSet = selectedKeys as Set<any>;
-    return installedSkills.filter(skill => {
-      const key = `${skill.name}-${skill.scope}`;
-      return keysSet.has(key);
-    });
-  }, [selectedKeys, installedSkills]);
-
-  const uniqueAgents = useMemo(() => {
-    const agentsSet = new Set<string>();
-    for (const skill of installedSkills) {
-      if (skill.agents) {
-        for (const agent of skill.agents) {
-          agentsSet.add(agent);
-        }
-      }
-    }
-    return Array.from(agentsSet).sort();
-  }, [installedSkills]);
-
-  const toggleSelectSkill = useCallback((skillKey: string) => {
-    setSelectedKeys(prev => {
-      const next = new Set<any>(prev === 'all' ? [] : Array.from(prev as Set<any>));
-      if (next.has(skillKey)) {
-        next.delete(skillKey);
-      } else {
-        next.add(skillKey);
-      }
-      return next;
-    });
-  }, []);
-
-  const handleBulkUpdate = useCallback(
-    async (skillsToUpdate: InstalledSkill[]) => {
-      if (skillsToUpdate.length === 0) return;
-
-      setSelectedKeys(new Set());
-      setBulkLoadingStatus(`Preparing to update ${skillsToUpdate.length} skill(s)...`);
-
-      let successCount = 0;
-      let failCount = 0;
-
-      for (let i = 0; i < skillsToUpdate.length; i++) {
-        const skill = skillsToUpdate[i];
-        setBulkLoadingStatus(`Updating skill ${i + 1} of ${skillsToUpdate.length}: "${skill.name}"...`);
-        try {
-          const res = await ipc.invoke('skills-manager:update', skill.name, skill.scope === 'global', skill.path);
-          if (res.success) {
-            successCount++;
-          } else {
-            failCount++;
-            console.error(`Failed to update ${skill.name}:`, res.error);
-          }
-        } catch (err) {
-          failCount++;
-          console.error(`Error updating ${skill.name}:`, err);
-        }
-      }
-
-      setBulkLoadingStatus(null);
-      await onRefreshInstalled();
-
-      if (failCount === 0) {
-        bottomToast.success(`Successfully updated all ${successCount} skill(s)!`);
-      } else {
-        bottomToast.warning(`Updated ${successCount} skill(s), ${failCount} failed.`);
-      }
-    },
-    [onRefreshInstalled],
-  );
-
-  const handleBulkRemove = useCallback(
-    async (skillsToRemove: InstalledSkill[]) => {
-      if (skillsToRemove.length === 0) return;
-
-      setSelectedKeys(new Set());
-      setConfirmBulkDelete(false);
-      setBulkLoadingStatus(`Preparing to remove ${skillsToRemove.length} skill(s)...`);
-
-      let successCount = 0;
-      let failCount = 0;
-
-      for (let i = 0; i < skillsToRemove.length; i++) {
-        const skill = skillsToRemove[i];
-        setBulkLoadingStatus(`Removing skill ${i + 1} of ${skillsToRemove.length}: "${skill.name}"...`);
-        try {
-          const res = await ipc.invoke('skills-manager:remove', skill.name, skill.scope === 'global', skill.path);
-          if (res.success) {
-            successCount++;
-          } else {
-            failCount++;
-            console.error(`Failed to remove ${skill.name}:`, res.error);
-          }
-        } catch (err) {
-          failCount++;
-          console.error(`Error removing ${skill.name}:`, err);
-        }
-      }
-
-      setBulkLoadingStatus(null);
-      await onRefreshInstalled();
-
-      if (failCount === 0) {
-        bottomToast.success(`Successfully removed all ${successCount} skill(s).`);
-      } else {
-        bottomToast.warning(`Removed ${successCount} skill(s), ${failCount} failed.`);
-      }
-    },
-    [onRefreshInstalled],
-  );
-
-  const onPressBulkRemove = useCallback(() => {
-    if (!confirmBulkDelete) {
-      setConfirmBulkDelete(true);
-      if (confirmBulkDeleteTimeoutRef.current) {
-        clearTimeout(confirmBulkDeleteTimeoutRef.current);
-      }
-      confirmBulkDeleteTimeoutRef.current = setTimeout(() => {
-        setConfirmBulkDelete(false);
-      }, 3000);
-    } else {
-      if (confirmBulkDeleteTimeoutRef.current) {
-        clearTimeout(confirmBulkDeleteTimeoutRef.current);
-      }
-      handleBulkRemove(selectedSkillsList);
-    }
-  }, [confirmBulkDelete, selectedSkillsList, handleBulkRemove]);
-
-  const handleBulkActionOption = useCallback(
-    (key: React.Key) => {
-      const option = String(key);
-      if (option === 'all') {
-        handleBulkUpdate(installedSkills);
-      } else if (option === 'project') {
-        const filtered = installedSkills.filter(s => s.scope === 'project');
-        handleBulkUpdate(filtered);
-      } else if (option === 'global') {
-        const filtered = installedSkills.filter(s => s.scope === 'global');
-        handleBulkUpdate(filtered);
-      } else if (option.startsWith('agent-')) {
-        const agentName = option.substring('agent-'.length);
-        const filtered = installedSkills.filter(s => s.agents && s.agents.includes(agentName));
-        handleBulkUpdate(filtered);
-      }
-    },
-    [installedSkills, handleBulkUpdate],
-  );
-
-  const getParentFolderPath = useCallback((filePath: string) => {
-    const normalized = filePath.replace(/\\/g, '/');
-    const lastSlash = normalized.lastIndexOf('/');
-    if (lastSlash === -1) return 'Other';
-    return filePath.substring(0, lastSlash);
-  }, []);
-
-  const [filterQuery, setFilterQuery] = useState('');
-
-  const filteredSkills = useMemo(() => {
-    if (!filterQuery.trim()) return installedSkills;
-    const query = filterQuery.toLowerCase().trim();
-    return installedSkills.filter(
-      skill =>
-        skill.name.toLowerCase().includes(query) ||
-        skill.scope.toLowerCase().includes(query) ||
-        (skill.path && skill.path.toLowerCase().includes(query)) ||
-        (skill.agents && skill.agents.some(agent => agent.toLowerCase().includes(query))),
-    );
-  }, [installedSkills, filterQuery]);
-
-  const folderGroups = useMemo(() => {
-    const map: Record<string, InstalledSkill[]> = {};
-    for (const skill of filteredSkills) {
-      const parent = getParentFolderPath(skill.path);
-      if (!map[parent]) {
-        map[parent] = [];
-      }
-      map[parent].push(skill);
-    }
-    return Object.entries(map).map(([folderPath, skills]) => ({
-      id: folderPath,
-      title: folderPath,
-      icon: <Folder className="size-4 text-LynxBlue" />,
-      skills,
-    }));
-  }, [filteredSkills, getParentFolderPath]);
-
-  const scopeGroups = useMemo(() => {
-    const map: Record<'project' | 'global', InstalledSkill[]> = {
-      project: [],
-      global: [],
-    };
-    for (const skill of filteredSkills) {
-      map[skill.scope].push(skill);
-    }
-
-    const groups: {
-      id: string;
-      title: string;
-      icon: React.ReactNode;
-      skills: InstalledSkill[];
-    }[] = [];
-    if (map.project.length > 0) {
-      groups.push({
-        id: 'project',
-        title: 'Project Scope',
-        icon: <Laptop className="size-4 text-LynxBlue" />,
-        skills: map.project,
-      });
-    }
-    if (map.global.length > 0) {
-      groups.push({
-        id: 'global',
-        title: 'Global Scope',
-        icon: <CloudStorage className="size-4 text-LynxPurple" />,
-        skills: map.global,
-      });
-    }
-    return groups;
-  }, [filteredSkills]);
-
-  const agentGroups = useMemo(() => {
-    const map: Record<string, InstalledSkill[]> = {};
-    const noAgentSkills: InstalledSkill[] = [];
-
-    for (const skill of filteredSkills) {
-      if (skill.agents && skill.agents.length > 0) {
-        const firstAgent = skill.agents[0];
-        if (!map[firstAgent]) {
-          map[firstAgent] = [];
-        }
-        map[firstAgent].push(skill);
-      } else {
-        noAgentSkills.push(skill);
-      }
-    }
-
-    const groups = Object.entries(map).map(([agentName, skills]) => ({
-      id: agentName,
-      title: `Agent: ${agentName}`,
-      icon: <User className="size-4 text-LynxPurple" />,
-      skills,
-    }));
-
-    if (noAgentSkills.length > 0) {
-      groups.push({
-        id: 'none',
-        title: 'Common (No Target Agent)',
-        icon: <User className="size-4 text-semi-muted" />,
-        skills: noAgentSkills,
-      });
-    }
-    return groups;
-  }, [filteredSkills]);
-
-  const currentGroups = useMemo(() => {
-    if (groupBy === 'folder') return folderGroups;
-    if (groupBy === 'scope') return scopeGroups;
-    if (groupBy === 'agents') return agentGroups;
-    return [];
-  }, [groupBy, folderGroups, scopeGroups, agentGroups]);
 
   // Expand the first group and collapse others by default when currentGroups changes
   useEffect(() => {

@@ -7,6 +7,7 @@ import {
   Dropdown,
   Label,
   ListBox,
+  Popover,
   ScrollShadow,
   Select,
   Separator,
@@ -17,7 +18,7 @@ import {
 } from '@heroui/react';
 import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {CloudStorage, Folder, InfoCircle, Laptop, TrashBin2, User} from '@solar-icons/react-perf/BoldDuotone';
-import {Refresh} from '@solar-icons/react-perf/Linear';
+import {Refresh, Settings} from '@solar-icons/react-perf/Linear';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {InstalledSkill} from '../types';
@@ -612,62 +613,6 @@ export default function InstalledSkillsTab({
 
   return (
     <div className="size-full flex flex-col overflow-hidden">
-      {/* Project Folders Manager */}
-      <div className="mb-4 px-2">
-        <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
-          <div className="flex items-center gap-2">
-            <Folder className="size-4 text-LynxBlue" />
-            <span className="text-xs font-semibold text-white/90">Project Folders</span>
-            <Chip size="sm" variant="secondary" className="bg-white/10 text-white/80 text-[10px] h-5 px-1.5 py-0">
-              {projectDirs.length}
-            </Chip>
-          </div>
-          <Button
-            size="sm"
-            variant="secondary"
-            onPress={handleAddProjectDir}
-            className="text-[11px] h-7 bg-LynxBlue/20 text-LynxBlue border-none hover:bg-LynxBlue/30 shrink-0">
-            + Add Project Folder
-          </Button>
-        </div>
-
-        <div
-          className={
-            'flex flex-col gap-1.5 mt-2 bg-black/10 border' + ' border-white/5 rounded-xl p-2 max-h-32 overflow-y-auto'
-          }>
-          {projectDirs.map(dir => {
-            const count = getSkillsCountForDir(dir);
-            return (
-              <div
-                key={dir}
-                className="flex items-center justify-between text-xs py-1 px-2 hover:bg-white/2 rounded-lg group">
-                <div className="flex items-center gap-2 truncate">
-                  <span className="w-1.5 h-1.5 rounded-full bg-LynxBlue/60 shrink-0" />
-                  <span title={dir} className="font-JetBrainsMono text-[11px] text-white/70 truncate">
-                    {dir}
-                  </span>
-                  <Chip
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white/5 text-white/50 text-[9px] h-4.5 py-0 px-1 shrink-0 ml-1.5">
-                    {count} skill{count === 1 ? '' : 's'}
-                  </Chip>
-                </div>
-                <Button
-                  className={
-                    'h-5 min-w-0 p-0 text-semi-muted hover:text-danger' + ' cursor-pointer border-none bg-transparent'
-                  }
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => handleRemoveProjectDir(dir)}>
-                  <TrashBin2 className="size-3.5" />
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {installedSkills.length === 0 ? (
         <div
           className={
@@ -816,6 +761,86 @@ export default function InstalledSkillsTab({
                   </ListBox>
                 </Select.Popover>
               </Select>
+
+              <Popover>
+                <Popover.Trigger>
+                  <Button size="sm" variant="secondary" aria-label="Manage project folders" isIconOnly>
+                    <Settings />
+                  </Button>
+                </Popover.Trigger>
+                <Popover.Content className="w-120">
+                  <Popover.Dialog className="flex flex-col gap-3">
+                    <Popover.Arrow />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Folder className="size-4 text-LynxBlue" />
+                        <span className="text-xs font-semibold text-white/90">Project Folders</span>
+                        <Chip
+                          size="sm"
+                          variant="secondary"
+                          className="bg-white/10 text-white/80 text-[10px] h-5 px-1.5 py-0">
+                          {projectDirs.length}
+                        </Chip>
+                      </div>
+                    </div>
+
+                    <div
+                      className={
+                        'flex flex-col gap-1.5 max-h-48 overflow-y-auto' +
+                        ' bg-surface-secondary border border-white/5 rounded-2xl p-2'
+                      }>
+                      {projectDirs.length === 0 ? (
+                        <span className="text-xs text-semi-muted text-center py-4">No project folders registered</span>
+                      ) : (
+                        projectDirs.map(dir => {
+                          const count = getSkillsCountForDir(dir);
+                          return (
+                            <div
+                              className={
+                                'flex items-center justify-between text-xs' +
+                                ' py-1 px-2 hover:bg-white/2 rounded-lg group'
+                              }
+                              key={dir}>
+                              <div className="flex items-center gap-2 truncate">
+                                <span title={dir} className="font-JetBrainsMono text-[10px] text-white/70 truncate">
+                                  {dir}
+                                </span>
+                                <Chip
+                                  size="sm"
+                                  variant="secondary"
+                                  className="bg-white/5 text-white/50 text-[9px] h-4.5 py-0 px-1 shrink-0 ml-1.5">
+                                  {count} skill{count === 1 ? '' : 's'}
+                                </Chip>
+                              </div>
+                              <Button
+                                className={
+                                  'h-5 min-w-0 p-0 text-semi-muted hover:text-danger' +
+                                  ' cursor-pointer border-none bg-transparent'
+                                }
+                                size="sm"
+                                variant="ghost"
+                                onPress={() => handleRemoveProjectDir(dir)}>
+                                <TrashBin2 className="size-3.5" />
+                              </Button>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <Button
+                      className={
+                        'w-full text-[11px] h-8 bg-LynxBlue/20 text-LynxBlue' +
+                        ' border-none hover:bg-LynxBlue/30 shrink-0'
+                      }
+                      size="sm"
+                      variant="secondary"
+                      onPress={handleAddProjectDir}>
+                      + Add Project Folder
+                    </Button>
+                  </Popover.Dialog>
+                </Popover.Content>
+              </Popover>
             </div>
           </div>
 

@@ -1,10 +1,15 @@
+import type {Selection} from '@heroui/react';
 import {
   Button,
+  Checkbox,
   Chip,
   Description,
+  Dropdown,
+  Label,
   ListBox,
   ScrollShadow,
   Select,
+  Separator,
   Spinner,
   Table,
   Tooltip,
@@ -13,7 +18,7 @@ import {
 import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {CloudStorage, Folder, InfoCircle, Laptop, TrashBin2, User} from '@solar-icons/react-perf/BoldDuotone';
 import {Refresh} from '@solar-icons/react-perf/Linear';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {InstalledSkill} from '../types';
 
@@ -36,6 +41,203 @@ export default function InstalledSkillsTab({
   const [deletingSkills, setDeletingSkills] = useState<Record<string, boolean>>({});
   const [confirmDelete, setConfirmDelete] = useState<Record<string, boolean>>({});
   const [groupBy, setGroupBy] = useState<string>('all');
+
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set<any>());
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [bulkLoadingStatus, setBulkLoadingStatus] = useState<string | null>(null);
+
+  const confirmBulkDeleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up confirmation timer on unmount
+  useEffect(() => {
+    return () => {
+      if (confirmBulkDeleteTimeoutRef.current) {
+        clearTimeout(confirmBulkDeleteTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Clear selected keys that are no longer present in installedSkills
+  useEffect(() => {
+    setSelectedKeys(prev => {
+      if (prev === 'all') return prev;
+      const validKeys = new Set(installedSkills.map(s => `${s.name}-${s.scope}`));
+      const next = new Set<any>();
+      const prevSet = prev as Set<any>;
+      for (const k of prevSet) {
+        if (validKeys.has(String(k))) {
+          next.add(k);
+        }
+      }
+      if (next.size !== prevSet.size) {
+        return next;
+      }
+      return prev;
+    });
+  }, [installedSkills]);
+
+  const selectedSkillsList = useMemo(() => {
+    if (selectedKeys === 'all') {
+      return installedSkills;
+    }
+    const keysSet = selectedKeys as Set<any>;
+    return installedSkills.filter(skill => {
+      const key = `${skill.name}-${skill.scope}`;
+      return keysSet.has(key);
+    });
+  }, [selectedKeys, installedSkills]);
+
+  const uniqueAgents = useMemo(() => {
+    const agentsSet = new Set<string>();
+    for (const skill of installedSkills) {
+      if (skill.agents) {
+        for (const agent of skill.agents) {
+          agentsSet.add(agent);
+        }
+      }
+    }
+    return Array.from(agentsSet).sort();
+  }, [installedSkills]);
+
+  const handleSelectionChange = useCallback((keys: Selection, tableSkills: InstalledSkill[]) => {
+    if (keys === 'all') {
+      setSelectedKeys(prev => {
+        const next = new Set<any>(prev === 'all' ? [] : Array.from(prev as Set<any>));
+        for (const skill of tableSkills) {
+          next.add(`${skill.name}-${skill.scope}`);
+        }
+        return next;
+      });
+    } else {
+      setSelectedKeys(prev => {
+        const next = new Set<any>(prev === 'all' ? [] : Array.from(prev as Set<any>));
+        for (const skill of tableSkills) {
+          next.delete(`${skill.name}-${skill.scope}`);
+        }
+        const keysSet = keys as Set<any>;
+        for (const key of keysSet) {
+          next.add(key);
+        }
+        return next;
+      });
+    }
+  }, []);
+
+  const handleBulkUpdate = useCallback(
+    async (skillsToUpdate: InstalledSkill[]) => {
+      if (skillsToUpdate.length === 0) return;
+
+      setSelectedKeys(new Set());
+      setBulkLoadingStatus(`Preparing to update ${skillsToUpdate.length} skill(s)...`);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < skillsToUpdate.length; i++) {
+        const skill = skillsToUpdate[i];
+        setBulkLoadingStatus(`Updating skill ${i + 1} of ${skillsToUpdate.length}: "${skill.name}"...`);
+        try {
+          const res = await ipc.invoke('skills-manager:update', skill.name, skill.scope === 'global');
+          if (res.success) {
+            successCount++;
+          } else {
+            failCount++;
+            console.error(`Failed to update ${skill.name}:`, res.error);
+          }
+        } catch (err) {
+          failCount++;
+          console.error(`Error updating ${skill.name}:`, err);
+        }
+      }
+
+      setBulkLoadingStatus(null);
+      await onRefreshInstalled();
+
+      if (failCount === 0) {
+        bottomToast.success(`Successfully updated all ${successCount} skill(s)!`);
+      } else {
+        bottomToast.warning(`Updated ${successCount} skill(s), ${failCount} failed.`);
+      }
+    },
+    [onRefreshInstalled],
+  );
+
+  const handleBulkRemove = useCallback(
+    async (skillsToRemove: InstalledSkill[]) => {
+      if (skillsToRemove.length === 0) return;
+
+      setSelectedKeys(new Set());
+      setConfirmBulkDelete(false);
+      setBulkLoadingStatus(`Preparing to remove ${skillsToRemove.length} skill(s)...`);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < skillsToRemove.length; i++) {
+        const skill = skillsToRemove[i];
+        setBulkLoadingStatus(`Removing skill ${i + 1} of ${skillsToRemove.length}: "${skill.name}"...`);
+        try {
+          const res = await ipc.invoke('skills-manager:remove', skill.name, skill.scope === 'global');
+          if (res.success) {
+            successCount++;
+          } else {
+            failCount++;
+            console.error(`Failed to remove ${skill.name}:`, res.error);
+          }
+        } catch (err) {
+          failCount++;
+          console.error(`Error removing ${skill.name}:`, err);
+        }
+      }
+
+      setBulkLoadingStatus(null);
+      await onRefreshInstalled();
+
+      if (failCount === 0) {
+        bottomToast.success(`Successfully removed all ${successCount} skill(s).`);
+      } else {
+        bottomToast.warning(`Removed ${successCount} skill(s), ${failCount} failed.`);
+      }
+    },
+    [onRefreshInstalled],
+  );
+
+  const onPressBulkRemove = useCallback(() => {
+    if (!confirmBulkDelete) {
+      setConfirmBulkDelete(true);
+      if (confirmBulkDeleteTimeoutRef.current) {
+        clearTimeout(confirmBulkDeleteTimeoutRef.current);
+      }
+      confirmBulkDeleteTimeoutRef.current = setTimeout(() => {
+        setConfirmBulkDelete(false);
+      }, 3000);
+    } else {
+      if (confirmBulkDeleteTimeoutRef.current) {
+        clearTimeout(confirmBulkDeleteTimeoutRef.current);
+      }
+      handleBulkRemove(selectedSkillsList);
+    }
+  }, [confirmBulkDelete, selectedSkillsList, handleBulkRemove]);
+
+  const handleBulkActionOption = useCallback(
+    (key: React.Key) => {
+      const option = String(key);
+      if (option === 'all') {
+        handleBulkUpdate(installedSkills);
+      } else if (option === 'project') {
+        const filtered = installedSkills.filter(s => s.scope === 'project');
+        handleBulkUpdate(filtered);
+      } else if (option === 'global') {
+        const filtered = installedSkills.filter(s => s.scope === 'global');
+        handleBulkUpdate(filtered);
+      } else if (option.startsWith('agent-')) {
+        const agentName = option.substring('agent-'.length);
+        const filtered = installedSkills.filter(s => s.agents && s.agents.includes(agentName));
+        handleBulkUpdate(filtered);
+      }
+    },
+    [installedSkills, handleBulkUpdate],
+  );
 
   const getParentFolderPath = useCallback((filePath: string) => {
     const normalized = filePath.replace(/\\/g, '/');
@@ -192,8 +394,20 @@ export default function InstalledSkillsTab({
     (skills: InstalledSkill[]) => (
       <Table className="w-full">
         <Table.ScrollContainer>
-          <Table.Content>
+          <Table.Content
+            selectionMode="multiple"
+            selectedKeys={selectedKeys}
+            onSelectionChange={keys => handleSelectionChange(keys, skills)}>
             <Table.Header>
+              <Table.Column className="w-12 pr-0">
+                <Checkbox slot="selection" aria-label="Select all">
+                  <Checkbox.Content>
+                    <Checkbox.Control>
+                      <Checkbox.Indicator />
+                    </Checkbox.Control>
+                  </Checkbox.Content>
+                </Checkbox>
+              </Table.Column>
               <Table.Column isRowHeader>Name</Table.Column>
               <Table.Column>Scope</Table.Column>
               <Table.Column>Target Agents</Table.Column>
@@ -201,115 +415,136 @@ export default function InstalledSkillsTab({
               <Table.Column className="w-48 text-right">Actions</Table.Column>
             </Table.Header>
             <Table.Body>
-              {skills.map(skill => (
-                <Table.Row key={`${skill.name}-${skill.scope}`} className="hover:bg-white/5 transition">
-                  <Table.Cell className="font-semibold text-sm">{skill.name}</Table.Cell>
-                  <Table.Cell>
-                    <Chip
-                      className={
-                        skill.scope === 'project'
-                          ? 'bg-LynxBlue/20 text-LynxBlue text-xs'
-                          : 'bg-LynxPurple/20 text-LynxPurple text-xs'
-                      }
-                      variant="secondary">
-                      {skill.scope === 'project' ? 'Project' : 'Global'}
-                    </Chip>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex flex-wrap gap-1 items-center max-w-44">
-                      {skill.agents && skill.agents.length > 0 ? (
-                        skill.agents.length <= 2 ? (
-                          skill.agents.map(agent => (
-                            <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5 shrink-0">
-                              {agent}
-                            </Chip>
-                          ))
-                        ) : (
-                          <>
-                            {skill.agents.slice(0, 2).map(agent => (
+              {skills.map(skill => {
+                const rowKey = `${skill.name}-${skill.scope}`;
+                return (
+                  <Table.Row id={rowKey} key={rowKey} className="hover:bg-white/5 transition">
+                    <Table.Cell className="pr-0">
+                      <Checkbox slot="selection" variant="secondary" aria-label={`Select ${skill.name}`}>
+                        <Checkbox.Content>
+                          <Checkbox.Control>
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                        </Checkbox.Content>
+                      </Checkbox>
+                    </Table.Cell>
+                    <Table.Cell className="font-semibold text-sm">{skill.name}</Table.Cell>
+                    <Table.Cell>
+                      <Chip
+                        className={
+                          skill.scope === 'project'
+                            ? 'bg-LynxBlue/20 text-LynxBlue text-xs'
+                            : 'bg-LynxPurple/20 text-LynxPurple text-xs'
+                        }
+                        variant="secondary">
+                        {skill.scope === 'project' ? 'Project' : 'Global'}
+                      </Chip>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className="flex flex-wrap gap-1 items-center max-w-44">
+                        {skill.agents && skill.agents.length > 0 ? (
+                          skill.agents.length <= 2 ? (
+                            skill.agents.map(agent => (
                               <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5 shrink-0">
                                 {agent}
                               </Chip>
-                            ))}
-                            <Tooltip delay={300}>
-                              <Tooltip.Trigger>
-                                <Chip
-                                  className={
-                                    'bg-white/5 hover:bg-white/15 text-white/70' +
-                                    ' text-[10px] h-5 py-0.5 cursor-pointer shrink-0'
-                                  }>
-                                  +{skill.agents.length - 2} more
+                            ))
+                          ) : (
+                            <>
+                              {skill.agents.slice(0, 2).map(agent => (
+                                <Chip key={agent} className="bg-white/10 text-white/90 text-[10px] h-5 py-0.5 shrink-0">
+                                  {agent}
                                 </Chip>
-                              </Tooltip.Trigger>
-                              <Tooltip.Content showArrow>
-                                <Tooltip.Arrow />
-                                <div className="flex flex-col gap-1 p-1">
-                                  {skill.agents.slice(2).map(agent => (
-                                    <span key={agent} className="text-xs font-semibold">
-                                      {agent}
-                                    </span>
-                                  ))}
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </>
-                        )
-                      ) : (
-                        <span className="text-xs text-semi-muted">None</span>
-                      )}
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell className="">
-                    <Tooltip delay={300}>
-                      <Tooltip.Trigger>
-                        <Button
-                          className={
-                            'font-JetBrainsMono text-xs text-semi-muted hover:text-LynxBlue' +
-                            ' cursor-pointer h-auto justify-start border-none' +
-                            ' hover:bg-transparent font-normal text-left text-wrap line-clamp-1'
-                          }
-                          size="sm"
-                          variant="ghost"
-                          onPress={() => ipc.send('app:openPath', skill.path)}>
+                              ))}
+                              <Tooltip delay={300}>
+                                <Tooltip.Trigger>
+                                  <Chip
+                                    className={
+                                      'bg-white/5 hover:bg-white/15 text-white/70' +
+                                      ' text-[10px] h-5 py-0.5 cursor-pointer shrink-0'
+                                    }>
+                                    +{skill.agents.length - 2} more
+                                  </Chip>
+                                </Tooltip.Trigger>
+                                <Tooltip.Content showArrow>
+                                  <Tooltip.Arrow />
+                                  <div className="flex flex-col gap-1 p-1">
+                                    {skill.agents.slice(2).map(agent => (
+                                      <span key={agent} className="text-xs font-semibold">
+                                        {agent}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </>
+                          )
+                        ) : (
+                          <span className="text-xs text-semi-muted">None</span>
+                        )}
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="">
+                      <Tooltip delay={300}>
+                        <Tooltip.Trigger>
+                          <Button
+                            className={
+                              'font-JetBrainsMono text-xs text-semi-muted hover:text-LynxBlue' +
+                              ' cursor-pointer h-auto justify-start border-none' +
+                              ' hover:bg-transparent font-normal text-left text-wrap line-clamp-1'
+                            }
+                            size="sm"
+                            variant="ghost"
+                            onPress={() => ipc.send('app:openPath', skill.path)}>
+                            {skill.path}
+                          </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content showArrow>
+                          <Tooltip.Arrow />
                           {skill.path}
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </Table.Cell>
+                    <Table.Cell className="text-right">
+                      <div className="inline-flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="tertiary"
+                          className="text-xs"
+                          onPress={() => handleUpdate(skill.name, skill.scope === 'global')}
+                          isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name] || !!bulkLoadingStatus}>
+                          {updatingSkills[skill.name] ? <Spinner size="sm" /> : <Refresh />}
+                          Update
                         </Button>
-                      </Tooltip.Trigger>
-                      <Tooltip.Content showArrow>
-                        <Tooltip.Arrow />
-                        {skill.path}
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </Table.Cell>
-                  <Table.Cell className="text-right">
-                    <div className="inline-flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="tertiary"
-                        className="text-xs"
-                        onPress={() => handleUpdate(skill.name, skill.scope === 'global')}
-                        isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name]}>
-                        {updatingSkills[skill.name] ? <Spinner size="sm" /> : <Refresh />}
-                        Update
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="text-xs"
-                        variant="danger-soft"
-                        onPress={() => handleDelete(skill.name, skill.scope === 'global')}
-                        isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name]}>
-                        {deletingSkills[skill.name] ? <Spinner size="sm" /> : <TrashBin2 />}
-                        {confirmDelete[skill.name] ? 'Confirm?' : 'Remove'}
-                      </Button>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+                        <Button
+                          size="sm"
+                          className="text-xs"
+                          variant="danger-soft"
+                          onPress={() => handleDelete(skill.name, skill.scope === 'global')}
+                          isDisabled={updatingSkills[skill.name] || deletingSkills[skill.name] || !!bulkLoadingStatus}>
+                          {deletingSkills[skill.name] ? <Spinner size="sm" /> : <TrashBin2 />}
+                          {confirmDelete[skill.name] ? 'Confirm?' : 'Remove'}
+                        </Button>
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
             </Table.Body>
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
     ),
-    [updatingSkills, deletingSkills, confirmDelete, handleUpdate, handleDelete],
+    [
+      selectedKeys,
+      bulkLoadingStatus,
+      updatingSkills,
+      deletingSkills,
+      confirmDelete,
+      handleUpdate,
+      handleDelete,
+      handleSelectionChange,
+    ],
   );
 
   if (isLoadingInstalled) {
@@ -347,11 +582,96 @@ export default function InstalledSkillsTab({
 
   return (
     <div className="size-full flex flex-col overflow-hidden">
+      {/* Bulk operation progress banner */}
+      {bulkLoadingStatus && (
+        <div
+          className={
+            'flex items-center gap-3 px-3 py-2.5 bg-LynxBlue/15 border' +
+            ' border-LynxBlue/25 rounded-xl mb-4 text-xs text-white/95 animate-pulse'
+          }>
+          <Spinner size="sm" />
+          <span className="font-medium">{bulkLoadingStatus}</span>
+        </div>
+      )}
+
       {/* Top Bar for controls */}
       <div className="flex justify-between items-center mb-4 gap-4 px-2">
-        <Typography className="text-sm text-semi-muted">
-          Showing {installedSkills.length} installed skill{installedSkills.length === 1 ? '' : 's'}
-        </Typography>
+        {selectedSkillsList.length > 0 ? (
+          <div className="flex items-center gap-3">
+            <Typography className="text-sm font-semibold text-LynxBlue">
+              {selectedSkillsList.length} skill{selectedSkillsList.length === 1 ? '' : 's'} selected
+            </Typography>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="text-xs"
+                isDisabled={!!bulkLoadingStatus}
+                onPress={() => handleBulkUpdate(selectedSkillsList)}>
+                <Refresh className="size-3.5 animate-spin-slow" />
+                Update Selected
+              </Button>
+              <Button
+                size="sm"
+                className="text-xs"
+                variant="danger-soft"
+                onPress={onPressBulkRemove}
+                isDisabled={!!bulkLoadingStatus}>
+                <TrashBin2 className="size-3.5" />
+                {confirmBulkDelete ? 'Confirm Remove?' : 'Remove Selected'}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                isDisabled={!!bulkLoadingStatus}
+                onPress={() => setSelectedKeys(new Set())}
+                className="text-xs text-semi-muted hover:text-white">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Typography className="text-sm text-semi-muted">
+              Showing {installedSkills.length} installed skill{installedSkills.length === 1 ? '' : 's'}
+            </Typography>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button size="sm" variant="secondary" className="text-xs" isDisabled={!!bulkLoadingStatus}>
+                  <Refresh className="size-3.5" />
+                  Update All...
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Popover className="min-w-50">
+                <Dropdown.Menu onAction={handleBulkActionOption}>
+                  <Dropdown.Item id="all" textValue="Update All">
+                    <Label>Update All ({installedSkills.length})</Label>
+                  </Dropdown.Item>
+                  <Dropdown.Item id="project" textValue="Update Project Scope">
+                    <Label>Update Project Scope ({installedSkills.filter(s => s.scope === 'project').length})</Label>
+                  </Dropdown.Item>
+                  <Dropdown.Item id="global" textValue="Update Global Scope">
+                    <Label>Update Global Scope ({installedSkills.filter(s => s.scope === 'global').length})</Label>
+                  </Dropdown.Item>
+
+                  {uniqueAgents.length > 0 && <Separator className="my-1" />}
+
+                  {uniqueAgents.map(agent => {
+                    const agentCount = installedSkills.filter(s => s.agents && s.agents.includes(agent)).length;
+                    return (
+                      <Dropdown.Item key={agent} id={`agent-${agent}`} textValue={`Update Agent: ${agent}`}>
+                        <Label>
+                          Update Agent: {agent} ({agentCount})
+                        </Label>
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Menu>
+              </Dropdown.Popover>
+            </Dropdown>
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           <span className="text-xs text-semi-muted whitespace-nowrap">Group by:</span>
           <Select
@@ -359,6 +679,7 @@ export default function InstalledSkillsTab({
             className="w-56"
             variant="secondary"
             placeholder="All Skills"
+            isDisabled={!!bulkLoadingStatus}
             onChange={val => setGroupBy((val as string) || 'all')}>
             <Select.Trigger>
               <Select.Value />
@@ -394,7 +715,7 @@ export default function InstalledSkillsTab({
         ) : (
           <div className="flex flex-col gap-6">
             {currentGroups.map(group => (
-              <div key={group.id} className="border border-white/5 rounded-xl bg-white/[0.02] p-4 flex flex-col gap-3">
+              <div key={group.id} className="border border-white/5 rounded-xl bg-white/2 p-4 flex flex-col gap-3">
                 <div className="flex items-center gap-2 px-1">
                   {group.icon}
                   <Typography

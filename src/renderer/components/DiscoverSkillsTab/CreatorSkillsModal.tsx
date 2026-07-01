@@ -1,6 +1,9 @@
-import {Button, Checkbox, Description, Modal, ScrollShadow, Typography} from '@heroui/react';
+import {Button, Checkbox, Description, InputGroup, Modal, ScrollShadow, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
 import {Download, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
+import {Magnifier} from '@solar-icons/react-perf/Linear';
+import {X} from 'lucide-react';
+import {useEffect, useState} from 'react';
 
 import {OfficialOwner, RegistrySkill} from '../../types';
 import {formatInstalls} from './SkillCard';
@@ -22,91 +25,168 @@ export function CreatorSkillsModal({
   selectedSkills,
   onToggleSelectSkill,
 }: CreatorSkillsModalProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (selectedOwnerForSkills) {
+      setSearchQuery('');
+    }
+  }, [selectedOwnerForSkills]);
+
+  const filteredRepos =
+    selectedOwnerForSkills?.repos
+      .map(r => {
+        const filteredSkills = r.skills.filter(
+          skill =>
+            skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            r.repo.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        return {
+          ...r,
+          skills: filteredSkills,
+        };
+      })
+      .filter(r => r.skills.length > 0) || [];
+
   return (
-    <TabModal size="lg" isOpen={!!selectedOwnerForSkills} onOpenChange={open => !open && onClose()} isDismissable>
+    <TabModal
+      size="lg"
+      dialogClassName="max-w-4xl! px-1"
+      isOpen={!!selectedOwnerForSkills}
+      onOpenChange={open => !open && onClose()}
+      isDismissable>
       <Modal.CloseTrigger onPress={onClose} />
-      <Modal.Header className="pb-3 border-b border-border/50 flex items-center gap-3 font-Nunito">
-        <img
-          onError={e => {
-            (e.target as HTMLImageElement).src = 'https://github.com/github.png';
-          }}
-          alt={selectedOwnerForSkills?.owner}
-          className="size-10 rounded-full border border-border bg-black"
-          src={`https://github.com/${selectedOwnerForSkills?.owner}.png`}
-        />
-        <div>
-          <Modal.Heading className="text-lg font-bold">{selectedOwnerForSkills?.owner}</Modal.Heading>
-          <Description className="text-xs text-semi-muted font-JetBrainsMono">All Available Skills</Description>
+      <Modal.Header className="pb-3 font-Nunito w-full pr-10 pl-4">
+        <div className="flex flex-row items-center justify-between text-left gap-4 w-full">
+          <div className="flex flex-row items-center justify-start gap-3.5 min-w-0">
+            <img
+              onError={e => {
+                (e.target as HTMLImageElement).src = 'https://github.com/github.png';
+              }}
+              alt={selectedOwnerForSkills?.owner}
+              src={`https://github.com/${selectedOwnerForSkills?.owner}.png`}
+              className="size-11 rounded-full border border-border/80 bg-black shrink-0"
+            />
+            <div className="flex flex-col justify-center text-left min-w-0">
+              <Modal.Heading className="text-lg font-bold text-foreground leading-tight">
+                {selectedOwnerForSkills?.owner}
+              </Modal.Heading>
+              <Description className="text-xs text-semi-muted font-JetBrainsMono mt-0.5">
+                All Available Skills
+              </Description>
+            </div>
+          </div>
+
+          {/* Search bar inside header */}
+          <div className="w-90 shrink-0 mr-4">
+            <InputGroup variant="secondary" fullWidth>
+              <InputGroup.Prefix>
+                <Magnifier className="size-4 text-semi-muted" />
+              </InputGroup.Prefix>
+              <InputGroup.Input
+                value={searchQuery}
+                placeholder="Search creator skills..."
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <InputGroup.Suffix>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    aria-label="Clear search"
+                    onPress={() => setSearchQuery('')}
+                    className="h-5 w-5 min-w-5 p-0 hover:bg-white/10 rounded-full flex items-center justify-center"
+                    isIconOnly>
+                    <X className="size-3 text-semi-muted" />
+                  </Button>
+                </InputGroup.Suffix>
+              )}
+            </InputGroup>
+          </div>
         </div>
       </Modal.Header>
 
-      <Modal.Body className="font-Nunito flex flex-col max-h-[70vh] pr-1 py-4">
-        <ScrollShadow className="flex-1 overflow-y-auto flex flex-col gap-4 mt-2">
-          {selectedOwnerForSkills?.repos.map(r => (
-            <div key={r.repo} className="flex flex-col gap-2">
-              <Typography
-                className={
-                  'text-xs font-semibold text-semi-muted font-JetBrainsMono ' +
-                  'bg-foreground/5 px-2 py-1 rounded-md w-fit'
-                }>
-                {r.repo}
-              </Typography>
-              <div className="flex flex-col gap-1.5 pl-1">
-                {r.skills.map(skill => {
-                  const registrySkill: RegistrySkill = {
-                    id: `${r.repo}/${skill.name}`,
-                    name: skill.name,
-                    installs: skill.installs,
-                    source: r.repo,
-                  };
-                  const installed = isSkillInstalled(skill.name);
-                  const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
-                  return (
-                    <div
-                      className={
-                        'flex items-center gap-3 p-2.5 rounded-xl bg-surface/40 transition' +
-                        ' border cursor-pointer ' +
-                        (installed
-                          ? 'border-success/30 bg-success/5'
-                          : 'border-border-secondary/40 hover:border-foreground/10')
-                      }
-                      key={`${r.repo}-${skill.name}`}
-                      onClick={() => onToggleSelectSkill(registrySkill)}>
-                      <Checkbox
-                        variant="secondary"
-                        isSelected={isSelected}
-                        aria-label={`Select ${skill.name}`}
-                        onChange={() => onToggleSelectSkill(registrySkill)}>
-                        <Checkbox.Content>
-                          <Checkbox.Control>
-                            <Checkbox.Indicator />
-                          </Checkbox.Control>
-                        </Checkbox.Content>
-                      </Checkbox>
-                      <div className="flex-1 min-w-0 pr-2">
-                        <Typography className="text-xs font-bold truncate">{skill.name}</Typography>
-                        <Typography className="text-[10px] text-semi-muted truncate font-JetBrainsMono mt-0.5">
-                          {formatInstalls(skill.installs)} installs
-                        </Typography>
-                      </div>
-                      <Button
-                        onPress={() => {
-                          onClose();
-                          onSelectSkill(registrySkill);
-                        }}
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 min-w-8"
-                        onClick={e => e.stopPropagation()}
-                        isIconOnly>
-                        {installed ? <SettingsMinimalistic className="size-3.5" /> : <Download className="size-3.5" />}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
+      <Modal.Body className="font-Nunito flex flex-col max-h-[70vh] pr-1">
+        <ScrollShadow className="flex-1 overflow-y-auto flex flex-col gap-5 px-4 mt-2">
+          {filteredRepos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-semi-muted text-center gap-1.5">
+              <Typography className="text-sm font-semibold">No skills found matching "{searchQuery}"</Typography>
+              <Description className="text-xs">Try searching for a different keyword or name</Description>
             </div>
-          ))}
+          ) : (
+            filteredRepos.map(r => (
+              <div key={r.repo} className="flex flex-col gap-3">
+                <Typography
+                  className={
+                    'text-xs font-semibold text-semi-muted font-JetBrainsMono ' +
+                    'bg-foreground/5 px-2.5 py-1 rounded-lg w-fit border border-border-secondary/20'
+                  }>
+                  {r.repo}
+                </Typography>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pl-1">
+                  {r.skills.map(skill => {
+                    const registrySkill: RegistrySkill = {
+                      id: `${r.repo}/${skill.name}`,
+                      name: skill.name,
+                      installs: skill.installs,
+                      source: r.repo,
+                    };
+                    const installed = isSkillInstalled(skill.name);
+                    const isSelected = selectedSkills.some(s => s.id === registrySkill.id);
+                    return (
+                      <div
+                        className={
+                          'flex items-center gap-3 p-3 rounded-2xl bg-surface/30 transition-all duration-200' +
+                          ' border cursor-pointer hover:shadow-md hover:shadow-black/5 active:scale-[0.99] ' +
+                          (installed
+                            ? 'border-success/30 bg-success/5 hover:bg-success/10'
+                            : 'border-border-secondary/40 hover:border-foreground/10 hover:bg-foreground/5')
+                        }
+                        key={`${r.repo}-${skill.name}`}
+                        onClick={() => onToggleSelectSkill(registrySkill)}>
+                        <Checkbox
+                          variant="secondary"
+                          isSelected={isSelected}
+                          aria-label={`Select ${skill.name}`}
+                          onChange={() => onToggleSelectSkill(registrySkill)}>
+                          <Checkbox.Content>
+                            <Checkbox.Control>
+                              <Checkbox.Indicator />
+                            </Checkbox.Control>
+                          </Checkbox.Content>
+                        </Checkbox>
+                        <div className="flex-1 min-w-0 pr-1">
+                          <Typography className="text-sm font-bold truncate text-foreground">{skill.name}</Typography>
+                          <Typography className="text-xs text-semi-muted truncate font-JetBrainsMono mt-0.5">
+                            {formatInstalls(skill.installs)} installs
+                          </Typography>
+                        </div>
+                        <Button
+                          onPress={() => {
+                            onClose();
+                            onSelectSkill(registrySkill);
+                          }}
+                          className={
+                            'h-8 w-8 min-w-8 hover:bg-foreground/10 rounded-xl' +
+                            ' flex items-center justify-center shrink-0'
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onClick={e => e.stopPropagation()}
+                          isIconOnly>
+                          {installed ? (
+                            <SettingsMinimalistic className="size-4 text-semi-muted" />
+                          ) : (
+                            <Download className="size-4 text-foreground" />
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )}
         </ScrollShadow>
       </Modal.Body>
     </TabModal>

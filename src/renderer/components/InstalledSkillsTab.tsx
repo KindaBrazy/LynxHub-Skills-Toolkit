@@ -574,13 +574,14 @@ export default function InstalledSkillsTab({
                     <Tooltip.Trigger>
                       <Button
                         className={
-                          'h-7 w-7 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer' +
-                          ' border-none bg-transparent hover:bg-foreground/5 rounded-lg' +
+                          'size-8 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer' +
+                          ' border-none bg-transparent hover:bg-foreground/5 rounded-full' +
                           ' flex items-center justify-center'
                         }
                         size="sm"
                         variant="ghost"
-                        onPress={() => ipc.send('app:openPath', skill.path)}>
+                        onPress={() => ipc.send('app:openPath', skill.path)}
+                        isIconOnly>
                         <Folder className="size-4" />
                       </Button>
                     </Tooltip.Trigger>
@@ -605,8 +606,8 @@ export default function InstalledSkillsTab({
                     <Tooltip.Trigger>
                       <Button
                         className={
-                          'h-7 w-7 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer' +
-                          ' border-none bg-transparent hover:bg-foreground/5 rounded-lg' +
+                          'size-8 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer' +
+                          ' border-none bg-transparent hover:bg-foreground/5 rounded-full' +
                           ' flex items-center justify-center'
                         }
                         size="sm"
@@ -626,8 +627,8 @@ export default function InstalledSkillsTab({
                     <Tooltip.Trigger>
                       <Button
                         className={
-                          'h-7 w-7 min-w-0 p-0 text-semi-muted hover:text-danger cursor-pointer' +
-                          ' border-none bg-transparent hover:bg-danger/10 rounded-lg' +
+                          'size-8 min-w-0 p-0 text-semi-muted hover:text-danger cursor-pointer' +
+                          ' border-none bg-transparent hover:bg-danger/10 rounded-full' +
                           ' flex items-center justify-center'
                         }
                         size="sm"
@@ -752,7 +753,7 @@ export default function InstalledSkillsTab({
                   <Dropdown.Trigger>
                     <Button size="sm" variant="secondary" className="text-xs" isDisabled={!!bulkLoadingStatus}>
                       <Refresh className="size-3.5" />
-                      Update All...
+                      Update All
                     </Button>
                   </Dropdown.Trigger>
                   <Dropdown.Popover className="min-w-50">

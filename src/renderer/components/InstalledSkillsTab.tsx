@@ -7,6 +7,7 @@ import {
   cn,
   Description,
   Dropdown,
+  InputGroup,
   Label,
   ListBox,
   Popover,
@@ -19,7 +20,8 @@ import {
 } from '@heroui/react';
 import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {CloudStorage, Folder, InfoCircle, Laptop, TrashBin2, User} from '@solar-icons/react-perf/BoldDuotone';
-import {AltArrowDown, Refresh, Settings} from '@solar-icons/react-perf/Linear';
+import {AltArrowDown, Magnifier, Refresh, Settings} from '@solar-icons/react-perf/Linear';
+import {X} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {InstalledSkill} from '../types';
@@ -291,9 +293,23 @@ export default function InstalledSkillsTab({
     return filePath.substring(0, lastSlash);
   }, []);
 
+  const [filterQuery, setFilterQuery] = useState('');
+
+  const filteredSkills = useMemo(() => {
+    if (!filterQuery.trim()) return installedSkills;
+    const query = filterQuery.toLowerCase().trim();
+    return installedSkills.filter(
+      skill =>
+        skill.name.toLowerCase().includes(query) ||
+        skill.scope.toLowerCase().includes(query) ||
+        (skill.path && skill.path.toLowerCase().includes(query)) ||
+        (skill.agents && skill.agents.some(agent => agent.toLowerCase().includes(query))),
+    );
+  }, [installedSkills, filterQuery]);
+
   const folderGroups = useMemo(() => {
     const map: Record<string, InstalledSkill[]> = {};
-    for (const skill of installedSkills) {
+    for (const skill of filteredSkills) {
       const parent = getParentFolderPath(skill.path);
       if (!map[parent]) {
         map[parent] = [];
@@ -313,7 +329,7 @@ export default function InstalledSkillsTab({
       project: [],
       global: [],
     };
-    for (const skill of installedSkills) {
+    for (const skill of filteredSkills) {
       map[skill.scope].push(skill);
     }
 
@@ -340,13 +356,13 @@ export default function InstalledSkillsTab({
       });
     }
     return groups;
-  }, [installedSkills]);
+  }, [filteredSkills]);
 
   const agentGroups = useMemo(() => {
     const map: Record<string, InstalledSkill[]> = {};
     const noAgentSkills: InstalledSkill[] = [];
 
-    for (const skill of installedSkills) {
+    for (const skill of filteredSkills) {
       if (skill.agents && skill.agents.length > 0) {
         const firstAgent = skill.agents[0];
         if (!map[firstAgent]) {
@@ -374,7 +390,7 @@ export default function InstalledSkillsTab({
       });
     }
     return groups;
-  }, [installedSkills]);
+  }, [filteredSkills]);
 
   const currentGroups = useMemo(() => {
     if (groupBy === 'folder') return folderGroups;
@@ -747,7 +763,9 @@ export default function InstalledSkillsTab({
             ) : (
               <div className="flex items-center gap-3">
                 <Typography className="text-sm text-semi-muted">
-                  Showing {installedSkills.length} installed skill{installedSkills.length === 1 ? '' : 's'}
+                  {filterQuery.trim()
+                    ? `Found ${filteredSkills.length} of ${installedSkills.length} skills`
+                    : `Showing ${installedSkills.length} installed skill${installedSkills.length === 1 ? '' : 's'}`}
                 </Typography>
                 <Dropdown>
                   <Dropdown.Trigger>
@@ -789,7 +807,35 @@ export default function InstalledSkillsTab({
             )}
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-semi-muted whitespace-nowrap">Group by:</span>
+              <InputGroup className="w-64" variant="secondary">
+                <InputGroup.Prefix className="pl-3" aria-hidden="true">
+                  <Magnifier className="size-3.5 text-semi-muted" />
+                </InputGroup.Prefix>
+                <InputGroup.Input
+                  value={filterQuery}
+                  className="pl-2 text-xs"
+                  aria-label="Filter skills"
+                  placeholder="Filter skills..."
+                  onChange={e => setFilterQuery(e.target.value)}
+                />
+                {filterQuery && (
+                  <InputGroup.Suffix className="pr-2">
+                    <Button
+                      className={
+                        'h-5 w-5 min-w-5 p-0 hover:bg-foreground/10' + ' rounded-full flex items-center justify-center'
+                      }
+                      size="sm"
+                      variant="ghost"
+                      aria-label="Clear filter"
+                      onPress={() => setFilterQuery('')}
+                      isIconOnly>
+                      <X className="size-3 text-semi-muted" />
+                    </Button>
+                  </InputGroup.Suffix>
+                )}
+              </InputGroup>
+
+              <span className="text-xs text-semi-muted whitespace-nowrap ml-2">Group by:</span>
               <Select
                 value={groupBy}
                 className="w-56"
@@ -911,7 +957,7 @@ export default function InstalledSkillsTab({
 
           <ScrollShadow className="flex-1 overflow-y-auto px-2">
             {groupBy === 'all' ? (
-              renderSkillsTable(installedSkills, true)
+              renderSkillsTable(filteredSkills, true)
             ) : (
               <Accordion
                 expandedKeys={expandedKeys}

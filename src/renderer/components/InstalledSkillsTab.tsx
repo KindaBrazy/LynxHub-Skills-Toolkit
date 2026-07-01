@@ -806,14 +806,14 @@ export default function InstalledSkillsTab({
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pt-1">
               <InputGroup className="w-64" variant="secondary">
-                <InputGroup.Prefix className="pl-3" aria-hidden="true">
+                <InputGroup.Prefix aria-hidden="true">
                   <Magnifier className="size-3.5 text-semi-muted" />
                 </InputGroup.Prefix>
                 <InputGroup.Input
                   value={filterQuery}
-                  className="pl-2 text-xs"
+                  className="text-xs"
                   aria-label="Filter skills"
                   placeholder="Filter skills..."
                   onChange={e => setFilterQuery(e.target.value)}

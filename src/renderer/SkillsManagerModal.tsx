@@ -4,6 +4,7 @@ import {CloudStorage, Compass, Inbox} from '@solar-icons/react-perf/BoldDuotone'
 import {useCallback, useEffect, useState} from 'react';
 
 import DiscoverSkillsTab from './components/DiscoverSkillsTab';
+import InstallCustomSkillModal from './components/InstallCustomSkillModal';
 import InstalledSkillsTab from './components/InstalledSkillsTab';
 import SkillInstallerModal from './components/SkillInstallerModal';
 import {InstalledSkill, RegistrySkill} from './types';
@@ -26,6 +27,7 @@ export default function SkillsManagerModal() {
 
   // Selected Skills for Installer Modal
   const [selectedSkills, setSelectedSkills] = useState<RegistrySkill[]>([]);
+  const [isCustomInstallOpen, setIsCustomInstallOpen] = useState(false);
 
   // Event listener to open modal from window event
   useEffect(() => {
@@ -143,6 +145,7 @@ export default function SkillsManagerModal() {
                 installedSkills={installedSkills}
                 isLoadingInstalled={isLoadingInstalled}
                 onRefreshInstalled={loadInstalledSkills}
+                onInstallCustom={() => setIsCustomInstallOpen(true)}
               />
             </Tabs.Panel>
 
@@ -169,6 +172,13 @@ export default function SkillsManagerModal() {
         selectedSkills={selectedSkills}
         onClose={() => setSelectedSkills([])}
         onInstallSuccess={loadInstalledSkills}
+      />
+
+      {/* Custom Installer Modal */}
+      <InstallCustomSkillModal
+        isOpen={isCustomInstallOpen}
+        onClose={() => setIsCustomInstallOpen(false)}
+        onProceed={skill => setSelectedSkills([skill])}
       />
     </>
   );

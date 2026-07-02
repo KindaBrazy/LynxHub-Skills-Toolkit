@@ -17,7 +17,7 @@ import {
 import {bottomToast} from '@lynx/layouts/ToastProviders';
 import {InfoCircle} from '@solar-icons/react-perf/BoldDuotone';
 import {AltArrowDown, Magnifier, Refresh} from '@solar-icons/react-perf/Linear';
-import {X} from 'lucide-react';
+import {Plus, X} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 
 import {InstalledSkill} from '../../types';
@@ -33,6 +33,7 @@ interface InstalledSkillsTabProps {
   isLoadingInstalled: boolean;
   onRefreshInstalled: () => Promise<void>;
   onSwitchTab?: (tabKey: string) => void;
+  onInstallCustom?: () => void;
 }
 
 export default function InstalledSkillsTab({
@@ -40,6 +41,7 @@ export default function InstalledSkillsTab({
   isLoadingInstalled,
   onRefreshInstalled,
   onSwitchTab,
+  onInstallCustom,
 }: InstalledSkillsTabProps) {
   const [updatingSkills, setUpdatingSkills] = useState<Record<string, boolean>>({});
   const [deletingSkills, setDeletingSkills] = useState<Record<string, boolean>>({});
@@ -244,14 +246,25 @@ export default function InstalledSkillsTab({
           <Description className="text-xs text-semi-muted mt-1">
             Head over to the 'Discover Skills' tab to install capabilities for your agents.
           </Description>
-          {onSwitchTab && (
-            <Button
-              size="sm"
-              onPress={() => onSwitchTab('discover')}
-              className="mt-4 bg-LynxPurple text-white px-5 hover:opacity-90 transition">
-              Browse Skills
-            </Button>
-          )}
+          <div className="flex gap-2 mt-4">
+            {onSwitchTab && (
+              <Button
+                size="sm"
+                onPress={() => onSwitchTab('discover')}
+                className="bg-LynxPurple text-white px-5 hover:opacity-90 transition">
+                Browse Skills
+              </Button>
+            )}
+            {onInstallCustom && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onPress={onInstallCustom}
+                className="px-5 hover:opacity-90 transition">
+                Install Custom...
+              </Button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden min-h-0">
@@ -346,6 +359,17 @@ export default function InstalledSkillsTab({
                     </Dropdown.Menu>
                   </Dropdown.Popover>
                 </Dropdown>
+                {onInstallCustom && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="text-xs"
+                    onPress={onInstallCustom}
+                    isDisabled={!!bulkLoadingStatus}>
+                    <Plus className="size-3.5" />
+                    Install Custom...
+                  </Button>
+                )}
               </div>
             )}
 

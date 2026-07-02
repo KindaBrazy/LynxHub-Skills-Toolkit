@@ -29,7 +29,8 @@ export function SecurityAudits({isLoadingAudit, auditReport, auditReports = []}:
             const reports = auditReports.length > 0 ? auditReports : auditReport ? [auditReport] : [];
 
             return reports.map(report => {
-              const skillName = report.slug.split('/').pop() || report.source;
+              const skillName =
+                (report.slug || '').split('/').pop() || report.source || report.id?.split('/').pop() || '';
               const hasAudits = report.audits && report.audits.length > 0;
 
               return (

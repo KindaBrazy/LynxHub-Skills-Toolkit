@@ -1,0 +1,14 @@
+import path from "path";
+import os from "os";
+const homeDirectory = os.homedir();
+const { env } = process;
+const xdgData = env.XDG_DATA_HOME || (homeDirectory ? path.join(homeDirectory, ".local", "share") : void 0);
+const xdgConfig = env.XDG_CONFIG_HOME || (homeDirectory ? path.join(homeDirectory, ".config") : void 0);
+env.XDG_STATE_HOME || homeDirectory && path.join(homeDirectory, ".local", "state");
+env.XDG_CACHE_HOME || homeDirectory && path.join(homeDirectory, ".cache");
+env.XDG_RUNTIME_DIR;
+const xdgDataDirectories = (env.XDG_DATA_DIRS || "/usr/local/share/:/usr/share/").split(":");
+if (xdgData) xdgDataDirectories.unshift(xdgData);
+const xdgConfigDirectories = (env.XDG_CONFIG_DIRS || "/etc/xdg").split(":");
+if (xdgConfig) xdgConfigDirectories.unshift(xdgConfig);
+export { xdgConfig as t };

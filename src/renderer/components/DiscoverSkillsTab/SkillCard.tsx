@@ -89,7 +89,7 @@ export function SkillCard({
         ' transition flex flex-col justify-between h-full'
       }
       variant="secondary">
-      <Card.Header className="flex flex-col gap-2 pb-2">
+      <Card.Header className="flex flex-col gap-2">
         <div className="flex items-center justify-between w-full min-h-6">
           <Checkbox isSelected={isSelected} aria-label={`Select ${skill.name}`} onChange={() => onToggleSelect(skill)}>
             <Checkbox.Content>
@@ -136,7 +136,7 @@ export function SkillCard({
           </div>
 
           {/* Inline Description */}
-          <Typography className={'text-xs text-foreground-secondary line-clamp-2 mt-2 leading-relaxed min-h-8'}>
+          <Typography className={'text-xs text-semi-muted line-clamp-2 mt-2 leading-relaxed min-h-8'}>
             {isLoadingDesc ? (
               <span className="text-semi-muted/40 animate-pulse">Loading description...</span>
             ) : (
@@ -146,7 +146,7 @@ export function SkillCard({
         </div>
       </Card.Header>
 
-      <Card.Content className="pb-3 pt-1 mt-auto">
+      <Card.Content>
         <div className="flex items-center gap-1.5 text-xs text-semi-muted font-JetBrainsMono">
           <Icon className={`size-3.5 ${iconClass}`} />
           <span>{skill.installs > 0 ? `${formatInstalls(skill.installs)} Downloads` : 'New skill'}</span>

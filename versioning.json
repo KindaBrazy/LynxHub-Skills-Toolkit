@@ -1,0 +1,60 @@
+{
+  "versions": [
+    {
+      "version": "0.1.0",
+      "commit": "b33ad26",
+      "engines": {
+        "extensionApi": "^2.0.0"
+      },
+      "stage": "early_access",
+      "platforms": [
+        "win32",
+        "linux",
+        "darwin"
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "version": "0.1.0",
+      "date": "2026-07-02",
+      "items": [
+        {
+          "✨ New Features": [
+            {
+              "📦 Local & Global Skill Management": [
+                "List all installed skills, grouped by parent directory, target scope (Project-scoped or Global), or targeted agents.",
+                "Supports bulk actions for batch updating, uninstalling, or scoped grouping."
+              ]
+            },
+            {
+              "🔍 Live Registry Discovery": [
+                "Stream and parse leaderboards (Trending, Hot, All-Time) and official creators directly from skills.sh.",
+                "Instant search queries against the registry to search for available packages."
+              ]
+            },
+            {
+              "🛡️ Automated Security Audits": [
+                "Fetch live safety audits (passes/warnings/failures) for registry packages before committing to installation.",
+                "Displays auditing provider reports and risk summaries dynamically."
+              ]
+            },
+            {
+              "⚡ Visual Skill Creator Wizard": [
+                "An interactive wizard to author new custom skills files with ease.",
+                "Configures name validation, internal flags, allowed-tools, and scoping preferences.",
+                "Guided step authoring with structured inputs (When to Use, Steps list) or raw Markdown input."
+              ]
+            },
+            {
+              "⚙️ Multilayer Scope Configuration": [
+                "Install skills locally into standard project-specific folders (.agents/skills) or globally (~/.agents/skills).",
+                "Select and manage custom directories to load project skills from."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

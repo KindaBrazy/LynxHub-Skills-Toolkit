@@ -37,6 +37,15 @@ export default function SkillsManagerModal() {
     return () => window.removeEventListener('open-skills-manager', handleOpen);
   }, []);
 
+  // Clear description cache when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      ipc.invoke('skills-manager:clear-description-cache').catch(err => {
+        console.error('Failed to clear description cache:', err);
+      });
+    }
+  }, [isOpen]);
+
   const loadInstalledSkills = useCallback(async () => {
     setIsLoadingInstalled(true);
     try {

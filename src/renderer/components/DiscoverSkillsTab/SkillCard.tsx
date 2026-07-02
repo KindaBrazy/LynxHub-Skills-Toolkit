@@ -1,8 +1,11 @@
 import {Button, Card, Checkbox, Chip, Typography} from '@heroui/react';
 import {Download, Fire, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
 import {ExternalLink, TrendingUp} from 'lucide-react';
+import {useEffect, useState} from 'react';
 
 import {RegistrySkill} from '../../types';
+
+const ipc = (window as any).electron.ipcRenderer;
 
 export const getGithubUrl = (source: string) => {
   const parts = source.split('/');
@@ -31,7 +34,6 @@ interface SkillCardProps {
   activeSubTab: string;
   isSelected: boolean;
   onToggleSelect: (skill: RegistrySkill) => void;
-  onShowDetails: (skill: RegistrySkill) => void;
 }
 
 export function SkillCard({
@@ -42,9 +44,33 @@ export function SkillCard({
   activeSubTab,
   isSelected,
   onToggleSelect,
-  onShowDetails,
 }: SkillCardProps) {
   const githubUrl = getGithubUrl(skill.source);
+  const [description, setDescription] = useState<string>('');
+  const [isLoadingDesc, setIsLoadingDesc] = useState<boolean>(false);
+
+  useEffect(() => {
+    let active = true;
+    const fetchDesc = async () => {
+      setIsLoadingDesc(true);
+      try {
+        const res = await ipc.invoke('skills-manager:get-description', skill.source, skill.name);
+        if (active) {
+          setDescription(res || 'No description available.');
+        }
+      } catch (err) {
+        console.error('Failed to fetch skill description:', err);
+      } finally {
+        if (active) {
+          setIsLoadingDesc(false);
+        }
+      }
+    };
+    fetchDesc();
+    return () => {
+      active = false;
+    };
+  }, [skill.source, skill.name]);
 
   let Icon = Download;
   let iconClass = 'text-semi-muted/80';
@@ -59,25 +85,19 @@ export function SkillCard({
   return (
     <Card
       className={
-        'border border-border hover:border-LynxBlue/40 cursor-pointer hover:shadow-lg hover:shadow-LynxBlue/5' +
-        ' active:scale-[0.99] transition flex flex-col justify-between h-full group'
+        'border border-border hover:border-foreground/10 hover:shadow-lg hover:shadow-black/20' +
+        ' transition flex flex-col justify-between h-full'
       }
-      variant="secondary"
-      onClick={() => onShowDetails(skill)}>
+      variant="secondary">
       <Card.Header className="flex flex-col gap-2 pb-2">
         <div className="flex items-center justify-between w-full min-h-6">
-          <div onClick={e => e.stopPropagation()}>
-            <Checkbox
-              isSelected={isSelected}
-              aria-label={`Select ${skill.name}`}
-              onChange={() => onToggleSelect(skill)}>
-              <Checkbox.Content>
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-              </Checkbox.Content>
-            </Checkbox>
-          </div>
+          <Checkbox isSelected={isSelected} aria-label={`Select ${skill.name}`} onChange={() => onToggleSelect(skill)}>
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+            </Checkbox.Content>
+          </Checkbox>
 
           <div className="flex items-center gap-1.5 ml-auto">
             {rank !== undefined && (
@@ -98,12 +118,7 @@ export function SkillCard({
         </div>
 
         <div className="min-w-0 w-full mt-1">
-          <Typography
-            className={
-              'font-bold text-base text-wrap line-clamp-2 leading-snug' +
-              ' group-hover:text-LynxBlue transition-colors duration-300'
-            }
-            title={skill.name}>
+          <Typography title={skill.name} className="font-bold text-base text-wrap line-clamp-2 leading-snug">
             {skill.name}
           </Typography>
           <div className="flex items-center gap-1 mt-1">
@@ -113,7 +128,6 @@ export function SkillCard({
                 href={githubUrl}
                 rel="noopener noreferrer"
                 title="View source on GitHub"
-                onClick={e => e.stopPropagation()}
                 className="text-xs text-semi-muted hover:text-LynxBlue transition flex items-center gap-1 min-w-0">
                 <span className="truncate">{skill.source}</span>
                 <ExternalLink className="size-3 shrink-0" />
@@ -122,6 +136,15 @@ export function SkillCard({
               <span className="text-xs text-semi-muted truncate">{skill.source}</span>
             )}
           </div>
+
+          {/* Inline Description */}
+          <Typography className={'text-xs text-foreground-secondary line-clamp-2 mt-2 leading-relaxed min-h-8'}>
+            {isLoadingDesc ? (
+              <span className="text-semi-muted/40 animate-pulse">Loading description...</span>
+            ) : (
+              description
+            )}
+          </Typography>
         </div>
       </Card.Header>
 
@@ -132,9 +155,7 @@ export function SkillCard({
         </div>
       </Card.Content>
 
-      <Card.Footer
-        onClick={e => e.stopPropagation()}
-        className="flex justify-end gap-2 border-t border-border-secondary/50 pt-3">
+      <Card.Footer className="flex justify-end gap-2 border-t border-border-secondary/50 pt-3">
         <Button size="sm" onPress={() => onSelect(skill)} className="w-full justify-center">
           {installed ? <SettingsMinimalistic className="size-4" /> : <Download className="size-4" />}
           {installed ? 'Configure / Re-install' : 'Install'}

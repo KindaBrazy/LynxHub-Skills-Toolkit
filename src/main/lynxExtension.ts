@@ -25,6 +25,9 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
     storageManager.setCustomData('skills-project-dirs', dirs);
   };
 
+  const descriptionCache = new Map<string, {desc: string; timestamp: number}>();
+  const DESC_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
   lynxApi.listenForChannels(() => {
     // Handler: List installed skills (local or global)
     mainIpc.lynxIpc.handle('skills-manager:list', async (isGlobal: boolean) => {
@@ -93,6 +96,12 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
 
     // Handler: Get skill description from skills.sh
     mainIpc.lynxIpc.handle('skills-manager:get-description', async (source: string, name: string) => {
+      const cacheKey = `${source}/${name}`;
+      const cached = descriptionCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < DESC_CACHE_TTL) {
+        return cached.desc;
+      }
+
       try {
         const url = `https://skills.sh/${source}/${name}`;
         const res = await fetch(url);
@@ -102,17 +111,24 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
           text.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) ||
           text.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
         if (!match) return '';
-        return match[1]
+        const desc = match[1]
           .replace(/&quot;/g, '"')
           .replace(/&amp;/g, '&')
           .replace(/&#39;/g, "'")
           .replace(/&apos;/g, "'")
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>');
+        descriptionCache.set(cacheKey, {desc, timestamp: Date.now()});
+        return desc;
       } catch (error) {
         console.error(`Error loading description for ${source}/${name}:`, error);
         return '';
       }
+    });
+
+    // Handler: Clear descriptions cache
+    mainIpc.lynxIpc.handle('skills-manager:clear-description-cache', async () => {
+      descriptionCache.clear();
     });
 
     // Handler: Search/Discover skills on registry (skills.sh)

@@ -21,7 +21,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {OfficialOwner, RegistrySkill} from '../../types';
 import {CreatorSkillsModal} from './CreatorSkillsModal';
 import {formatInstalls, SkillCard} from './SkillCard';
-import {SkillDetailsModal} from './SkillDetailsModal';
 
 const ipc = (window as any).electron.ipcRenderer;
 
@@ -55,7 +54,6 @@ export default function DiscoverSkillsTab({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [selectedOwnerForSkills, setSelectedOwnerForSkills] = useState<OfficialOwner | null>(null);
-  const [selectedSkillForDetails, setSelectedSkillForDetails] = useState<RegistrySkill | null>(null);
 
   const [selectedSkills, setSelectedSkills] = useState<RegistrySkill[]>([]);
 
@@ -320,7 +318,6 @@ export default function DiscoverSkillsTab({
                       onSelect={onSelectSkill}
                       activeSubTab={activeSubTab}
                       onToggleSelect={toggleSelectSkill}
-                      onShowDetails={setSelectedSkillForDetails}
                     />
                   );
                 })}
@@ -531,7 +528,6 @@ export default function DiscoverSkillsTab({
                       activeSubTab={activeSubTab}
                       rank={startIndex + index + 1}
                       onToggleSelect={toggleSelectSkill}
-                      onShowDetails={setSelectedSkillForDetails}
                     />
                   );
                 })}
@@ -586,14 +582,6 @@ export default function DiscoverSkillsTab({
         onToggleSelectSkill={toggleSelectSkill}
         selectedOwnerForSkills={selectedOwnerForSkills}
         onClose={() => setSelectedOwnerForSkills(null)}
-      />
-
-      {/* View Details Modal */}
-      <SkillDetailsModal
-        onInstall={onSelectSkill}
-        skill={selectedSkillForDetails}
-        isSkillInstalled={isSkillInstalled}
-        onClose={() => setSelectedSkillForDetails(null)}
       />
     </div>
   );

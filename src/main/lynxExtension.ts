@@ -215,6 +215,18 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
       return updated;
     });
 
+    // Handler: Get grouping preference
+    mainIpc.lynxIpc.handle('skills-manager:get-group-by', async () => {
+      if (!storageManager) return 'all';
+      return storageManager.getCustomData('skills-group-by') || 'all';
+    });
+
+    // Handler: Set grouping preference
+    mainIpc.lynxIpc.handle('skills-manager:set-group-by', async (groupBy: string) => {
+      if (!storageManager) return;
+      storageManager.setCustomData('skills-group-by', groupBy);
+    });
+
     // Handler: Get available agents from cli.mjs
     mainIpc.lynxIpc.handle('skills-manager:get-agents', async () => {
       try {

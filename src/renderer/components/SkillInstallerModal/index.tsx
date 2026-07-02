@@ -19,6 +19,7 @@ import {
 } from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
 import {CheckCircle, CloudStorage, InfoCircle} from '@solar-icons/react-perf/BoldDuotone';
+import {Plus} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 
 import {AuditReport, RegistrySkill} from '../../types';
@@ -268,7 +269,9 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
               onChange={val => handleProjectSelectChange(val as string)}
               fullWidth>
               <Select.Trigger>
-                <Select.Value>{selectedProjectCwd || 'Select a project folder...'}</Select.Value>
+                <Select.Value className="font-JetBrainsMono text-sm">
+                  {selectedProjectCwd || 'Select a project folder...'}
+                </Select.Value>
                 <Select.Indicator />
               </Select.Trigger>
               <Select.Popover>
@@ -279,12 +282,13 @@ export default function SkillInstallerModal({selectedSkills, onClose, onInstallS
                       <ListBox.ItemIndicator />
                     </ListBox.Item>
                   ))}
-                  {projectDirs.length > 0 && <Separator className="my-1 opacity-10" />}
+                  {projectDirs.length > 0 && <Separator className="opacity-50" />}
                   <ListBox.Item
                     id="add-new"
-                    className="text-LynxBlue font-medium"
+                    className="text-accent gap-x-1 font-medium"
                     textValue="+ Register new project directory...">
-                    + Register new project directory...
+                    <Plus className="size-3" />
+                    Register new project directory...
                     <ListBox.ItemIndicator />
                   </ListBox.Item>
                 </ListBox>

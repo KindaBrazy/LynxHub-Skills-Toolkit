@@ -77,9 +77,31 @@ export default function InstalledSkillsTab({
     }
   }, []);
 
+  const loadGroupBy = useCallback(async () => {
+    try {
+      const savedGroupBy = await ipc.invoke('skills-manager:get-group-by');
+      if (savedGroupBy) {
+        setGroupBy(savedGroupBy);
+      }
+    } catch (err) {
+      console.error('Failed to load group-by preference:', err);
+    }
+  }, []);
+
+  const handleGroupByChange = useCallback(async (val: any) => {
+    const targetGroup = (val as string) || 'all';
+    setGroupBy(targetGroup);
+    try {
+      await ipc.invoke('skills-manager:set-group-by', targetGroup);
+    } catch (err) {
+      console.error('Failed to save group-by preference:', err);
+    }
+  }, []);
+
   useEffect(() => {
     loadProjects();
-  }, [loadProjects]);
+    loadGroupBy();
+  }, [loadProjects, loadGroupBy]);
 
   const handleAddProjectDir = useCallback(async () => {
     try {
@@ -362,8 +384,8 @@ export default function InstalledSkillsTab({
                 className="w-56"
                 variant="secondary"
                 placeholder="All Skills"
-                isDisabled={!!bulkLoadingStatus}
-                onChange={val => setGroupBy((val as string) || 'all')}>
+                onChange={handleGroupByChange}
+                isDisabled={!!bulkLoadingStatus}>
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />

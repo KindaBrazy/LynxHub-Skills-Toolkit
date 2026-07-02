@@ -1,9 +1,11 @@
 import {Button, Description, InputGroup, Modal, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
-import {CloudStorage} from '@solar-icons/react-perf/BoldDuotone';
+import {CloudStorage, Folder} from '@solar-icons/react-perf/BoldDuotone';
 import {useState} from 'react';
 
 import {RegistrySkill} from '../types';
+
+const ipc = (window as any).electron.ipcRenderer;
 
 interface InstallCustomSkillModalProps {
   isOpen: boolean;
@@ -19,7 +21,7 @@ export default function InstallCustomSkillModal({isOpen, onClose, onProceed}: In
     if (!trimmed) return;
 
     // Extract name from source (e.g. last path segment)
-    const name = trimmed.split('/').filter(Boolean).pop() || trimmed;
+    const name = trimmed.split(/[/\\]/).filter(Boolean).pop() || trimmed;
 
     const customSkill: RegistrySkill = {
       id: trimmed,
@@ -31,6 +33,17 @@ export default function InstallCustomSkillModal({isOpen, onClose, onProceed}: In
     onProceed(customSkill);
     setCustomSource('');
     onClose();
+  };
+
+  const handleSelectFolder = async () => {
+    try {
+      const dir = await ipc.invoke('skills-manager:select-project-dir');
+      if (dir) {
+        setCustomSource(dir);
+      }
+    } catch (err) {
+      console.error('Failed to select local directory:', err);
+    }
   };
 
   return (
@@ -54,8 +67,19 @@ export default function InstallCustomSkillModal({isOpen, onClose, onProceed}: In
               className="px-3"
               value={customSource}
               onChange={e => setCustomSource(e.target.value)}
-              placeholder="e.g., owner/repo or https://github.com/owner/repo"
+              placeholder="e.g., owner/repo or select a local folder path"
             />
+            <InputGroup.Suffix className="pr-1.5">
+              <Button
+                size="sm"
+                variant="ghost"
+                onPress={handleSelectFolder}
+                aria-label="Select local folder"
+                className="h-7 w-7 min-w-7 p-0 hover:bg-white/10 rounded-lg flex items-center justify-center"
+                isIconOnly>
+                <Folder className="size-4 text-semi-muted hover:text-white" />
+              </Button>
+            </InputGroup.Suffix>
           </InputGroup>
         </div>
 
@@ -93,7 +117,9 @@ export default function InstallCustomSkillModal({isOpen, onClose, onProceed}: In
             </div>
             <div>
               <span className="font-bold text-foreground/80 font-JetBrainsMono">Local Folder Path: </span>
-              <code className="text-accent bg-foreground/5 px-1 rounded font-JetBrainsMono">./my-local-skills</code>
+              <code className="text-accent bg-foreground/5 px-1 rounded font-JetBrainsMono">
+                Select folder via browse button or type path
+              </code>
               <p className="text-[10px] pl-2 mt-0.5">Loads skills from a local directory path</p>
             </div>
           </div>

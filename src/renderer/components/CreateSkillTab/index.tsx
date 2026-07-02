@@ -428,11 +428,18 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
 
               <TextField isRequired>
                 <Label className="text-xs font-semibold text-semi-muted">Short Description</Label>
-                <Input
+                <TextArea
+                  onChange={e => {
+                    setDescription(e.target.value);
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
+                  rows={1}
                   variant="secondary"
                   value={description}
-                  onChange={e => setDescription(e.target.value)}
                   placeholder="e.g. Summarizes git branch differences and formats logs"
+                  className="resize-none min-h-0 py-2 overflow-hidden leading-normal font-Nunito"
                 />
                 <Description className="text-[10px]">
                   Brief summary explaining when the agent should activate this skill.
@@ -505,7 +512,14 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
             {/* Target Agents Selector */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <Label className="text-xs font-semibold text-semi-muted">Target Coding Agents</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs font-semibold text-semi-muted">Target Coding Agents</Label>
+                  {selectedAgents.length > 0 && (
+                    <span className="text-[10px] bg-LynxPurple/20 text-LynxPurple px-1.5 py-0.5 rounded-full font-bold">
+                      {selectedAgents.length}
+                    </span>
+                  )}
+                </div>
                 <div className="flex gap-3 text-[10px] font-semibold">
                   <button
                     type="button"
@@ -521,6 +535,39 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
                   </button>
                 </div>
               </div>
+
+              {/* Show chips of selected agents */}
+              {selectedAgents.length > 0 && (
+                <div
+                  className={
+                    'flex flex-wrap gap-1.5 p-2 bg-black/5 border ' +
+                    'border-border/20 rounded-xl max-h-20 overflow-y-auto ' +
+                    'scrollbar-thin'
+                  }>
+                  {selectedAgents.map(agentName => {
+                    const agent = agents.find(a => a.name === agentName);
+                    const displayName = agent ? agent.displayName : agentName;
+                    return (
+                      <div
+                        className={
+                          'flex items-center gap-1 bg-LynxPurple/15 text-LynxPurple ' +
+                          'border border-LynxPurple/25 text-[10px] px-2 py-0.5 ' +
+                          'rounded-full font-semibold'
+                        }
+                        key={agentName}>
+                        <span>{displayName}</span>
+                        <button
+                          type="button"
+                          aria-label={`Deselect ${displayName}`}
+                          className="hover:text-white transition-colors cursor-pointer ml-0.5"
+                          onClick={() => setSelectedAgents(selectedAgents.filter(name => name !== agentName))}>
+                          <X className="size-2.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Agent Filter and Scrollable checkbox area */}
               <Card className="flex flex-col gap-2.5 p-3.5 bg-surface-secondary border border-border/40 rounded-2xl">

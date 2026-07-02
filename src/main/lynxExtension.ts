@@ -91,6 +91,30 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
       }
     });
 
+    // Handler: Get skill description from skills.sh
+    mainIpc.lynxIpc.handle('skills-manager:get-description', async (source: string, name: string) => {
+      try {
+        const url = `https://skills.sh/${source}/${name}`;
+        const res = await fetch(url);
+        if (!res.ok) return '';
+        const text = await res.text();
+        const match =
+          text.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) ||
+          text.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
+        if (!match) return '';
+        return match[1]
+          .replace(/&quot;/g, '"')
+          .replace(/&amp;/g, '&')
+          .replace(/&#39;/g, "'")
+          .replace(/&apos;/g, "'")
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>');
+      } catch (error) {
+        console.error(`Error loading description for ${source}/${name}:`, error);
+        return '';
+      }
+    });
+
     // Handler: Search/Discover skills on registry (skills.sh)
     mainIpc.lynxIpc.handle('skills-manager:search', async (query: string) => {
       try {

@@ -31,6 +31,7 @@ interface SkillCardProps {
   activeSubTab: string;
   isSelected: boolean;
   onToggleSelect: (skill: RegistrySkill) => void;
+  onShowDetails: (skill: RegistrySkill) => void;
 }
 
 export function SkillCard({
@@ -41,6 +42,7 @@ export function SkillCard({
   activeSubTab,
   isSelected,
   onToggleSelect,
+  onShowDetails,
 }: SkillCardProps) {
   const githubUrl = getGithubUrl(skill.source);
 
@@ -57,19 +59,25 @@ export function SkillCard({
   return (
     <Card
       className={
-        'border border-border hover:border-foreground/10 hover:shadow-lg hover:shadow-black/20' +
-        ' transition flex flex-col justify-between h-full'
+        'border border-border hover:border-LynxBlue/40 cursor-pointer hover:shadow-lg hover:shadow-LynxBlue/5' +
+        ' active:scale-[0.99] transition flex flex-col justify-between h-full group'
       }
-      variant="secondary">
+      variant="secondary"
+      onClick={() => onShowDetails(skill)}>
       <Card.Header className="flex flex-col gap-2 pb-2">
         <div className="flex items-center justify-between w-full min-h-6">
-          <Checkbox isSelected={isSelected} aria-label={`Select ${skill.name}`} onChange={() => onToggleSelect(skill)}>
-            <Checkbox.Content>
-              <Checkbox.Control>
-                <Checkbox.Indicator />
-              </Checkbox.Control>
-            </Checkbox.Content>
-          </Checkbox>
+          <div onClick={e => e.stopPropagation()}>
+            <Checkbox
+              isSelected={isSelected}
+              aria-label={`Select ${skill.name}`}
+              onChange={() => onToggleSelect(skill)}>
+              <Checkbox.Content>
+                <Checkbox.Control>
+                  <Checkbox.Indicator />
+                </Checkbox.Control>
+              </Checkbox.Content>
+            </Checkbox>
+          </div>
 
           <div className="flex items-center gap-1.5 ml-auto">
             {rank !== undefined && (
@@ -90,7 +98,12 @@ export function SkillCard({
         </div>
 
         <div className="min-w-0 w-full mt-1">
-          <Typography title={skill.name} className="font-bold text-base text-wrap line-clamp-2 leading-snug">
+          <Typography
+            className={
+              'font-bold text-base text-wrap line-clamp-2 leading-snug' +
+              ' group-hover:text-LynxBlue transition-colors duration-300'
+            }
+            title={skill.name}>
             {skill.name}
           </Typography>
           <div className="flex items-center gap-1 mt-1">
@@ -100,6 +113,7 @@ export function SkillCard({
                 href={githubUrl}
                 rel="noopener noreferrer"
                 title="View source on GitHub"
+                onClick={e => e.stopPropagation()}
                 className="text-xs text-semi-muted hover:text-LynxBlue transition flex items-center gap-1 min-w-0">
                 <span className="truncate">{skill.source}</span>
                 <ExternalLink className="size-3 shrink-0" />
@@ -118,7 +132,9 @@ export function SkillCard({
         </div>
       </Card.Content>
 
-      <Card.Footer className="flex justify-end gap-2 border-t border-border-secondary/50 pt-3">
+      <Card.Footer
+        onClick={e => e.stopPropagation()}
+        className="flex justify-end gap-2 border-t border-border-secondary/50 pt-3">
         <Button size="sm" onPress={() => onSelect(skill)} className="w-full justify-center">
           {installed ? <SettingsMinimalistic className="size-4" /> : <Download className="size-4" />}
           {installed ? 'Configure / Re-install' : 'Install'}

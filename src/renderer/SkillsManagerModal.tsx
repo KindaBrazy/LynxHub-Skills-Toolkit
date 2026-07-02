@@ -1,8 +1,9 @@
 import {Description, Modal, Tabs, Typography} from '@heroui/react';
 import TabModal from '@lynx/components/TabModal';
-import {CloudStorage, Compass, Inbox} from '@solar-icons/react-perf/BoldDuotone';
+import {CloudStorage, Compass, Inbox, PenNewSquare} from '@solar-icons/react-perf/BoldDuotone';
 import {useCallback, useEffect, useState} from 'react';
 
+import CreateSkillTab from './components/CreateSkillTab';
 import DiscoverSkillsTab from './components/DiscoverSkillsTab';
 import InstallCustomSkillModal from './components/InstallCustomSkillModal';
 import InstalledSkillsTab from './components/InstalledSkillsTab';
@@ -135,6 +136,11 @@ export default function SkillsManagerModal() {
                   Discover
                   <Tabs.Indicator />
                 </Tabs.Tab>
+                <Tabs.Tab id="create" className="flex items-center gap-2">
+                  <PenNewSquare className="size-4" />
+                  Create
+                  <Tabs.Indicator />
+                </Tabs.Tab>
               </Tabs.List>
             </Tabs.ListContainer>
 
@@ -161,6 +167,16 @@ export default function SkillsManagerModal() {
                 isSkillInstalled={isSkillInstalled}
                 onSearchQueryChange={setSearchQuery}
                 onSelectSkill={skill => setSelectedSkills([skill])}
+              />
+            </Tabs.Panel>
+
+            {/* Create Skill Panel */}
+            <Tabs.Panel id="create" className="flex-1 flex flex-col overflow-hidden min-h-0">
+              <CreateSkillTab
+                onCreated={() => {
+                  loadInstalledSkills();
+                  setActiveTab('installed');
+                }}
               />
             </Tabs.Panel>
           </Tabs>

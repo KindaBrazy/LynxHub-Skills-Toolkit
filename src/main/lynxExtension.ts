@@ -2,6 +2,7 @@ import {MainIpcApi} from '@lynx_main/plugins/extensions/ipcWrapper';
 import {ExtensionMainApi, MainExtensionUtils} from '@lynx_main/plugins/extensions/types';
 import {dialog} from 'electron';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 
 import {getSkillsCliPath, parseAgentsFromCli, runSkillsCommand} from './cliRunner';
@@ -277,5 +278,55 @@ export async function initialExtension(lynxApi: ExtensionMainApi, _utils: MainEx
         return [];
       }
     });
+
+    // Handler: Create a custom skill
+    mainIpc.lynxIpc.handle(
+      'skills-manager:create-skill',
+      async (
+        name: string,
+        scope: 'project' | 'global',
+        projectDir: string | undefined,
+        agentPaths: {agent: string; path: string}[],
+        content: string,
+        overwrite?: boolean,
+      ) => {
+        try {
+          const resolvedPaths: string[] = [];
+
+          // 1. Resolve and check all paths
+          for (const item of agentPaths) {
+            let targetDir = '';
+            if (scope === 'project') {
+              if (!projectDir) {
+                throw new Error('Project directory is required for project-scoped skills');
+              }
+              targetDir = path.join(projectDir, item.path, name);
+            } else {
+              const homedir = os.homedir();
+              const cleanPath = item.path.replace(/^~[/\\]/, '');
+              targetDir = path.join(homedir, cleanPath, name);
+            }
+
+            const skillFilePath = path.join(targetDir, 'SKILL.md');
+            if (fs.existsSync(skillFilePath) && !overwrite) {
+              return {success: false, exists: true, message: `Skill already exists in agent path: ${item.path}`};
+            }
+            resolvedPaths.push(targetDir);
+          }
+
+          // 2. Write the files
+          for (const targetDir of resolvedPaths) {
+            fs.mkdirSync(targetDir, {recursive: true});
+            const skillFilePath = path.join(targetDir, 'SKILL.md');
+            fs.writeFileSync(skillFilePath, content, 'utf8');
+          }
+
+          return {success: true, paths: resolvedPaths};
+        } catch (error: any) {
+          console.error('Error creating skill:', error);
+          return {success: false, error: error.message || String(error)};
+        }
+      },
+    );
   });
 }

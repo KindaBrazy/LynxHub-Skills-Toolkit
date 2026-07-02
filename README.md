@@ -1,6 +1,6 @@
 # 🛠️ LynxHub Skills Manager
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![LynxHub Extension](https://img.shields.io/badge/LynxHub-Extension-blueviolet)](https://github.com/KindaBrazy/LynxHub)
 [![Registry](https://img.shields.io/badge/Registry-skills.sh-00c853)](https://skills.sh)
 

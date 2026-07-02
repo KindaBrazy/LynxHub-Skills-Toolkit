@@ -29,6 +29,17 @@ An interactive, feature-rich GUI management extension for **AI Coding Agent Skil
 
 ---
 
+## 📦 Installation
+
+To use this extension, follow these steps:
+
+1. **Install LynxHub**: Download and install the main [LynxHub](https://github.com/KindaBrazy/LynxHub) application.
+2. **Navigate to Plugins**: Open the LynxHub app and go to the **Plugins** page.
+3. **Select & Install**: Find and select **LynxHub Skills Manager** from the list, then click install.
+4. **Restart**: Restart the LynxHub application to apply the changes.
+
+---
+
 ## 📸 Interface Preview
 
 ### 1. Installed Skills & Custom Groups

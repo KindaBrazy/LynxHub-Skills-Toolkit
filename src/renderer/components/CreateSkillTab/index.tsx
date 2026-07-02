@@ -15,7 +15,8 @@ import {
   Typography,
 } from '@heroui/react';
 import LynxSwitch from '@lynx/components/LynxSwitch';
-import {AltArrowDown, AltArrowUp, CheckCircle, Folder, TrashBinMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
+import {CheckCircle, Folder, TrashBin2} from '@solar-icons/react-perf/BoldDuotone';
+import {AltArrowDown, AltArrowUp} from '@solar-icons/react-perf/LineDuotone';
 import {PenSquare, Plus, X} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
@@ -623,14 +624,10 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
                             }}
                             value={step}
                             className="flex-1"
-                            variant="secondary"
                             placeholder={`Step ${idx + 1} instructions`}
                           />
                           <div className="flex gap-1 shrink-0">
                             <Button
-                              className={
-                                'h-7 w-7 min-w-7 hover:bg-white/10 rounded-lg ' + 'flex items-center justify-center p-0'
-                              }
                               onPress={() => {
                                 const updated = [...steps];
                                 const temp = updated[idx];
@@ -642,12 +639,9 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
                               variant="ghost"
                               isDisabled={idx === 0}
                               isIconOnly>
-                              <AltArrowUp className="size-4 text-semi-muted hover:text-white" />
+                              <AltArrowUp />
                             </Button>
                             <Button
-                              className={
-                                'h-7 w-7 min-w-7 hover:bg-white/10 rounded-lg ' + 'flex items-center justify-center p-0'
-                              }
                               onPress={() => {
                                 const updated = [...steps];
                                 const temp = updated[idx];
@@ -659,20 +653,15 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
                               variant="ghost"
                               isDisabled={idx === steps.length - 1}
                               isIconOnly>
-                              <AltArrowDown className="size-4 text-semi-muted hover:text-white" />
+                              <AltArrowDown />
                             </Button>
                             <Button
-                              className={
-                                'h-7 w-7 min-w-7 hover:bg-danger/20 hover:text-danger ' +
-                                'rounded-lg flex items-center justify-center p-0 border ' +
-                                'border-transparent hover:border-danger/20'
-                              }
                               size="sm"
-                              variant="danger"
+                              variant="danger-soft"
                               isDisabled={steps.length <= 1}
                               onPress={() => setSteps(steps.filter((_, i) => i !== idx))}
                               isIconOnly>
-                              <TrashBinMinimalistic className="size-4" />
+                              <TrashBin2 />
                             </Button>
                           </div>
                         </div>
@@ -681,9 +670,9 @@ export default function CreateSkillTab({onCreated}: CreateSkillTabProps) {
 
                     <Button
                       size="sm"
-                      variant="ghost"
-                      onPress={() => setSteps([...steps, ''])}
-                      className="w-fit self-start gap-1 h-8 mt-1 border border-border/50 hover:bg-white/5">
+                      variant="tertiary"
+                      className="w-fit h-8 mt-1"
+                      onPress={() => setSteps([...steps, ''])}>
                       <Plus className="size-3.5" /> Add Step
                     </Button>
                   </div>

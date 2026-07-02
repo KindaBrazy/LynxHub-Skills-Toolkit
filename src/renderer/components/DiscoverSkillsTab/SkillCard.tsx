@@ -1,6 +1,6 @@
-import {Button, Card, Checkbox, Chip, Typography} from '@heroui/react';
+import {Button, Card, Checkbox, Chip, Link, Typography} from '@heroui/react';
 import {Download, Fire, SettingsMinimalistic} from '@solar-icons/react-perf/BoldDuotone';
-import {ExternalLink, TrendingUp} from 'lucide-react';
+import {TrendingUp} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
 import {RegistrySkill} from '../../types';
@@ -123,15 +123,13 @@ export function SkillCard({
           </Typography>
           <div className="flex items-center gap-1 mt-1">
             {githubUrl ? (
-              <a
+              <Link
                 target="_blank"
-                href={githubUrl}
-                rel="noopener noreferrer"
-                title="View source on GitHub"
-                className="text-xs text-semi-muted hover:text-LynxBlue transition flex items-center gap-1 min-w-0">
+                onPress={() => window.open(githubUrl)}
+                className="text-xs text-semi-muted hover:text-accent transition flex items-center gap-1 min-w-0">
                 <span className="truncate">{skill.source}</span>
-                <ExternalLink className="size-3 shrink-0" />
-              </a>
+                <Link.Icon className="size-3 shrink-0" />
+              </Link>
             ) : (
               <span className="text-xs text-semi-muted truncate">{skill.source}</span>
             )}

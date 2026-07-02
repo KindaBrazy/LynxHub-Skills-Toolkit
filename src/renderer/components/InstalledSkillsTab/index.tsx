@@ -367,7 +367,7 @@ export default function InstalledSkillsTab({
                     onPress={onInstallCustom}
                     isDisabled={!!bulkLoadingStatus}>
                     <Plus className="size-3.5" />
-                    Install Custom...
+                    Install Custom
                   </Button>
                 )}
               </div>

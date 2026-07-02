@@ -1,4 +1,4 @@
-# 🛠️ LynxHub Skills Manager (`lynxhub-skills-toolkit`)
+# 🛠️ LynxHub Skills Manager
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![LynxHub Extension](https://img.shields.io/badge/LynxHub-Extension-blueviolet)](https://github.com/KindaBrazy/LynxHub)

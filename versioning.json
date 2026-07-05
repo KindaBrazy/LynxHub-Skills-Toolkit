@@ -2,7 +2,7 @@
   "versions": [
     {
       "version": "0.1.0",
-      "commit": "b33ad26",
+      "commit": "41bcc1c",
       "engines": {
         "extensionApi": "^2.0.0"
       },

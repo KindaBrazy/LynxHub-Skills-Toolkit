@@ -1,9 +1,10 @@
 import {ToolsCard} from '@lynx/components/ToolsCard';
 import {BookOpen} from 'lucide-react';
 
-export default function ToolsPage() {
+export function SkillsToolkitCard() {
   return (
     <ToolsCard
+      id="skills-toolkit"
       onPress={() => {
         window.dispatchEvent(new CustomEvent('open-skills-manager'));
       }}
@@ -13,3 +14,5 @@ export default function ToolsPage() {
     />
   );
 }
+
+export default SkillsToolkitCard;

@@ -13,48 +13,6 @@ var freeSelf = typeof self == "object" && self && self.Object === Object && self
 /** Built-in value references. */
 var Symbol$1 = (freeGlobal || freeSelf || Function("return this")()).Symbol;
 //#endregion
-//#region node_modules/lodash-es/_arrayMap.js
-/**
-* A specialized version of `_.map` for arrays without support for iteratee
-* shorthands.
-*
-* @private
-* @param {Array} [array] The array to iterate over.
-* @param {Function} iteratee The function invoked per iteration.
-* @returns {Array} Returns the new mapped array.
-*/
-function arrayMap(array, iteratee) {
-	var index = -1, length = array == null ? 0 : array.length, result = Array(length);
-	while (++index < length) result[index] = iteratee(array[index], index, array);
-	return result;
-}
-//#endregion
-//#region node_modules/lodash-es/isArray.js
-/**
-* Checks if `value` is classified as an `Array` object.
-*
-* @static
-* @memberOf _
-* @since 0.1.0
-* @category Lang
-* @param {*} value The value to check.
-* @returns {boolean} Returns `true` if `value` is an array, else `false`.
-* @example
-*
-* _.isArray([1, 2, 3]);
-* // => true
-*
-* _.isArray(document.body.children);
-* // => false
-*
-* _.isArray('abc');
-* // => false
-*
-* _.isArray(_.noop);
-* // => false
-*/
-var isArray$1 = Array.isArray;
-//#endregion
 //#region node_modules/lodash-es/_getRawTag.js
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -174,6 +132,48 @@ var symbolTag = "[object Symbol]";
 function isSymbol(value) {
 	return typeof value == "symbol" || isObjectLike(value) && baseGetTag(value) == symbolTag;
 }
+//#endregion
+//#region node_modules/lodash-es/_arrayMap.js
+/**
+* A specialized version of `_.map` for arrays without support for iteratee
+* shorthands.
+*
+* @private
+* @param {Array} [array] The array to iterate over.
+* @param {Function} iteratee The function invoked per iteration.
+* @returns {Array} Returns the new mapped array.
+*/
+function arrayMap(array, iteratee) {
+	var index = -1, length = array == null ? 0 : array.length, result = Array(length);
+	while (++index < length) result[index] = iteratee(array[index], index, array);
+	return result;
+}
+//#endregion
+//#region node_modules/lodash-es/isArray.js
+/**
+* Checks if `value` is classified as an `Array` object.
+*
+* @static
+* @memberOf _
+* @since 0.1.0
+* @category Lang
+* @param {*} value The value to check.
+* @returns {boolean} Returns `true` if `value` is an array, else `false`.
+* @example
+*
+* _.isArray([1, 2, 3]);
+* // => true
+*
+* _.isArray(document.body.children);
+* // => false
+*
+* _.isArray('abc');
+* // => false
+*
+* _.isArray(_.noop);
+* // => false
+*/
+var isArray$1 = Array.isArray;
 //#endregion
 //#region node_modules/lodash-es/_baseToString.js
 /** Used as references for various `Number` constants. */
@@ -389,7 +389,7 @@ var package_default = {
 	name: "lynxhub",
 	productName: "LynxHub",
 	desktopName: "ai.kindabrazy.lynxhub.desktop",
-	version: "3.5.5",
+	version: "3.5.6",
 	type: "module",
 	description: "Cross-platform, extensible terminal/browser for AI management",
 	main: "./out/main/index.cjs",
@@ -405,10 +405,10 @@ var package_default = {
 	homepage: "https://github.com/KindaBrazy/LynxHub",
 	appDetails: {
 		"title": "LynxHub",
-		"buildNumber": 52,
+		"buildNumber": 53,
 		"detailedDescription": "Open-source, cross-platform terminal and browser, designed for managing AI. Highly modular and extensible, it's the all-in-one environment for AI power users.",
 		"moduleApiVersion": "2.1.0",
-		"extensionApiVersion": "2.0.0"
+		"extensionApiVersion": "2.2.0"
 	},
 	scripts: {
 		"typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
@@ -454,10 +454,11 @@ var package_default = {
 		"@electron-toolkit/preload": "^3.0.2",
 		"@electron-toolkit/utils": "^4.0.0",
 		"@originjs/vite-plugin-federation": "^1.4.1",
-		"@sentry/electron": "^7.14.0",
-		"@sentry/react": "^10.60.0",
+		"@sentry/electron": "^7.15.0",
+		"@sentry/react": "^10.62.0",
 		"axios": "^1.18.1",
 		"fix-path": "^5.0.0",
+		"fuse.js": "^7.4.2",
 		"graceful-fs": "^4.2.11",
 		"lowdb": "^7.0.1",
 		"node-pty": "^1.2.0-beta.13",
@@ -471,15 +472,15 @@ var package_default = {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",
 		"@electron-toolkit/tsconfig": "^2.0.0",
 		"@eslint/js": "^10.0.1",
-		"@heroui/react": "^3.2.1",
-		"@heroui/styles": "^3.2.1",
+		"@heroui/react": "^3.2.2",
+		"@heroui/styles": "^3.2.2",
 		"@icons-pack/react-simple-icons": "^13.13.0",
-		"@number-flow/react": "^0.6.0",
+		"@number-flow/react": "^0.6.1",
 		"@reduxjs/toolkit": "^2.12.0",
 		"@sentry/vite-plugin": "^5.3.0",
 		"@solar-icons/react-perf": "^2.1.1",
 		"@tailwindcss/typography": "^0.5.20",
-		"@tailwindcss/vite": "^4.3.1",
+		"@tailwindcss/vite": "^4.3.2",
 		"@types/decompress": "^4.2.7",
 		"@types/fontfaceobserver": "^2.1.3",
 		"@types/graceful-fs": "^4.1.9",
@@ -505,26 +506,26 @@ var package_default = {
 		"@xterm/xterm": "^6.0.0",
 		"chokidar": "^5.0.0",
 		"decompress": "^4.2.1",
-		"electron": "^42.5.0",
+		"electron": "^43.1.0",
 		"electron-builder": "^26.15.3",
 		"electron-dl": "^4.0.0",
 		"electron-log": "^5.4.4",
 		"electron-updater": "^6.8.9",
 		"electron-vite": "^6.0.0-beta.1",
-		"eslint": "^10.5.0",
+		"eslint": "^10.6.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
-		"eslint-plugin-perfectionist": "^5.9.1",
+		"eslint-plugin-perfectionist": "^5.10.0",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"eslint-plugin-simple-import-sort": "^13.0.0",
 		"fontfaceobserver": "^2.3.0",
-		"framer-motion": "^12.41.0",
+		"framer-motion": "^12.42.2",
 		"globals": "^17.7.0",
 		"lodash-es": "^4.18.1",
-		"lucide-react": "^1.21.0",
+		"lucide-react": "^1.24.0",
 		"normalize-url": "^9.0.1",
 		"ogl": "^1.0.11",
-		"prettier": "^3.8.4",
+		"prettier": "^3.9.5",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"react-error-boundary": "^6.1.2",
@@ -539,11 +540,11 @@ var package_default = {
 		"run-script-os": "^1.1.6",
 		"simple-git": "^3.36.0",
 		"tailwind-lint": "^0.12.0",
-		"tailwindcss": "^4.3.1",
-		"three": "^0.184.0",
+		"tailwindcss": "^4.3.2",
+		"three": "^0.185.1",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.62.0",
-		"vite": "^8.1.0"
+		"typescript-eslint": "^8.63.0",
+		"vite": "^8.1.4"
 	},
 	allowScripts: {
 		"electron": true,
@@ -1545,7 +1546,7 @@ function formatProdErrorMessage(code) {
 }
 //#endregion
 //#region src/renderer/mainWindow/redux/reducers/tabs.ts
-var { useSelector: useSelector$1 } = await importShared("react-redux");
+var { useSelector: useSelector$2 } = await importShared("react-redux");
 var findUniqueTabId = (baseId, tabs) => {
 	let idNumber = 1;
 	let candidateId = baseId;
@@ -1680,19 +1681,19 @@ var tabsSlice = createSlice({
 /**
 * Hook to access tabs reducer state by key with inferred return type.
 */
-var useTabsState = (key) => useSelector$1((state) => state.tabs[key]);
+var useTabsState = (key) => useSelector$2((state) => state.tabs[key]);
 tabsSlice.actions;
 tabsSlice.reducer;
 //#endregion
 //#region src/renderer/mainWindow/components/TabModal.tsx
 var import_jsx_runtime = require_jsx_runtime();
 var { Modal: Modal$4 } = await importShared("@heroui/react");
-var { useEffect: useEffect$9, useState: useState$10 } = await importShared("react");
+var { useEffect: useEffect$11, useState: useState$11 } = await importShared("react");
 var { UNSAFE_PortalProvider } = await importShared("react-aria");
 function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissable = false, backdropVariant, dialogClassName, containerClassName, isKeyboardDismissDisabled }) {
 	const activeTab = useTabsState("activeTab");
-	const [targetContainer, setTargetContainer] = useState$10(null);
-	useEffect$9(() => {
+	const [targetContainer, setTargetContainer] = useState$11(null);
+	useEffect$11(() => {
 		setTargetContainer(isOpen ? document.getElementById(`${activeTab}_wrapper`) : null);
 	}, [isOpen]);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$4, {
@@ -1724,7 +1725,7 @@ function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissabl
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/lib/IconBase.mjs
 var { forwardRef: e } = await importShared("react");
-var r$23 = e((e, r) => {
+var r$25 = e((e, r) => {
 	let { alt: i, color: a = `currentColor`, size: o = `1em`, mirrored: s = !1, children: c, ...l } = e;
 	return (0, import_jsx_runtime.jsxs)(`svg`, {
 		ref: r,
@@ -1739,11 +1740,11 @@ var r$23 = e((e, r) => {
 		children: [!!i && (0, import_jsx_runtime.jsx)(`title`, { children: i }), c]
 	});
 });
-r$23.displayName = `IconBase`;
+r$25.displayName = `IconBase`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows-action/BoldDuotone/Download.mjs
-var { forwardRef: t$22 } = await importShared("react");
-var i$19 = t$22((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$24 } = await importShared("react");
+var i$20 = t$24((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1757,11 +1758,11 @@ var i$19 = t$22((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$19.displayName = `Download`;
+i$20.displayName = `Download`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/devices/BoldDuotone/CloudStorage.mjs
-var { forwardRef: t$21 } = await importShared("react");
-var i$18 = t$21((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$23 } = await importShared("react");
+var i$19 = t$23((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1775,11 +1776,11 @@ var i$18 = t$21((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$18.displayName = `CloudStorage`;
+i$19.displayName = `CloudStorage`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/devices/BoldDuotone/Laptop.mjs
-var { forwardRef: t$20 } = await importShared("react");
-var i$17 = t$20((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$22 } = await importShared("react");
+var i$18 = t$22((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [
@@ -1800,11 +1801,11 @@ var i$17 = t$20((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		})
 	]
 }));
-i$17.displayName = `Laptop`;
+i$18.displayName = `Laptop`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/folders/BoldDuotone/Folder.mjs
-var { forwardRef: t$19 } = await importShared("react");
-var i$16 = t$19((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$21 } = await importShared("react");
+var i$17 = t$21((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1816,11 +1817,11 @@ var i$16 = t$19((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$16.displayName = `Folder`;
+i$17.displayName = `Folder`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/like/BoldDuotone/Star.mjs
-var { forwardRef: t$18 } = await importShared("react");
-var i$15 = t$18((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$20 } = await importShared("react");
+var i$16 = t$20((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1832,11 +1833,11 @@ var i$15 = t$18((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$15.displayName = `Star`;
+i$16.displayName = `Star`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/map/BoldDuotone/Compass.mjs
-var { forwardRef: t$17 } = await importShared("react");
-var i$14 = t$17((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$19 } = await importShared("react");
+var i$15 = t$19((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1848,11 +1849,11 @@ var i$14 = t$17((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$14.displayName = `Compass`;
+i$15.displayName = `Compass`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/messages/BoldDuotone/Inbox.mjs
-var { forwardRef: t$16 } = await importShared("react");
-var i$13 = t$16((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$18 } = await importShared("react");
+var i$14 = t$18((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1864,11 +1865,11 @@ var i$13 = t$16((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$13.displayName = `Inbox`;
+i$14.displayName = `Inbox`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/messages/BoldDuotone/PenNewSquare.mjs
-var { forwardRef: t$15 } = await importShared("react");
-var i$12 = t$15((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$17 } = await importShared("react");
+var i$13 = t$17((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [
@@ -1887,11 +1888,11 @@ var i$12 = t$15((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		})
 	]
 }));
-i$12.displayName = `PenNewSquare`;
+i$13.displayName = `PenNewSquare`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/money/BoldDuotone/VerifiedCheck.mjs
-var { forwardRef: t$14 } = await importShared("react");
-var i$11 = t$14((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$16 } = await importShared("react");
+var i$12 = t$16((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1903,11 +1904,11 @@ var i$11 = t$14((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$11.displayName = `VerifiedCheck`;
+i$12.displayName = `VerifiedCheck`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/nature/BoldDuotone/Fire.mjs
-var { forwardRef: t$13 } = await importShared("react");
-var i$10 = t$13((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$15 } = await importShared("react");
+var i$11 = t$15((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1919,11 +1920,11 @@ var i$10 = t$13((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$10.displayName = `Fire`;
+i$11.displayName = `Fire`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/security/BoldDuotone/ShieldCheck.mjs
-var { forwardRef: t$12 } = await importShared("react");
-var i$9 = t$12((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$14 } = await importShared("react");
+var i$10 = t$14((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1935,11 +1936,11 @@ var i$9 = t$12((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$9.displayName = `ShieldCheck`;
+i$10.displayName = `ShieldCheck`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/settings/BoldDuotone/SettingsMinimalistic.mjs
-var { forwardRef: t$11 } = await importShared("react");
-var i$8 = t$11((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$13 } = await importShared("react");
+var i$9 = t$13((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1953,11 +1954,11 @@ var i$8 = t$11((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$8.displayName = `SettingsMinimalistic`;
+i$9.displayName = `SettingsMinimalistic`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/ui/BoldDuotone/CheckCircle.mjs
-var { forwardRef: t$10 } = await importShared("react");
-var i$7 = t$10((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$12 } = await importShared("react");
+var i$8 = t$12((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -1969,11 +1970,11 @@ var i$7 = t$10((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$7.displayName = `CheckCircle`;
+i$8.displayName = `CheckCircle`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/ui/BoldDuotone/InfoCircle.mjs
-var { forwardRef: t$9 } = await importShared("react");
-var i$6 = t$9((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$11 } = await importShared("react");
+var i$7 = t$11((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [
@@ -1992,11 +1993,11 @@ var i$6 = t$9((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		})
 	]
 }));
-i$6.displayName = `InfoCircle`;
+i$7.displayName = `InfoCircle`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/ui/BoldDuotone/TrashBin2.mjs
-var { forwardRef: t$8 } = await importShared("react");
-var i$5 = t$8((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$10 } = await importShared("react");
+var i$6 = t$10((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -2008,11 +2009,11 @@ var i$5 = t$8((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$5.displayName = `TrashBin2`;
+i$6.displayName = `TrashBin2`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/users/BoldDuotone/User.mjs
-var { forwardRef: t$7 } = await importShared("react");
-var i$4 = t$7((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$9 } = await importShared("react");
+var i$5 = t$9((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`circle`, {
@@ -2026,10 +2027,10 @@ var i$4 = t$7((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		fill: `currentColor`
 	})]
 }));
-i$4.displayName = `User`;
+i$5.displayName = `User`;
 //#endregion
 //#region src/renderer/mainWindow/redux/reducers/settings.ts
-var { useSelector } = await importShared("react-redux");
+var { useSelector: useSelector$1 } = await importShared("react-redux");
 var settingsSlice = createSlice({
 	initialState: {
 		tooltipLevel: "essential",
@@ -2065,7 +2066,7 @@ var settingsSlice = createSlice({
 /**
 * Hook to access a single settings state field with key-safe typing.
 */
-var useSettingsState = (name) => useSelector((state) => state.settings[name]);
+var useSettingsState = (name) => useSelector$1((state) => state.settings[name]);
 settingsSlice.actions;
 settingsSlice.reducer;
 //#endregion
@@ -2449,14 +2450,14 @@ var SettingsSearchHighlight = ({ text, children, className, highlightClassName }
 //#endregion
 //#region src/renderer/mainWindow/components/LynxSwitch.tsx
 var { Description: Description$8, Surface, Switch } = await importShared("@heroui/react");
-var { useCallback: useCallback$7, useEffect: useEffect$8, useState: useState$9 } = await importShared("react");
+var { useCallback: useCallback$7, useEffect: useEffect$10, useState: useState$10 } = await importShared("react");
 /**
 * Customizable switch component with title, description, and search highlighting.
 * Supports both controlled and uncontrolled modes.
 */
 function LynxSwitch({ enabled = false, onEnabledChange, title, description, isDisabled, className, size = "md", thumbIcon, icon, variant = "default" }) {
-	const [isSelected, setIsSelected] = useState$9(enabled);
-	useEffect$8(() => {
+	const [isSelected, setIsSelected] = useState$10(enabled);
+	useEffect$10(() => {
 		setIsSelected(enabled);
 	}, [enabled]);
 	const onChange = useCallback$7((selected) => {
@@ -2501,8 +2502,8 @@ function LynxSwitch({ enabled = false, onEnabledChange, title, description, isDi
 }
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows/LineDuotone/AltArrowDown.mjs
-var { forwardRef: t$6 } = await importShared("react");
-var r$6 = t$6((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
+var { forwardRef: t$8 } = await importShared("react");
+var r$8 = t$8((t, r) => (0, import_jsx_runtime.jsx)(r$25, {
 	ref: r,
 	...t,
 	children: (0, import_jsx_runtime.jsx)(`path`, {
@@ -2513,11 +2514,11 @@ var r$6 = t$6((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
 		strokeLinejoin: `round`
 	})
 }));
-r$6.displayName = `AltArrowDown`;
+r$8.displayName = `AltArrowDown`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows/LineDuotone/AltArrowUp.mjs
-var { forwardRef: t$5 } = await importShared("react");
-var r$5 = t$5((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
+var { forwardRef: t$7 } = await importShared("react");
+var r$7 = t$7((t, r) => (0, import_jsx_runtime.jsx)(r$25, {
 	ref: r,
 	...t,
 	children: (0, import_jsx_runtime.jsx)(`path`, {
@@ -2528,11 +2529,11 @@ var r$5 = t$5((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
 		strokeLinejoin: `round`
 	})
 }));
-r$5.displayName = `AltArrowUp`;
+r$7.displayName = `AltArrowUp`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows/LineDuotone/ArrowDown.mjs
-var { forwardRef: t$4 } = await importShared("react");
-var i$3 = t$4((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$6 } = await importShared("react");
+var i$4 = t$6((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -2547,11 +2548,27 @@ var i$3 = t$4((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 		strokeLinejoin: `round`
 	})]
 }));
-i$3.displayName = `ArrowDown`;
+i$4.displayName = `ArrowDown`;
+//#endregion
+//#region node_modules/@solar-icons/react-perf/dist/icons/ui/LineDuotone/Pin.mjs
+var { forwardRef: t$5 } = await importShared("react");
+var i$3 = t$5((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
+	ref: i,
+	...t,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M15.9894 4.9502L16.52 4.42014L16.52 4.42014L15.9894 4.9502ZM19.0717 8.03562L18.5411 8.56568L18.5411 8.56568L19.0717 8.03562ZM8.73845 19.429L8.20785 19.9591L8.73845 19.429ZM4.62176 15.3081L5.15236 14.7781L4.62176 15.3081ZM17.567 14.9943L17.3032 14.2922L17.567 14.9943ZM15.6499 15.7146L15.9137 16.4167L15.6499 15.7146ZM8.33227 8.38177L7.62805 8.12375H7.62805L8.33227 8.38177ZM9.02673 6.48636L9.73095 6.74438L9.02673 6.48636ZM5.84512 10.6735L6.04445 11.3965H6.04445L5.84512 10.6735ZM7.30174 10.1351L6.86354 9.52646L6.86354 9.52646L7.30174 10.1351ZM7.6759 9.79038L8.24673 10.2768H8.24673L7.6759 9.79038ZM14.2511 16.3805L14.7421 16.9475L14.7421 16.9475L14.2511 16.3805ZM13.3807 18.2012L12.6575 18.0022V18.0022L13.3807 18.2012ZM13.917 16.7466L13.3076 16.3094L13.3076 16.3094L13.917 16.7466ZM2.71854 12.7552L1.96855 12.76V12.76L2.71854 12.7552ZM2.93053 11.9521L2.28061 11.5778H2.28061L2.93053 11.9521ZM11.3053 21.3431L11.3064 20.5931H11.3064L11.3053 21.3431ZM12.0933 21.1347L11.7216 20.4833L11.7216 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8589 2.76845L11.6973 2.03606ZM15.4588 5.48026L18.5411 8.56568L19.6023 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26905 18.8989L5.15236 14.7781L4.09116 15.8382L8.20785 19.9591L9.26905 18.8989ZM17.3032 14.2922L15.3861 15.0125L15.9137 16.4167L17.8308 15.6964L17.3032 14.2922ZM9.03649 8.63979L9.73095 6.74438L8.32251 6.22834L7.62805 8.12375L9.03649 8.63979ZM6.04445 11.3965C6.75591 11.2003 7.29726 11.0625 7.73995 10.7438L6.86354 9.52646C6.6906 9.65097 6.46608 9.72428 5.64578 9.95044L6.04445 11.3965ZM7.62805 8.12375C7.3351 8.92332 7.24345 9.14153 7.10507 9.30391L8.24673 10.2768C8.60048 9.86175 8.78237 9.33337 9.03649 8.63979L7.62805 8.12375ZM7.73995 10.7438C7.92704 10.6091 8.09719 10.4523 8.24673 10.2768L7.10507 9.30391C7.03377 9.38757 6.95268 9.46229 6.86354 9.52646L7.73995 10.7438ZM15.3861 15.0125C14.697 15.2714 14.1717 15.4571 13.7601 15.8135L14.7421 16.9475C14.9029 16.8082 15.1193 16.7152 15.9137 16.4167L15.3861 15.0125ZM14.1038 18.4001C14.3291 17.5813 14.4022 17.3569 14.5263 17.1838L13.3076 16.3094C12.9903 16.7517 12.853 17.2919 12.6575 18.0022L14.1038 18.4001ZM13.7601 15.8135C13.5904 15.9605 13.4385 16.1269 13.3076 16.3094L14.5263 17.1838C14.5888 17.0968 14.6612 17.0175 14.7421 16.9475L13.7601 15.8135ZM5.15236 14.7781C4.50623 14.1313 4.06806 13.691 3.78374 13.3338C3.49842 12.9753 3.46896 12.8201 3.46852 12.7505L1.96855 12.76C1.97223 13.3422 2.26135 13.8297 2.6101 14.2679C2.95984 14.7073 3.47123 15.2176 4.09116 15.8382L5.15236 14.7781ZM5.64578 9.95044C4.80056 10.1835 4.10403 10.3743 3.58304 10.5835C3.06349 10.792 2.57124 11.0732 2.28061 11.5778L3.58045 12.3264C3.61507 12.2663 3.717 12.146 4.14187 11.9755C4.56531 11.8055 5.16345 11.6394 6.04445 11.3965L5.64578 9.95044ZM3.46852 12.7505C3.46758 12.6016 3.50623 12.4553 3.58045 12.3264L2.28061 11.5778C2.07362 11.9372 1.96593 12.3452 1.96855 12.76L3.46852 12.7505ZM8.20785 19.9591C8.83172 20.5836 9.34472 21.0987 9.78654 21.4506C10.2271 21.8015 10.718 22.0922 11.3042 22.0931L11.3064 20.5931C11.237 20.593 11.0815 20.5644 10.7211 20.2773C10.3619 19.9912 9.91931 19.5499 9.26905 18.8989L8.20785 19.9591ZM12.6575 18.0022C12.4133 18.8897 12.2463 19.4924 12.0752 19.9188C11.9034 20.3467 11.7822 20.4487 11.7216 20.4833L12.4651 21.7861C12.9741 21.4956 13.2573 21.0004 13.4672 20.4775C13.6777 19.9532 13.8695 19.2516 14.1038 18.4001L12.6575 18.0022ZM11.3042 22.0931C11.7113 22.0937 12.1115 21.9879 12.4651 21.7861L11.7216 20.4833C11.5951 20.5555 11.452 20.5933 11.3064 20.5931L11.3042 22.0931ZM18.5411 8.56568C19.6046 9.63022 20.3403 10.3695 20.7918 10.9788C21.2353 11.5774 21.2864 11.8959 21.2322 12.1464L22.6983 12.4634C22.8882 11.5854 22.5383 10.8162 21.997 10.0857C21.4636 9.36592 20.6306 8.53486 19.6023 7.50556L18.5411 8.56568ZM17.8308 15.6964C19.1922 15.1849 20.2941 14.773 21.0771 14.3384C21.8719 13.8973 22.5084 13.3416 22.6983 12.4634L21.2322 12.1464C21.178 12.3968 21.0002 12.6655 20.3492 13.0268C19.6865 13.3946 18.7113 13.7632 17.3032 14.2922L17.8308 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1909 1.46165 12.4175 1.10912 11.5357 1.30367L11.8589 2.76845C12.1086 2.71335 12.4278 2.7633 13.0305 3.21075C13.6434 3.66579 14.3877 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73095 6.74438C10.2526 5.32075 10.6162 4.33403 10.9813 3.66315C11.3403 3.00338 11.6091 2.82357 11.8589 2.76845L11.5357 1.30367C10.6541 1.49819 10.1006 2.14332 9.6637 2.94618C9.23286 3.73793 8.82695 4.85154 8.32251 6.22834L9.73095 6.74438Z`,
+		fill: `currentColor`
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		opacity: `0.5`,
+		d: `M1.4694 21.4697C1.17666 21.7627 1.1769 22.2376 1.46994 22.5304C1.76298 22.8231 2.23786 22.8229 2.5306 22.5298L1.4694 21.4697ZM7.18383 17.8719C7.47657 17.5788 7.47633 17.1039 7.18329 16.8112C6.89024 16.5185 6.41537 16.5187 6.12263 16.8117L7.18383 17.8719ZM2.5306 22.5298L7.18383 17.8719L6.12263 16.8117L1.4694 21.4697L2.5306 22.5298Z`,
+		fill: `currentColor`
+	})]
+}));
+i$3.displayName = `Pin`;
 //#endregion
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2562,7 +2579,7 @@ var mergeClasses = (...classes) => classes.filter((className, index, array) => {
 //#endregion
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2571,7 +2588,7 @@ var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLo
 //#endregion
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2580,7 +2597,7 @@ var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1
 //#endregion
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2592,7 +2609,7 @@ var toPascalCase = (string) => {
 //#endregion
 //#region node_modules/lucide-react/dist/esm/defaultAttributes.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2611,7 +2628,7 @@ var defaultAttributes = {
 //#endregion
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2623,7 +2640,7 @@ var hasA11yProp = (props) => {
 //#endregion
 //#region node_modules/lucide-react/dist/esm/context.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2634,7 +2651,7 @@ var useLucideContext = () => useContext(LucideContext);
 //#endregion
 //#region node_modules/lucide-react/dist/esm/Icon.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2658,7 +2675,7 @@ var Icon = forwardRef$1(({ color, size, strokeWidth, absoluteStrokeWidth, classN
 //#endregion
 //#region node_modules/lucide-react/dist/esm/createLucideIcon.mjs
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2675,20 +2692,7 @@ var createLucideIcon = (iconName, iconNode) => {
 	return Component;
 };
 /**
-* @license lucide-react v1.21.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var SquarePen = createLucideIcon("square-pen", [["path", {
-	d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7",
-	key: "1m0v6g"
-}], ["path", {
-	d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
-	key: "ohrbg2"
-}]]);
-/**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2701,7 +2705,7 @@ var BookOpen = createLucideIcon("book-open", [["path", {
 	key: "ruj8y"
 }]]);
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2714,7 +2718,20 @@ var Plus = createLucideIcon("plus", [["path", {
 	key: "s699le"
 }]]);
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var SquarePen = createLucideIcon("square-pen", [["path", {
+	d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7",
+	key: "1m0v6g"
+}], ["path", {
+	d: "M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z",
+	key: "ohrbg2"
+}]]);
+/**
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -2727,7 +2744,7 @@ var TrendingUp = createLucideIcon("trending-up", [["path", {
 	key: "1t1m79"
 }]]);
 /**
-* @license lucide-react v1.21.0 - ISC
+* @license lucide-react v1.24.0 - ISC
 *
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
@@ -3105,73 +3122,79 @@ var AGENT_PATHS = {
 };
 //#endregion
 //#region extension/src/renderer/components/CreateSkillTab/index.tsx
-var { Button: Button$8, Card: Card$3, Checkbox: Checkbox$5, Description: Description$7, Form, Input, Label: Label$5, ListBox: ListBox$3, ScrollShadow: ScrollShadow$3, Select: Select$3, Tabs: Tabs$3, TextArea, TextField, Typography: Typography$7 } = await importShared("@heroui/react");
-var { useCallback: useCallback$6, useEffect: useEffect$7, useMemo: useMemo$2, useState: useState$8 } = await importShared("react");
-var ipc$8 = window.electron.ipcRenderer;
+var { Button: Button$9, Card: Card$3, Checkbox: Checkbox$5, Description: Description$7, Form, Input, Label: Label$5, ListBox: ListBox$3, ScrollShadow: ScrollShadow$3, Select: Select$3, Tabs: Tabs$3, TextArea, TextField, Typography: Typography$7 } = await importShared("@heroui/react");
+var { useCallback: useCallback$6, useEffect: useEffect$9, useMemo: useMemo$2, useState: useState$9 } = await importShared("react");
+var ipc$9 = window.electron.ipcRenderer;
 function CreateSkillTab({ onCreated }) {
-	const [name, setName] = useState$8("");
-	const [description, setDescription] = useState$8("");
-	const [scope, setScope] = useState$8("project");
-	const [projectDirs, setProjectDirs] = useState$8([]);
-	const [selectedProjectCwd, setSelectedProjectCwd] = useState$8("");
-	const [agents, setAgents] = useState$8([]);
-	const [selectedAgents, setSelectedAgents] = useState$8([]);
-	const [agentFilter, setAgentFilter] = useState$8("");
-	const [isInternal, setIsInternal] = useState$8(false);
-	const [allowedTools, setAllowedTools] = useState$8([]);
-	const [toolInput, setToolInput] = useState$8("");
-	const [instructionsMode, setInstructionsMode] = useState$8("steps");
-	const [whenToUse, setWhenToUse] = useState$8("");
-	const [steps, setSteps] = useState$8(["First, do this", "Then, do that"]);
-	const [customMarkdown, setCustomMarkdown] = useState$8("");
-	const [isCreating, setIsCreating] = useState$8(false);
-	const [creationSuccess, setCreationSuccess] = useState$8(false);
-	const [creationError, setCreationError] = useState$8("");
-	const [createdPaths, setCreatedPaths] = useState$8([]);
-	const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState$8(false);
+	const [name, setName] = useState$9("");
+	const [description, setDescription] = useState$9("");
+	const [scope, setScope] = useState$9("project");
+	const [projectDirs, setProjectDirs] = useState$9([]);
+	const [selectedProjectCwd, setSelectedProjectCwd] = useState$9("");
+	const [agents, setAgents] = useState$9([]);
+	const [selectedAgents, setSelectedAgents] = useState$9([]);
+	const [agentFilter, setAgentFilter] = useState$9("");
+	const [isInternal, setIsInternal] = useState$9(false);
+	const [allowedTools, setAllowedTools] = useState$9([]);
+	const [toolInput, setToolInput] = useState$9("");
+	const [instructionsMode, setInstructionsMode] = useState$9("steps");
+	const [whenToUse, setWhenToUse] = useState$9("");
+	const [steps, setSteps] = useState$9(["First, do this", "Then, do that"]);
+	const [customMarkdown, setCustomMarkdown] = useState$9("");
+	const [isCreating, setIsCreating] = useState$9(false);
+	const [creationSuccess, setCreationSuccess] = useState$9(false);
+	const [creationError, setCreationError] = useState$9("");
+	const [createdPaths, setCreatedPaths] = useState$9([]);
+	const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState$9(false);
 	const loadProjectDirs = useCallback$6(async () => {
 		try {
-			const dirs = await ipc$8.invoke("skills-manager:get-project-dirs");
+			const dirs = await ipc$9.invoke("skills-manager:get-project-dirs");
 			setProjectDirs(dirs || []);
 			if (dirs && dirs.length > 0 && !selectedProjectCwd) setSelectedProjectCwd(dirs[0]);
 		} catch (err) {
 			console.error("Failed to load project directories:", err);
 		}
 	}, [selectedProjectCwd]);
-	useEffect$7(() => {
+	useEffect$9(() => {
 		loadProjectDirs();
 	}, [loadProjectDirs]);
-	useEffect$7(() => {
+	useEffect$9(() => {
 		async function loadAgents() {
 			try {
-				const cliAgents = await ipc$8.invoke("skills-manager:get-agents");
-				if (cliAgents && cliAgents.length > 0) setAgents(cliAgents.map((a) => {
-					const info = AGENT_PATHS[a.name] || {
-						project: ".agents/skills",
-						global: `~/.agents/skills`,
-						displayName: a.displayName || a.name
-					};
-					return {
-						name: a.name,
+				const cliAgents = await ipc$9.invoke("skills-manager:get-agents");
+				if (cliAgents && cliAgents.length > 0) {
+					const mapped = cliAgents.map((a) => {
+						const info = AGENT_PATHS[a.name] || {
+							project: ".agents/skills",
+							global: `~/.agents/skills`,
+							displayName: a.displayName || a.name
+						};
+						return {
+							name: a.name,
+							displayName: info.displayName,
+							project: info.project,
+							global: info.global
+						};
+					});
+					setAgents(mapped);
+				} else {
+					const standard = Object.entries(AGENT_PATHS).map(([key, info]) => ({
+						name: key,
 						displayName: info.displayName,
 						project: info.project,
 						global: info.global
-					};
-				}));
-				else setAgents(Object.entries(AGENT_PATHS).map(([key, info]) => ({
-					name: key,
-					displayName: info.displayName,
-					project: info.project,
-					global: info.global
-				})));
+					}));
+					setAgents(standard);
+				}
 			} catch (err) {
 				console.error("Failed to load agents:", err);
-				setAgents(Object.entries(AGENT_PATHS).map(([key, info]) => ({
+				const standard = Object.entries(AGENT_PATHS).map(([key, info]) => ({
 					name: key,
 					displayName: info.displayName,
 					project: info.project,
 					global: info.global
-				})));
+				}));
+				setAgents(standard);
 			}
 		}
 		loadAgents();
@@ -3250,9 +3273,10 @@ function CreateSkillTab({ onCreated }) {
 	]);
 	const handleBrowseProjectFolder = async () => {
 		try {
-			const dir = await ipc$8.invoke("skills-manager:select-project-dir");
+			const dir = await ipc$9.invoke("skills-manager:select-project-dir");
 			if (dir) {
-				setProjectDirs(await ipc$8.invoke("skills-manager:add-project-dir", dir) || []);
+				const updated = await ipc$9.invoke("skills-manager:add-project-dir", dir);
+				setProjectDirs(updated || []);
 				setSelectedProjectCwd(dir);
 			}
 		} catch (err) {
@@ -3272,7 +3296,7 @@ function CreateSkillTab({ onCreated }) {
 					path: found ? scope === "project" ? found.project : found.global : ".agents/skills"
 				};
 			});
-			const result = await ipc$8.invoke("skills-manager:create-skill", name.trim().toLowerCase(), scope, scope === "project" ? selectedProjectCwd : void 0, agentPaths, generatedMarkdown, overwrite);
+			const result = await ipc$9.invoke("skills-manager:create-skill", name.trim().toLowerCase(), scope, scope === "project" ? selectedProjectCwd : void 0, agentPaths, generatedMarkdown, overwrite);
 			if (result.success) {
 				setCreationSuccess(true);
 				setCreatedPaths(result.paths || []);
@@ -3308,7 +3332,7 @@ function CreateSkillTab({ onCreated }) {
 				children: creationSuccess ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$3, {
 					className: "p-6 bg-surface-secondary border border-emerald-500/20 text-center flex flex-col items-center justify-center gap-4 my-auto max-w-xl mx-auto rounded-3xl",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$7, { className: "size-16 text-emerald-500" }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$8, { className: "size-16 text-emerald-500" }),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Typography$7, {
 							className: "text-xl font-bold text-emerald-400",
 							children: "Skill Created Successfully!"
@@ -3334,18 +3358,18 @@ function CreateSkillTab({ onCreated }) {
 								className: "flex flex-col gap-1 text-[11px] font-JetBrainsMono text-foreground/80 break-all select-all",
 								children: createdPaths.map((p) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "flex gap-1.5 items-start",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-3.5 shrink-0 text-LynxBlue/80 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: p })]
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$17, { className: "size-3.5 shrink-0 text-LynxBlue/80 mt-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: p })]
 								}, p))
 							})]
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex gap-3 mt-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								variant: "ghost",
 								onPress: resetForm,
 								children: "Create Another"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								onPress: onCreated,
 								className: "bg-LynxPurple text-white",
@@ -3408,11 +3432,11 @@ function CreateSkillTab({ onCreated }) {
 											className: "font-JetBrainsMono text-xs",
 											children: [dir, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox$3.ItemIndicator, {})]
 										}, dir)) }) })]
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$8, {
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$9, {
 										variant: "secondary",
 										onPress: handleBrowseProjectFolder,
 										className: "flex items-center gap-1.5 shrink-0 px-4",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-4" }), " Browse"]
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$17, { className: "size-4" }), " Browse"]
 									})]
 								}),
 								projectDirs.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
@@ -3501,7 +3525,7 @@ function CreateSkillTab({ onCreated }) {
 										className: "flex-1 font-JetBrainsMono",
 										placeholder: "e.g. run_command, read_file",
 										onChange: (e) => setToolInput(e.target.value)
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$8, {
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$9, {
 										variant: "secondary",
 										onPress: () => handleAddTool(),
 										className: "shrink-0 gap-1 px-4",
@@ -3678,7 +3702,7 @@ function CreateSkillTab({ onCreated }) {
 														/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 															className: "flex gap-1 shrink-0",
 															children: [
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 																	onPress: () => {
 																		const updated = [...steps];
 																		const temp = updated[idx];
@@ -3690,9 +3714,9 @@ function CreateSkillTab({ onCreated }) {
 																	variant: "ghost",
 																	isDisabled: idx === 0,
 																	isIconOnly: true,
-																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$5, {})
+																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$7, {})
 																}),
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 																	onPress: () => {
 																		const updated = [...steps];
 																		const temp = updated[idx];
@@ -3704,22 +3728,22 @@ function CreateSkillTab({ onCreated }) {
 																	variant: "ghost",
 																	isDisabled: idx === steps.length - 1,
 																	isIconOnly: true,
-																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$6, {})
+																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$8, {})
 																}),
-																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+																/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 																	size: "sm",
 																	variant: "danger-soft",
 																	isDisabled: steps.length <= 1,
 																	onPress: () => setSteps(steps.filter((_, i) => i !== idx)),
 																	isIconOnly: true,
-																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$5, {})
+																	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, {})
 																})
 															]
 														})
 													]
 												}, idx))
 											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$8, {
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$9, {
 												size: "sm",
 												variant: "tertiary",
 												className: "w-fit h-8 mt-1",
@@ -3749,14 +3773,14 @@ function CreateSkillTab({ onCreated }) {
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex justify-end gap-3 mt-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								type: "button",
 								variant: "ghost",
 								className: "px-5",
 								onPress: resetForm,
 								children: "Reset"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								type: "submit",
 								isDisabled: !isFormValid || isCreating,
@@ -3837,12 +3861,12 @@ function CreateSkillTab({ onCreated }) {
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$3.Footer, {
 							className: "flex justify-end gap-3 pt-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								variant: "ghost",
 								onPress: () => setIsOverwriteModalOpen(false),
 								children: "Cancel"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$8, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$9, {
 								size: "sm",
 								variant: "danger",
 								className: "px-5 font-semibold",
@@ -3861,8 +3885,8 @@ function CreateSkillTab({ onCreated }) {
 var CreateSkillTab_default = CreateSkillTab;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows/Linear/AltArrowDown.mjs
-var { forwardRef: t$3 } = await importShared("react");
-var r$3 = t$3((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
+var { forwardRef: t$4 } = await importShared("react");
+var r$4 = t$4((t, r) => (0, import_jsx_runtime.jsx)(r$25, {
 	ref: r,
 	...t,
 	children: (0, import_jsx_runtime.jsx)(`path`, {
@@ -3873,11 +3897,11 @@ var r$3 = t$3((t, r) => (0, import_jsx_runtime.jsx)(r$23, {
 		strokeLinejoin: `round`
 	})
 }));
-r$3.displayName = `AltArrowDown`;
+r$4.displayName = `AltArrowDown`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/arrows/Linear/Refresh.mjs
-var { forwardRef: t$2 } = await importShared("react");
-var i$2 = t$2((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$3 } = await importShared("react");
+var i$2 = t$3((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`path`, {
@@ -3891,8 +3915,8 @@ var i$2 = t$2((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 i$2.displayName = `Refresh`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/search/Linear/Magnifier.mjs
-var { forwardRef: t$1 } = await importShared("react");
-var i$1 = t$1((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$2 } = await importShared("react");
+var i$1 = t$2((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`circle`, {
@@ -3911,8 +3935,8 @@ var i$1 = t$1((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 i$1.displayName = `Magnifier`;
 //#endregion
 //#region node_modules/@solar-icons/react-perf/dist/icons/settings/Linear/Settings.mjs
-var { forwardRef: t } = await importShared("react");
-var i = t((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
+var { forwardRef: t$1 } = await importShared("react");
+var i = t$1((t, i) => (0, import_jsx_runtime.jsxs)(r$25, {
 	ref: i,
 	...t,
 	children: [(0, import_jsx_runtime.jsx)(`circle`, {
@@ -3930,9 +3954,9 @@ var i = t((t, i) => (0, import_jsx_runtime.jsxs)(r$23, {
 i.displayName = `Settings`;
 //#endregion
 //#region extension/src/renderer/components/DiscoverSkillsTab/SkillCard.tsx
-var { Button: Button$7, Card: Card$2, Checkbox: Checkbox$4, Chip: Chip$5, Link, Typography: Typography$6 } = await importShared("@heroui/react");
-var { useEffect: useEffect$6, useState: useState$7 } = await importShared("react");
-var ipc$7 = window.electron.ipcRenderer;
+var { Button: Button$8, Card: Card$2, Checkbox: Checkbox$4, Chip: Chip$5, Link, Typography: Typography$6 } = await importShared("@heroui/react");
+var { useEffect: useEffect$8, useState: useState$8 } = await importShared("react");
+var ipc$8 = window.electron.ipcRenderer;
 var getGithubUrl = (source) => {
 	const parts = source.split("/");
 	if (parts.length >= 2) return `https://github.com/${parts[0]}/${parts[1]}`;
@@ -3953,14 +3977,14 @@ var formatInstalls = (num) => {
 };
 function SkillCard({ skill, rank, installed, onSelect, activeSubTab, isSelected, onToggleSelect }) {
 	const githubUrl = getGithubUrl(skill.source);
-	const [description, setDescription] = useState$7("");
-	const [isLoadingDesc, setIsLoadingDesc] = useState$7(false);
-	useEffect$6(() => {
+	const [description, setDescription] = useState$8("");
+	const [isLoadingDesc, setIsLoadingDesc] = useState$8(false);
+	useEffect$8(() => {
 		let active = true;
 		const fetchDesc = async () => {
 			setIsLoadingDesc(true);
 			try {
-				const res = await ipc$7.invoke("skills-manager:get-description", skill.source, skill.name);
+				const res = await ipc$8.invoke("skills-manager:get-description", skill.source, skill.name);
 				if (active) setDescription(res || "No description available.");
 			} catch (err) {
 				console.error("Failed to fetch skill description:", err);
@@ -3973,13 +3997,13 @@ function SkillCard({ skill, rank, installed, onSelect, activeSubTab, isSelected,
 			active = false;
 		};
 	}, [skill.source, skill.name]);
-	let Icon = i$19;
+	let Icon = i$20;
 	let iconClass = "text-semi-muted/80";
 	if (activeSubTab === "trending") {
 		Icon = TrendingUp;
 		iconClass = "text-LynxBlue";
 	} else if (activeSubTab === "hot") {
-		Icon = i$10;
+		Icon = i$11;
 		iconClass = "text-LynxOrange";
 	}
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$2, {
@@ -4045,11 +4069,11 @@ function SkillCard({ skill, rank, installed, onSelect, activeSubTab, isSelected,
 			}) }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card$2.Footer, {
 				className: "flex justify-end gap-2 border-t border-border-secondary/50 pt-3",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$7, {
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$8, {
 					size: "sm",
 					onPress: () => onSelect(skill),
 					className: "w-full justify-center",
-					children: [installed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$8, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$19, { className: "size-4" }), installed ? "Configure / Re-install" : "Install"]
+					children: [installed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$9, { className: "size-4" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$20, { className: "size-4" }), installed ? "Configure / Re-install" : "Install"]
 				})
 			})
 		]
@@ -4057,18 +4081,18 @@ function SkillCard({ skill, rank, installed, onSelect, activeSubTab, isSelected,
 }
 //#endregion
 //#region extension/src/renderer/components/DiscoverSkillsTab/CreatorSkillsModal.tsx
-var { Button: Button$6, Checkbox: Checkbox$3, Description: Description$6, InputGroup: InputGroup$3, Modal: Modal$3, ScrollShadow: ScrollShadow$2, Typography: Typography$5 } = await importShared("@heroui/react");
-var { useEffect: useEffect$5, useState: useState$6 } = await importShared("react");
+var { Button: Button$7, Checkbox: Checkbox$3, Description: Description$6, InputGroup: InputGroup$3, Modal: Modal$3, ScrollShadow: ScrollShadow$2, Typography: Typography$5 } = await importShared("@heroui/react");
+var { useEffect: useEffect$7, useState: useState$7 } = await importShared("react");
 function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled, onSelectSkill, selectedSkills, onToggleSelectSkill }) {
-	const [searchQuery, setSearchQuery] = useState$6("");
-	const [limit, setLimit] = useState$6(30);
-	useEffect$5(() => {
+	const [searchQuery, setSearchQuery] = useState$7("");
+	const [limit, setLimit] = useState$7(30);
+	useEffect$7(() => {
 		if (selectedOwnerForSkills) {
 			setSearchQuery("");
 			setLimit(30);
 		}
 	}, [selectedOwnerForSkills]);
-	useEffect$5(() => {
+	useEffect$7(() => {
 		setLimit(30);
 	}, [searchQuery]);
 	const filteredRepos = selectedOwnerForSkills?.repos.map((r) => {
@@ -4136,7 +4160,7 @@ function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled,
 									placeholder: "Search creator skills...",
 									onChange: (e) => setSearchQuery(e.target.value)
 								}),
-								searchQuery && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(InputGroup$3.Suffix, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$6, {
+								searchQuery && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(InputGroup$3.Suffix, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$7, {
 									size: "sm",
 									variant: "ghost",
 									"aria-label": "Clear search",
@@ -4205,11 +4229,11 @@ function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled,
 												children: [
 													formatInstalls(skill.installs),
 													" ",
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$3, {})
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$4, {})
 												]
 											})]
 										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$6, {
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$7, {
 											onPress: () => {
 												onClose();
 												onSelectSkill(registrySkill);
@@ -4219,7 +4243,7 @@ function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled,
 											variant: "ghost",
 											onClick: (e) => e.stopPropagation(),
 											isIconOnly: true,
-											children: installed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$8, { className: "size-3.5 text-semi-muted" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$19, { className: "size-3.5 text-foreground" })
+											children: installed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$9, { className: "size-3.5 text-semi-muted" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$20, { className: "size-3.5 text-foreground" })
 										})
 									]
 								}, `${r.repo}-${skill.name}`);
@@ -4227,7 +4251,7 @@ function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled,
 						})]
 					}, r.repo)), hasMore && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						className: "flex justify-center mt-4 pb-6",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$6, {
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$7, {
 							className: "px-8 py-2 font-bold text-xs bg-foreground/5 hover:bg-foreground/10 border border-border-secondary/30 rounded-xl hover:border-LynxBlue/30 text-foreground transition-all duration-200",
 							variant: "secondary",
 							onPress: () => setLimit((prev) => prev + 30),
@@ -4247,19 +4271,19 @@ function CreatorSkillsModal({ selectedOwnerForSkills, onClose, isSkillInstalled,
 }
 //#endregion
 //#region extension/src/renderer/components/DiscoverSkillsTab/index.tsx
-var { Button: Button$5, Card: Card$1, Checkbox: Checkbox$2, Description: Description$5, InputGroup: InputGroup$2, Label: Label$4, ListBox: ListBox$2, Pagination, ScrollShadow: ScrollShadow$1, Select: Select$2, Spinner: Spinner$4, Tabs: Tabs$2, Typography: Typography$4 } = await importShared("@heroui/react");
-var { useCallback: useCallback$5, useEffect: useEffect$4, useState: useState$5 } = await importShared("react");
-var ipc$6 = window.electron.ipcRenderer;
+var { Button: Button$6, Card: Card$1, Checkbox: Checkbox$2, Description: Description$5, InputGroup: InputGroup$2, Label: Label$4, ListBox: ListBox$2, Pagination, ScrollShadow: ScrollShadow$1, Select: Select$2, Spinner: Spinner$4, Tabs: Tabs$2, Typography: Typography$4 } = await importShared("@heroui/react");
+var { useCallback: useCallback$5, useEffect: useEffect$6, useState: useState$6 } = await importShared("react");
+var ipc$7 = window.electron.ipcRenderer;
 function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, isLoadingSearch, hasSearched, onSearch, isSkillInstalled, onSelectSkill, onSelectSkills }) {
-	const [activeSubTab, setActiveSubTab] = useState$5("all-time");
-	const [discoverSkills, setDiscoverSkills] = useState$5([]);
-	const [officialOwners, setOfficialOwners] = useState$5([]);
-	const [isLoadingDiscover, setIsLoadingDiscover] = useState$5(false);
-	const [currentPage, setCurrentPage] = useState$5(1);
-	const [itemsPerPage, setItemsPerPage] = useState$5(24);
-	const [selectedOwnerForSkills, setSelectedOwnerForSkills] = useState$5(null);
-	const [selectedSkills, setSelectedSkills] = useState$5([]);
-	useEffect$4(() => {
+	const [activeSubTab, setActiveSubTab] = useState$6("all-time");
+	const [discoverSkills, setDiscoverSkills] = useState$6([]);
+	const [officialOwners, setOfficialOwners] = useState$6([]);
+	const [isLoadingDiscover, setIsLoadingDiscover] = useState$6(false);
+	const [currentPage, setCurrentPage] = useState$6(1);
+	const [itemsPerPage, setItemsPerPage] = useState$6(24);
+	const [selectedOwnerForSkills, setSelectedOwnerForSkills] = useState$6(null);
+	const [selectedSkills, setSelectedSkills] = useState$6([]);
+	useEffect$6(() => {
 		setSelectedSkills([]);
 	}, [activeSubTab, searchQuery]);
 	const toggleSelectSkill = useCallback$5((skill) => {
@@ -4271,7 +4295,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 	const loadDiscoverData = useCallback$5(async (tab) => {
 		setIsLoadingDiscover(true);
 		try {
-			const res = await ipc$6.invoke("skills-manager:get-discover-data", tab);
+			const res = await ipc$7.invoke("skills-manager:get-discover-data", tab);
 			if (tab === "official") setOfficialOwners(res || []);
 			else setDiscoverSkills(res || []);
 		} catch (err) {
@@ -4280,7 +4304,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 			setIsLoadingDiscover(false);
 		}
 	}, []);
-	useEffect$4(() => {
+	useEffect$6(() => {
 		if (!searchQuery.trim()) loadDiscoverData(activeSubTab);
 	}, [
 		activeSubTab,
@@ -4292,7 +4316,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 		onSearchQueryChange("");
 		setCurrentPage(1);
 	};
-	useEffect$4(() => {
+	useEffect$6(() => {
 		setCurrentPage(1);
 	}, [searchQuery]);
 	const isSearching = searchQuery.trim() !== "" && (hasSearched || isLoadingSearch);
@@ -4342,7 +4366,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 						}),
 						searchQuery && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(InputGroup$2.Suffix, {
 							className: "pr-2",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$6, {
 								size: "sm",
 								variant: "ghost",
 								"aria-label": "Clear search",
@@ -4353,7 +4377,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 							})
 						})
 					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$6, {
 					onPress: onSearch,
 					variant: "secondary",
 					isDisabled: !searchQuery.trim(),
@@ -4372,14 +4396,14 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 							selectedSkills.length === 1 ? "" : "s",
 							" selected for installation"
 						]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$6, {
 						size: "sm",
 						variant: "ghost",
 						className: "text-xs text-semi-muted",
 						onPress: () => setSelectedSkills([]),
 						children: "Clear Selection"
 					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$5, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$6, {
 					size: "sm",
 					onPress: () => onSelectSkills(selectedSkills),
 					className: "bg-LynxPurple text-white px-5 font-semibold",
@@ -4509,7 +4533,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 								id: "all-time",
 								className: "flex items-center gap-1.5 text-nowrap",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$15, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-4" }),
 									"All Time",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs$2.Indicator, {})
 								]
@@ -4527,7 +4551,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 								id: "hot",
 								className: "flex items-center gap-1.5  text-nowrap",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$10, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$11, { className: "size-4" }),
 									"Hot",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs$2.Indicator, {})
 								]
@@ -4536,7 +4560,7 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 								id: "official",
 								className: "flex items-center gap-1.5  text-nowrap",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$11, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$12, { className: "size-4" }),
 									"Official",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs$2.Indicator, {})
 								]
@@ -4737,11 +4761,11 @@ function DiscoverSkillsTab({ searchQuery, onSearchQueryChange, searchResults, is
 var DiscoverSkillsTab_default = DiscoverSkillsTab;
 //#endregion
 //#region extension/src/renderer/components/InstallCustomSkillModal.tsx
-var { Button: Button$4, Description: Description$4, InputGroup: InputGroup$1, Modal: Modal$2, Typography: Typography$3 } = await importShared("@heroui/react");
-var { useState: useState$4 } = await importShared("react");
-var ipc$5 = window.electron.ipcRenderer;
+var { Button: Button$5, Description: Description$4, InputGroup: InputGroup$1, Modal: Modal$2, Typography: Typography$3 } = await importShared("@heroui/react");
+var { useState: useState$5 } = await importShared("react");
+var ipc$6 = window.electron.ipcRenderer;
 function InstallCustomSkillModal({ isOpen, onClose, onProceed }) {
-	const [customSource, setCustomSource] = useState$4("");
+	const [customSource, setCustomSource] = useState$5("");
 	const handleProceed = () => {
 		const trimmed = customSource.trim();
 		if (!trimmed) return;
@@ -4756,7 +4780,7 @@ function InstallCustomSkillModal({ isOpen, onClose, onProceed }) {
 	};
 	const handleSelectFolder = async () => {
 		try {
-			const dir = await ipc$5.invoke("skills-manager:select-project-dir");
+			const dir = await ipc$6.invoke("skills-manager:select-project-dir");
 			if (dir) setCustomSource(dir);
 		} catch (err) {
 			console.error("Failed to select local directory:", err);
@@ -4773,7 +4797,7 @@ function InstallCustomSkillModal({ isOpen, onClose, onProceed }) {
 				className: "flex flex-col gap-y-1 px-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex items-center gap-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$18, { className: "size-6 text-LynxPurple" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$2.Heading, {
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$19, { className: "size-6 text-LynxPurple" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$2.Heading, {
 						className: "text-lg font-bold",
 						children: "Install Custom Skill"
 					})]
@@ -4800,14 +4824,14 @@ function InstallCustomSkillModal({ isOpen, onClose, onProceed }) {
 							placeholder: "e.g., owner/repo or select a local folder path"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(InputGroup$1.Suffix, {
 							className: "pr-1.5",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
 								size: "sm",
 								variant: "ghost",
 								onPress: handleSelectFolder,
 								"aria-label": "Select local folder",
 								className: "h-7 w-7 min-w-7 p-0 hover:bg-white/10 rounded-lg flex items-center justify-center",
 								isIconOnly: true,
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-4 text-semi-muted hover:text-white" })
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$17, { className: "size-4 text-semi-muted hover:text-white" })
 							})
 						})]
 					})]
@@ -4895,13 +4919,13 @@ function InstallCustomSkillModal({ isOpen, onClose, onProceed }) {
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Modal$2.Footer, {
 				className: "pt-3",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
 					size: "sm",
 					className: "px-5",
 					onPress: onClose,
 					variant: "secondary",
 					children: "Cancel"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$5, {
 					size: "sm",
 					onPress: handleProceed,
 					isDisabled: !customSource.trim(),
@@ -5038,9 +5062,9 @@ memo(() => {
 });
 //#endregion
 //#region extension/src/renderer/components/InstalledSkillsTab/ProjectFoldersPopover.tsx
-var { Button: Button$3, Chip: Chip$4, Popover } = await importShared("@heroui/react");
+var { Button: Button$4, Chip: Chip$4, Popover } = await importShared("@heroui/react");
 function ProjectFoldersPopover({ projectDirs, getSkillsCountForDir, onRemoveProjectDir, onAddProjectDir }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Popover.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Popover.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
 		size: "sm",
 		variant: "secondary",
 		"aria-label": "Manage project folders",
@@ -5057,7 +5081,7 @@ function ProjectFoldersPopover({ projectDirs, getSkillsCountForDir, onRemoveProj
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "flex items-center gap-2",
 						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-4 text-LynxBlue" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$17, { className: "size-4 text-LynxBlue" }),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 								className: "text-xs font-semibold text-foreground/90",
 								children: "Project Folders"
@@ -5096,17 +5120,17 @@ function ProjectFoldersPopover({ projectDirs, getSkillsCountForDir, onRemoveProj
 										count === 1 ? "" : "s"
 									]
 								})]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
 								className: "h-5 min-w-0 p-0 text-semi-muted hover:text-danger cursor-pointer border-none bg-transparent",
 								size: "sm",
 								variant: "ghost",
 								onPress: () => onRemoveProjectDir(dir),
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$5, { className: "size-3.5" })
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, { className: "size-3.5" })
 							})]
 						}, dir);
 					})
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
 					className: "w-full text-[11px] h-8 bg-LynxBlue/20 text-LynxBlue border-none hover:bg-LynxBlue/30 shrink-0",
 					size: "sm",
 					variant: "secondary",
@@ -5119,8 +5143,8 @@ function ProjectFoldersPopover({ projectDirs, getSkillsCountForDir, onRemoveProj
 }
 //#endregion
 //#region extension/src/renderer/components/InstalledSkillsTab/SkillsTable.tsx
-var { Button: Button$2, Checkbox: Checkbox$1, Chip: Chip$3, cn: cn$1, Spinner: Spinner$3, Tooltip } = await importShared("@heroui/react");
-var ipc$4 = window.electron.ipcRenderer;
+var { Button: Button$3, Checkbox: Checkbox$1, Chip: Chip$3, cn: cn$1, Spinner: Spinner$3, Tooltip } = await importShared("@heroui/react");
+var ipc$5 = window.electron.ipcRenderer;
 function SkillsTable({ skills, selectedKeys, setSelectedKeys, selectedSkillsList, updatingSkills, deletingSkills, confirmDelete, bulkLoadingStatus, handleUpdate, handleDelete, toggleSelectSkill, showHeader = false }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex flex-col gap-1 w-full",
@@ -5225,13 +5249,13 @@ function SkillsTable({ skills, selectedKeys, setSelectedKeys, selectedSkillsList
 							className: "w-12 shrink-0 flex justify-center",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, {
 								delay: 300,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
 									className: "size-8 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer border-none bg-transparent hover:bg-foreground/5 rounded-full flex items-center justify-center",
 									size: "sm",
 									variant: "ghost",
-									onPress: () => ipc$4.send("app:openPath", skill.path),
+									onPress: () => ipc$5.send("app:openPath", skill.path),
 									isIconOnly: true,
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$16, { className: "size-4" })
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$17, { className: "size-4" })
 								}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip.Content, {
 									showArrow: true,
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Arrow, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -5251,7 +5275,7 @@ function SkillsTable({ skills, selectedKeys, setSelectedKeys, selectedSkillsList
 							className: "w-20 shrink-0 flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, {
 								delay: 300,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
 									className: "size-8 min-w-0 p-0 text-semi-muted hover:text-LynxBlue cursor-pointer border-none bg-transparent hover:bg-foreground/5 rounded-full flex items-center justify-center",
 									size: "sm",
 									variant: "ghost",
@@ -5264,13 +5288,13 @@ function SkillsTable({ skills, selectedKeys, setSelectedKeys, selectedSkillsList
 								})]
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip, {
 								delay: 300,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$3, {
 									className: "size-8 min-w-0 p-0 text-semi-muted hover:text-danger cursor-pointer border-none bg-transparent hover:bg-danger/10 rounded-full flex items-center justify-center",
 									size: "sm",
 									variant: "ghost",
 									isDisabled: isUpdating || isDeleting || !!bulkLoadingStatus,
 									onPress: () => handleDelete(skill.name, skill.scope === "global", skill.path),
-									children: isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner$3, { size: "sm" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$5, { className: "size-4" })
+									children: isDeleting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner$3, { size: "sm" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, { className: "size-4" })
 								}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tooltip.Content, {
 									showArrow: true,
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip.Arrow, {}), confirmDelete[skill.name] ? "Confirm Remove?" : "Remove Skill"]
@@ -5285,19 +5309,19 @@ function SkillsTable({ skills, selectedKeys, setSelectedKeys, selectedSkillsList
 }
 //#endregion
 //#region extension/src/renderer/components/InstalledSkillsTab/useBulkActions.ts
-var { useCallback: useCallback$4, useEffect: useEffect$3, useMemo: useMemo$1, useRef, useState: useState$3 } = await importShared("react");
-var ipc$3 = window.electron.ipcRenderer;
+var { useCallback: useCallback$4, useEffect: useEffect$5, useMemo: useMemo$1, useRef: useRef$2, useState: useState$4 } = await importShared("react");
+var ipc$4 = window.electron.ipcRenderer;
 function useBulkActions(installedSkills, onRefreshInstalled) {
-	const [selectedKeys, setSelectedKeys] = useState$3(/* @__PURE__ */ new Set());
-	const [confirmBulkDelete, setConfirmBulkDelete] = useState$3(false);
-	const [bulkLoadingStatus, setBulkLoadingStatus] = useState$3(null);
-	const confirmBulkDeleteTimeoutRef = useRef(null);
-	useEffect$3(() => {
+	const [selectedKeys, setSelectedKeys] = useState$4(/* @__PURE__ */ new Set());
+	const [confirmBulkDelete, setConfirmBulkDelete] = useState$4(false);
+	const [bulkLoadingStatus, setBulkLoadingStatus] = useState$4(null);
+	const confirmBulkDeleteTimeoutRef = useRef$2(null);
+	useEffect$5(() => {
 		return () => {
 			if (confirmBulkDeleteTimeoutRef.current) clearTimeout(confirmBulkDeleteTimeoutRef.current);
 		};
 	}, []);
-	useEffect$3(() => {
+	useEffect$5(() => {
 		setSelectedKeys((prev) => {
 			if (prev === "all") return prev;
 			const validKeys = new Set(installedSkills.map((s) => `${s.name}-${s.scope}`));
@@ -5334,7 +5358,7 @@ function useBulkActions(installedSkills, onRefreshInstalled) {
 			const skill = skillsToUpdate[i];
 			setBulkLoadingStatus(`Updating skill ${i + 1} of ${skillsToUpdate.length}: "${skill.name}"...`);
 			try {
-				const res = await ipc$3.invoke("skills-manager:update", skill.name, skill.scope === "global", skill.path);
+				const res = await ipc$4.invoke("skills-manager:update", skill.name, skill.scope === "global", skill.path);
 				if (res.success) successCount++;
 				else {
 					failCount++;
@@ -5361,7 +5385,7 @@ function useBulkActions(installedSkills, onRefreshInstalled) {
 			const skill = skillsToRemove[i];
 			setBulkLoadingStatus(`Removing skill ${i + 1} of ${skillsToRemove.length}: "${skill.name}"...`);
 			try {
-				const res = await ipc$3.invoke("skills-manager:remove", skill.name, skill.scope === "global", skill.path);
+				const res = await ipc$4.invoke("skills-manager:remove", skill.name, skill.scope === "global", skill.path);
 				if (res.success) successCount++;
 				else {
 					failCount++;
@@ -5405,11 +5429,16 @@ function useBulkActions(installedSkills, onRefreshInstalled) {
 		handleBulkActionOption: useCallback$4((key) => {
 			const option = String(key);
 			if (option === "all") handleBulkUpdate(installedSkills);
-			else if (option === "project") handleBulkUpdate(installedSkills.filter((s) => s.scope === "project"));
-			else if (option === "global") handleBulkUpdate(installedSkills.filter((s) => s.scope === "global"));
-			else if (option.startsWith("agent-")) {
+			else if (option === "project") {
+				const filtered = installedSkills.filter((s) => s.scope === "project");
+				handleBulkUpdate(filtered);
+			} else if (option === "global") {
+				const filtered = installedSkills.filter((s) => s.scope === "global");
+				handleBulkUpdate(filtered);
+			} else if (option.startsWith("agent-")) {
 				const agentName = option.substring(6);
-				handleBulkUpdate(installedSkills.filter((s) => s.agents && s.agents.includes(agentName)));
+				const filtered = installedSkills.filter((s) => s.agents && s.agents.includes(agentName));
+				handleBulkUpdate(filtered);
 			}
 		}, [installedSkills, handleBulkUpdate]),
 		toggleSelectSkill
@@ -5451,7 +5480,7 @@ function useSkillsGroups(installedSkills, filterQuery, groupBy) {
 		return Object.entries(map).map(([folderPath, skills]) => ({
 			id: folderPath,
 			title: folderPath,
-			icon: React.createElement(i$16, { className: "size-4 text-LynxBlue" }),
+			icon: React.createElement(i$17, { className: "size-4 text-LynxBlue" }),
 			skills
 		}));
 	}, [filteredSkills, getParentFolderPath]);
@@ -5465,13 +5494,13 @@ function useSkillsGroups(installedSkills, filterQuery, groupBy) {
 		if (map.project.length > 0) groups.push({
 			id: "project",
 			title: "Project Scope",
-			icon: React.createElement(i$17, { className: "size-4 text-LynxBlue" }),
+			icon: React.createElement(i$18, { className: "size-4 text-LynxBlue" }),
 			skills: map.project
 		});
 		if (map.global.length > 0) groups.push({
 			id: "global",
 			title: "Global Scope",
-			icon: React.createElement(i$18, { className: "size-4 text-LynxPurple" }),
+			icon: React.createElement(i$19, { className: "size-4 text-LynxPurple" }),
 			skills: map.global
 		});
 		return groups;
@@ -5487,13 +5516,13 @@ function useSkillsGroups(installedSkills, filterQuery, groupBy) {
 		const groups = Object.entries(map).map(([agentName, skills]) => ({
 			id: agentName,
 			title: `Agent: ${agentName}`,
-			icon: React.createElement(i$4, { className: "size-4 text-LynxPurple" }),
+			icon: React.createElement(i$5, { className: "size-4 text-LynxPurple" }),
 			skills
 		}));
 		if (noAgentSkills.length > 0) groups.push({
 			id: "none",
 			title: "Common (No Target Agent)",
-			icon: React.createElement(i$4, { className: "size-4 text-semi-muted" }),
+			icon: React.createElement(i$5, { className: "size-4 text-semi-muted" }),
 			skills: noAgentSkills
 		});
 		return groups;
@@ -5517,29 +5546,30 @@ function useSkillsGroups(installedSkills, filterQuery, groupBy) {
 }
 //#endregion
 //#region extension/src/renderer/components/InstalledSkillsTab/index.tsx
-var { Accordion, Button: Button$1, Chip: Chip$2, cn, Description: Description$3, Dropdown, InputGroup, Label: Label$3, ListBox: ListBox$1, ScrollShadow, Select: Select$1, Separator: Separator$1, Spinner: Spinner$2, Typography: Typography$2 } = await importShared("@heroui/react");
-var { useCallback: useCallback$2, useEffect: useEffect$2, useState: useState$2 } = await importShared("react");
-var ipc$2 = window.electron.ipcRenderer;
+var { Accordion, Button: Button$2, Chip: Chip$2, cn, Description: Description$3, Dropdown, InputGroup, Label: Label$3, ListBox: ListBox$1, ScrollShadow, Select: Select$1, Separator: Separator$1, Spinner: Spinner$2, Typography: Typography$2 } = await importShared("@heroui/react");
+var { useCallback: useCallback$2, useEffect: useEffect$4, useState: useState$3 } = await importShared("react");
+var ipc$3 = window.electron.ipcRenderer;
 function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInstalled, onSwitchTab, onInstallCustom }) {
-	const [updatingSkills, setUpdatingSkills] = useState$2({});
-	const [deletingSkills, setDeletingSkills] = useState$2({});
-	const [confirmDelete, setConfirmDelete] = useState$2({});
-	const [groupBy, setGroupBy] = useState$2("all");
-	const [expandedKeys, setExpandedKeys] = useState$2(/* @__PURE__ */ new Set());
-	const [filterQuery, setFilterQuery] = useState$2("");
-	const [projectDirs, setProjectDirs] = useState$2([]);
+	const [updatingSkills, setUpdatingSkills] = useState$3({});
+	const [deletingSkills, setDeletingSkills] = useState$3({});
+	const [confirmDelete, setConfirmDelete] = useState$3({});
+	const [groupBy, setGroupBy] = useState$3("all");
+	const [expandedKeys, setExpandedKeys] = useState$3(/* @__PURE__ */ new Set());
+	const [filterQuery, setFilterQuery] = useState$3("");
+	const [projectDirs, setProjectDirs] = useState$3([]);
 	const { filteredSkills, currentGroups, uniqueAgents, getSkillsCountForDir } = useSkillsGroups(installedSkills, filterQuery, groupBy);
 	const { selectedKeys, setSelectedKeys, selectedSkillsList, confirmBulkDelete, bulkLoadingStatus, handleBulkUpdate, onPressBulkRemove, handleBulkActionOption, toggleSelectSkill } = useBulkActions(installedSkills, onRefreshInstalled);
 	const loadProjects = useCallback$2(async () => {
 		try {
-			setProjectDirs(await ipc$2.invoke("skills-manager:get-project-dirs") || []);
+			const dirs = await ipc$3.invoke("skills-manager:get-project-dirs");
+			setProjectDirs(dirs || []);
 		} catch (err) {
 			console.error("Failed to load project dirs:", err);
 		}
 	}, []);
 	const loadGroupBy = useCallback$2(async () => {
 		try {
-			const savedGroupBy = await ipc$2.invoke("skills-manager:get-group-by");
+			const savedGroupBy = await ipc$3.invoke("skills-manager:get-group-by");
 			if (savedGroupBy) setGroupBy(savedGroupBy);
 		} catch (err) {
 			console.error("Failed to load group-by preference:", err);
@@ -5549,20 +5579,21 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 		const targetGroup = val || "all";
 		setGroupBy(targetGroup);
 		try {
-			await ipc$2.invoke("skills-manager:set-group-by", targetGroup);
+			await ipc$3.invoke("skills-manager:set-group-by", targetGroup);
 		} catch (err) {
 			console.error("Failed to save group-by preference:", err);
 		}
 	}, []);
-	useEffect$2(() => {
+	useEffect$4(() => {
 		loadProjects();
 		loadGroupBy();
 	}, [loadProjects, loadGroupBy]);
 	const handleAddProjectDir = useCallback$2(async () => {
 		try {
-			const dir = await ipc$2.invoke("skills-manager:select-project-dir");
+			const dir = await ipc$3.invoke("skills-manager:select-project-dir");
 			if (dir) {
-				setProjectDirs(await ipc$2.invoke("skills-manager:add-project-dir", dir) || []);
+				const updated = await ipc$3.invoke("skills-manager:add-project-dir", dir);
+				setProjectDirs(updated || []);
 				bottomToast.success("Project folder registered successfully!");
 				await onRefreshInstalled();
 			}
@@ -5572,14 +5603,15 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 	}, [onRefreshInstalled]);
 	const handleRemoveProjectDir = useCallback$2(async (dir) => {
 		try {
-			setProjectDirs(await ipc$2.invoke("skills-manager:remove-project-dir", dir) || []);
+			const updated = await ipc$3.invoke("skills-manager:remove-project-dir", dir);
+			setProjectDirs(updated || []);
 			bottomToast.success("Project folder unregistered.");
 			await onRefreshInstalled();
 		} catch (err) {
 			console.error("Failed to remove project folder:", err);
 		}
 	}, [onRefreshInstalled]);
-	useEffect$2(() => {
+	useEffect$4(() => {
 		if (currentGroups.length > 0) setExpandedKeys(/* @__PURE__ */ new Set([currentGroups[0].id]));
 		else setExpandedKeys(/* @__PURE__ */ new Set());
 	}, [currentGroups]);
@@ -5589,7 +5621,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 			[name]: true
 		}));
 		try {
-			const res = await ipc$2.invoke("skills-manager:update", name, isGlobal, path);
+			const res = await ipc$3.invoke("skills-manager:update", name, isGlobal, path);
 			if (res.success) {
 				bottomToast.success(`Successfully updated skill "${name}"!`);
 				await onRefreshInstalled();
@@ -5623,7 +5655,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 			[name]: true
 		}));
 		try {
-			const res = await ipc$2.invoke("skills-manager:remove", name, isGlobal, path);
+			const res = await ipc$3.invoke("skills-manager:remove", name, isGlobal, path);
 			if (res.success) {
 				bottomToast.success(`Successfully removed skill "${name}".`);
 				await onRefreshInstalled();
@@ -5678,7 +5710,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 		children: installedSkills.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex flex-col items-center justify-center py-20 border border-dashed border-white/10 rounded-2xl bg-white/5 mx-2",
 			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, {
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$7, {
 					"aria-hidden": "true",
 					className: "size-10 text-semi-muted mb-3"
 				}),
@@ -5692,12 +5724,12 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex gap-2 mt-4",
-					children: [onSwitchTab && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+					children: [onSwitchTab && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
 						size: "sm",
 						onPress: () => onSwitchTab("discover"),
 						className: "bg-LynxPurple text-white px-5 hover:opacity-90 transition",
 						children: "Browse Skills"
-					}), onInstallCustom && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+					}), onInstallCustom && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
 						size: "sm",
 						variant: "secondary",
 						onPress: onInstallCustom,
@@ -5731,7 +5763,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex items-center gap-2",
 							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
 									size: "sm",
 									variant: "secondary",
 									className: "text-xs",
@@ -5739,7 +5771,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 									onPress: () => handleBulkUpdate(selectedSkillsList),
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$2, { className: "size-3.5" }), "Update Selected"]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
 									size: "sm",
 									className: "text-xs",
 									variant: "danger-soft",
@@ -5747,7 +5779,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 									isDisabled: !!bulkLoadingStatus,
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$2, { className: "size-3.5" }), confirmBulkDelete ? "Confirm Remove?" : "Remove Selected"]
 								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
 									size: "sm",
 									variant: "ghost",
 									isDisabled: !!bulkLoadingStatus,
@@ -5764,7 +5796,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 								className: "text-sm text-semi-muted",
 								children: filterQuery.trim() ? `Found ${filteredSkills.length} of ${installedSkills.length} skills` : `Showing ${installedSkills.length} installed skill${installedSkills.length === 1 ? "" : "s"}`
 							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Dropdown, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dropdown.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Dropdown, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dropdown.Trigger, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
 								size: "sm",
 								variant: "secondary",
 								className: "text-xs",
@@ -5820,7 +5852,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 									]
 								})
 							})] }),
-							onInstallCustom && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+							onInstallCustom && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
 								size: "sm",
 								variant: "secondary",
 								className: "text-xs",
@@ -5849,7 +5881,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 									}),
 									filterQuery && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(InputGroup.Suffix, {
 										className: "pr-2",
-										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
 											className: "h-5 w-5 min-w-5 p-0 hover:bg-foreground/10 rounded-full flex items-center justify-center",
 											size: "sm",
 											variant: "ghost",
@@ -5920,7 +5952,7 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "flex items-center gap-2 truncate",
 									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$3, { className: cn("size-4 text-semi-muted transition-transform duration-200 shrink-0", !expandedKeys.has(group.id) && "-rotate-90") }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$4, { className: cn("size-4 text-semi-muted transition-transform duration-200 shrink-0", !expandedKeys.has(group.id) && "-rotate-90") }),
 										group.icon,
 										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Typography$2, {
 											className: cn("font-semibold font-JetBrainsMono truncate", groupBy === "folder" ? "text-[12px] text-foreground/90" : "text-[13px] text-foreground/95"),
@@ -5937,11 +5969,11 @@ function InstalledSkillsTab({ installedSkills, isLoadingInstalled, onRefreshInst
 								}), groupBy === "folder" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 									className: "ml-auto",
 									onClick: (e) => e.stopPropagation(),
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
 										className: "text-[10px] text-semi-muted hover:text-LynxBlue h-auto p-0 border-none bg-transparent min-w-0 cursor-pointer hover:bg-transparent",
 										size: "sm",
 										variant: "ghost",
-										onPress: () => ipc$2.send("app:openPath", group.id),
+										onPress: () => ipc$3.send("app:openPath", group.id),
 										children: "Open Folder"
 									})
 								})]
@@ -5967,7 +5999,7 @@ function SecurityAudits({ isLoadingAudit, auditReport, auditReports = [] }) {
 		className: "flex flex-col gap-1.5 mt-2 bg-surface-secondary border border-border p-3 rounded-2xl",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$2, {
 			className: "text-xs font-semibold text-semi-muted flex items-center gap-1",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$9, { className: "size-4 text-LynxPurple" }), "Security & Safety Audits"]
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$10, { className: "size-4 text-LynxPurple" }), "Security & Safety Audits"]
 		}), isLoadingAudit ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex items-center gap-2 py-1",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner$1, { size: "sm" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -6031,29 +6063,29 @@ function SecurityAudits({ isLoadingAudit, auditReport, auditReports = [] }) {
 }
 //#endregion
 //#region extension/src/renderer/components/SkillInstallerModal/index.tsx
-var { Autocomplete, Button, Checkbox, Chip, Description: Description$2, EmptyState, Label: Label$1, ListBox, Modal: Modal$1, SearchField, Select, Separator, Spinner, Tabs: Tabs$1, Tag, TagGroup, useFilter } = await importShared("@heroui/react");
-var { useCallback: useCallback$1, useEffect: useEffect$1, useState: useState$1 } = await importShared("react");
-var ipc$1 = window.electron.ipcRenderer;
+var { Autocomplete, Button: Button$1, Checkbox, Chip, Description: Description$2, EmptyState, Label: Label$1, ListBox, Modal: Modal$1, SearchField, Select, Separator, Spinner, Tabs: Tabs$1, Tag, TagGroup, useFilter } = await importShared("@heroui/react");
+var { useCallback: useCallback$1, useEffect: useEffect$3, useState: useState$2 } = await importShared("react");
+var ipc$2 = window.electron.ipcRenderer;
 function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 	const { contains } = useFilter({ sensitivity: "base" });
-	const [installScope, setInstallScope] = useState$1("project");
-	const [installMethod, setInstallMethod] = useState$1("symlink");
-	const [supportedAgents, setSupportedAgents] = useState$1([]);
-	const [selectedAgents, setSelectedAgents] = useState$1(["antigravity"]);
-	const [allAgents, setAllAgents] = useState$1(false);
-	const [isInstalling, setIsInstalling] = useState$1(false);
-	const [installProgressMessage, setInstallProgressMessage] = useState$1("");
-	const [installResult, setInstallResult] = useState$1(null);
-	const [projectDirs, setProjectDirs] = useState$1([]);
-	const [selectedProjectCwd, setSelectedProjectCwd] = useState$1("");
+	const [installScope, setInstallScope] = useState$2("project");
+	const [installMethod, setInstallMethod] = useState$2("symlink");
+	const [supportedAgents, setSupportedAgents] = useState$2([]);
+	const [selectedAgents, setSelectedAgents] = useState$2(["antigravity"]);
+	const [allAgents, setAllAgents] = useState$2(false);
+	const [isInstalling, setIsInstalling] = useState$2(false);
+	const [installProgressMessage, setInstallProgressMessage] = useState$2("");
+	const [installResult, setInstallResult] = useState$2(null);
+	const [projectDirs, setProjectDirs] = useState$2([]);
+	const [selectedProjectCwd, setSelectedProjectCwd] = useState$2("");
 	const onRemoveTags = useCallback$1((keys) => {
 		setSelectedAgents((prev) => prev.filter((key) => !keys.has(key)));
 	}, []);
-	const [auditReports, setAuditReports] = useState$1([]);
-	const [isLoadingAudit, setIsLoadingAudit] = useState$1(false);
+	const [auditReports, setAuditReports] = useState$2([]);
+	const [isLoadingAudit, setIsLoadingAudit] = useState$2(false);
 	const loadProjects = useCallback$1(async () => {
 		try {
-			const dirs = await ipc$1.invoke("skills-manager:get-project-dirs");
+			const dirs = await ipc$2.invoke("skills-manager:get-project-dirs");
 			setProjectDirs(dirs || []);
 			if (dirs && dirs.length > 0) setSelectedProjectCwd((prev) => dirs.includes(prev) ? prev : dirs[0]);
 			else setSelectedProjectCwd("");
@@ -6061,10 +6093,11 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 			console.error("Failed to load project dirs:", err);
 		}
 	}, []);
-	useEffect$1(() => {
+	useEffect$3(() => {
 		const loadAgents = async () => {
 			try {
-				setSupportedAgents(await ipc$1.invoke("skills-manager:get-agents"));
+				const list = await ipc$2.invoke("skills-manager:get-agents");
+				setSupportedAgents(list);
 			} catch (err) {
 				console.error("Failed to load agents list:", err);
 			}
@@ -6072,7 +6105,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 		loadAgents();
 		loadProjects();
 	}, [loadProjects]);
-	useEffect$1(() => {
+	useEffect$3(() => {
 		if (selectedSkills.length > 0) {
 			setInstallScope("project");
 			setInstallMethod("symlink");
@@ -6090,7 +6123,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 						const source = skill.source || skill.id?.split("/").slice(0, 2).join("/");
 						const skillName = skill.name;
 						if (source && skillName) {
-							const res = await ipc$1.invoke("skills-manager:get-audit", source, skillName);
+							const res = await ipc$2.invoke("skills-manager:get-audit", source, skillName);
 							if (res) allAudits.push(res);
 						}
 					}));
@@ -6107,9 +6140,10 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 	}, [selectedSkills, loadProjects]);
 	const handleProjectSelectChange = useCallback$1(async (key) => {
 		if (key === "add-new") try {
-			const dir = await ipc$1.invoke("skills-manager:select-project-dir");
+			const dir = await ipc$2.invoke("skills-manager:select-project-dir");
 			if (dir) {
-				setProjectDirs(await ipc$1.invoke("skills-manager:add-project-dir", dir) || []);
+				const updated = await ipc$2.invoke("skills-manager:add-project-dir", dir);
+				setProjectDirs(updated || []);
 				setSelectedProjectCwd(dir);
 			}
 		} catch (err) {
@@ -6133,7 +6167,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 			setInstallProgressMessage(`Installing skill ${i + 1} of ${selectedSkills.length}: "${skill.name}"...`);
 			const source = skill.source ? skill.source.includes("/") ? `${skill.source}@${skill.name}` : `${skill.source}/${skill.name}` : skill.id || skill.name;
 			try {
-				const res = await ipc$1.invoke("skills-manager:add", source, isGlobal, agent, isCopy, targetCwd);
+				const res = await ipc$2.invoke("skills-manager:add", source, isGlobal, agent, isCopy, targetCwd);
 				if (res.success) successCount++;
 				else {
 					failCount++;
@@ -6182,7 +6216,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 				className: "flex flex-col gap-y-1 px-4",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex items-center gap-2",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$18, { className: "size-6 text-LynxPurple" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Heading, {
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$19, { className: "size-6 text-LynxPurple" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Heading, {
 						className: "text-lg font-bold",
 						children: selectedSkills.length > 1 ? `Install ${selectedSkills.length} Skills` : `Install ${selectedSkills[0]?.name}`
 					})]
@@ -6350,7 +6384,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 					}),
 					installResult && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: `flex items-start gap-2 p-3 rounded-xl text-xs ${installResult.success ? "bg-success/10 text-success" : "bg-danger/10 text-danger"}`,
-						children: [installResult.success ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$7, { className: "size-4 shrink-0 mt-0.5 text-success" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, { className: "size-4 shrink-0 mt-0.5 text-danger" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						children: [installResult.success ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$8, { className: "size-4 shrink-0 mt-0.5 text-success" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$7, { className: "size-4 shrink-0 mt-0.5 text-danger" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 							className: "break-all",
 							children: installResult.message
 						})]
@@ -6360,7 +6394,7 @@ function SkillInstallerModal({ selectedSkills, onClose, onInstallSuccess }) {
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator, { className: "opacity-10" }),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Footer, {
 				className: "pt-3",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
 					isDisabled: isInstalling || !allAgents && selectedAgents.length === 0 || installScope === "project" && !selectedProjectCwd,
 					size: "sm",
 					onPress: handleStartInstall,
@@ -6377,20 +6411,20 @@ var SkillInstallerModal_default = SkillInstallerModal;
 //#endregion
 //#region extension/src/renderer/SkillsManagerModal.tsx
 var { Description: Description$1, Modal, Tabs, Typography } = await importShared("@heroui/react");
-var { useCallback, useEffect, useState } = await importShared("react");
-var ipc = window.electron.ipcRenderer;
+var { useCallback, useEffect: useEffect$2, useState: useState$1 } = await importShared("react");
+var ipc$1 = window.electron.ipcRenderer;
 function SkillsManagerModal() {
-	const [isOpen, setIsOpen] = useState(false);
-	const [activeTab, setActiveTab] = useState("installed");
-	const [installedSkills, setInstalledSkills] = useState([]);
-	const [isLoadingInstalled, setIsLoadingInstalled] = useState(false);
-	const [searchQuery, setSearchQuery] = useState("");
-	const [searchResults, setSearchResults] = useState([]);
-	const [isLoadingSearch, setIsLoadingSearch] = useState(false);
-	const [hasSearched, setHasSearched] = useState(false);
-	const [selectedSkills, setSelectedSkills] = useState([]);
-	const [isCustomInstallOpen, setIsCustomInstallOpen] = useState(false);
-	useEffect(() => {
+	const [isOpen, setIsOpen] = useState$1(false);
+	const [activeTab, setActiveTab] = useState$1("installed");
+	const [installedSkills, setInstalledSkills] = useState$1([]);
+	const [isLoadingInstalled, setIsLoadingInstalled] = useState$1(false);
+	const [searchQuery, setSearchQuery] = useState$1("");
+	const [searchResults, setSearchResults] = useState$1([]);
+	const [isLoadingSearch, setIsLoadingSearch] = useState$1(false);
+	const [hasSearched, setHasSearched] = useState$1(false);
+	const [selectedSkills, setSelectedSkills] = useState$1([]);
+	const [isCustomInstallOpen, setIsCustomInstallOpen] = useState$1(false);
+	useEffect$2(() => {
 		const handleOpen = () => {
 			setIsOpen(true);
 			loadInstalledSkills();
@@ -6398,15 +6432,15 @@ function SkillsManagerModal() {
 		window.addEventListener("open-skills-manager", handleOpen);
 		return () => window.removeEventListener("open-skills-manager", handleOpen);
 	}, []);
-	useEffect(() => {
-		if (!isOpen) ipc.invoke("skills-manager:clear-description-cache").catch((err) => {
+	useEffect$2(() => {
+		if (!isOpen) ipc$1.invoke("skills-manager:clear-description-cache").catch((err) => {
 			console.error("Failed to clear description cache:", err);
 		});
 	}, [isOpen]);
 	const loadInstalledSkills = useCallback(async () => {
 		setIsLoadingInstalled(true);
 		try {
-			const [projectSkills, globalSkills] = await Promise.all([ipc.invoke("skills-manager:list", false), ipc.invoke("skills-manager:list", true)]);
+			const [projectSkills, globalSkills] = await Promise.all([ipc$1.invoke("skills-manager:list", false), ipc$1.invoke("skills-manager:list", true)]);
 			const formattedProject = (projectSkills || []).map((s) => ({
 				...s,
 				scope: "project"
@@ -6415,7 +6449,8 @@ function SkillsManagerModal() {
 				...s,
 				scope: "global"
 			}));
-			setInstalledSkills([...formattedProject, ...formattedGlobal]);
+			const combined = [...formattedProject, ...formattedGlobal];
+			setInstalledSkills(combined);
 		} catch (err) {
 			console.error("Failed to load installed skills:", err);
 		} finally {
@@ -6427,7 +6462,8 @@ function SkillsManagerModal() {
 		setIsLoadingSearch(true);
 		setHasSearched(true);
 		try {
-			setSearchResults(await ipc.invoke("skills-manager:search", searchQuery) || []);
+			const results = await ipc$1.invoke("skills-manager:search", searchQuery);
+			setSearchResults(results || []);
 		} catch (err) {
 			console.error("Failed to search skills:", err);
 			setSearchResults([]);
@@ -6450,7 +6486,7 @@ function SkillsManagerModal() {
 					className: "flex justify-between items-center mb-6",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "flex items-center gap-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$18, {
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$19, {
 							"aria-hidden": "true",
 							className: "size-8 text-LynxPurple"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Typography, {
@@ -6472,7 +6508,7 @@ function SkillsManagerModal() {
 								id: "installed",
 								className: "flex items-center gap-2",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$13, { className: "size-3.5" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$14, { className: "size-3.5" }),
 									"Installed",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.Indicator, {})
 								]
@@ -6481,7 +6517,7 @@ function SkillsManagerModal() {
 								id: "discover",
 								className: "flex items-center gap-2",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$14, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$15, { className: "size-4" }),
 									"Discover",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.Indicator, {})
 								]
@@ -6490,7 +6526,7 @@ function SkillsManagerModal() {
 								id: "create",
 								className: "flex items-center gap-2",
 								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$12, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$13, { className: "size-4" }),
 									"Create",
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.Indicator, {})
 								]
@@ -6547,20 +6583,676 @@ function SkillsManagerModal() {
 	] });
 }
 //#endregion
+//#region src/common/consts/ipcChannels/browser.ts
+/**
+* IPC channels for browser-related functionality.
+* Handles tab management, navigation, zoom, volume, and other webview interactions.
+*/
+var browserChannels = {
+	createBrowser: "browser:create-browser",
+	removeBrowser: "browser:remove-browser",
+	loadURL: "browser:load-url",
+	setVisible: "browser:set-visible",
+	openFindInPage: "browser:openFindInPage",
+	openZoom: "browser:openZoom",
+	openVolume: "browser:openVolume",
+	onZoomChanged: "browser:on-zoom-changed",
+	onLinkHover: "browser:on-link-hover",
+	resizeLinkPreview: "browser:resize-link-preview",
+	resizeBrowserView: "browser:resize-browser-view",
+	findInPage: "browser:findInPage",
+	stopFindInPage: "browser:stopFindInPage",
+	onFoundInPage: "browser:on-found-in-page",
+	setZoomFactor: "browser:setZoomFactor",
+	focusWebView: "browser:focus-webview",
+	clearCache: "browser:clear-cache",
+	clearCookies: "browser:clear-cookies",
+	reload: "browser:reload",
+	focus: "browser:focus",
+	stop: "browser:stop",
+	goBack: "browser:goBack",
+	goForward: "browser:goForward",
+	toggleDevTools: "browser:toggle-devtools",
+	onCanGo: "browser:on-can-go",
+	isLoading: "browser:is-loading",
+	onTitleChange: "browser:on-title-change",
+	onFavIconChange: "browser:on-favicon-change",
+	onUrlChange: "browser:on-url-change",
+	onDomReady: "browser:on-dom-ready",
+	getUserAgent: "browser:get-user-agent",
+	updateUserAgent: "browser:update-user-agent",
+	clearHistory: "browser:clear-history",
+	onFailedLoadUrl: "browser:on-failed-load-url",
+	onClearFailed: "browser:on-clear-failed",
+	setVolume: "volume:set",
+	setMuted: "volume:setMuted",
+	getState: "volume:getState",
+	updateTabVolume: "volume:updateTabVolume",
+	updateTabMuted: "volume:updateTabMuted",
+	onTabVolumeUpdate: "volume:onTabVolumeUpdate",
+	onTabMutedUpdate: "volume:onTabMutedUpdate",
+	onAudioStateChange: "volume:onAudioStateChange"
+};
+//#endregion
+//#region src/renderer/shared/ipc/ipcEvents.ts
+var listeners = {
+	before: /* @__PURE__ */ new Set(),
+	after: /* @__PURE__ */ new Set()
+};
+var channelListeners = {
+	before: /* @__PURE__ */ new Map(),
+	after: /* @__PURE__ */ new Map()
+};
+var getListenersForEvent = (event) => {
+	const base = [...listeners[event.phase]];
+	const perChannel = channelListeners[event.phase].get(event.channel);
+	if (perChannel) base.push(...perChannel);
+	return base;
+};
+var logHookError = (error) => {
+	console.error("Extension renderer IPC hook failed:", error);
+};
+var runListenerSync = (listener, event) => {
+	try {
+		const result = listener(event);
+		if (result && typeof result.then === "function") result.catch(logHookError);
+	} catch (error) {
+		logHookError(error);
+	}
+};
+var runListener = async (listener, event) => {
+	try {
+		await listener(event);
+	} catch (error) {
+		logHookError(error);
+	}
+};
+var emitRendererIpcEventSync = (event) => {
+	for (const listener of getListenersForEvent(event)) runListenerSync(listener, event);
+};
+var emitRendererIpcEvent = async (event) => {
+	for (const listener of getListenersForEvent(event)) await runListener(listener, event);
+};
+//#endregion
+//#region src/renderer/shared/ipc/lynxIpc.ts
+var ipc = window.electron.ipcRenderer;
+var send = (channel, ...args) => {
+	const eventStart = Date.now();
+	const beforeEvent = {
+		phase: "before",
+		method: "send",
+		channel,
+		args: [...args],
+		timestamp: eventStart
+	};
+	emitRendererIpcEventSync(beforeEvent);
+	try {
+		ipc.send(channel, ...args);
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "success",
+			durationMs: Date.now() - eventStart
+		});
+	} catch (error) {
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "error",
+			durationMs: Date.now() - eventStart,
+			error
+		});
+		throw error;
+	}
+};
+var sendSync = (channel, ...args) => {
+	const eventStart = Date.now();
+	const beforeEvent = {
+		phase: "before",
+		method: "sendSync",
+		channel,
+		args: [...args],
+		timestamp: eventStart
+	};
+	emitRendererIpcEventSync(beforeEvent);
+	try {
+		const result = ipc.sendSync(channel, ...args);
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "success",
+			durationMs: Date.now() - eventStart,
+			result
+		});
+		return result;
+	} catch (error) {
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "error",
+			durationMs: Date.now() - eventStart,
+			error
+		});
+		throw error;
+	}
+};
+var invoke = async (channel, ...args) => {
+	const eventStart = Date.now();
+	const beforeEvent = {
+		phase: "before",
+		method: "invoke",
+		channel,
+		args: [...args],
+		timestamp: eventStart
+	};
+	await emitRendererIpcEvent(beforeEvent);
+	try {
+		const result = await ipc.invoke(channel, ...args);
+		await emitRendererIpcEvent({
+			...beforeEvent,
+			phase: "after",
+			status: "success",
+			durationMs: Date.now() - eventStart,
+			result
+		});
+		return result;
+	} catch (error) {
+		await emitRendererIpcEvent({
+			...beforeEvent,
+			phase: "after",
+			status: "error",
+			durationMs: Date.now() - eventStart,
+			error
+		});
+		throw error;
+	}
+};
+var on = (channel, callback) => ipc.on(channel, (_, ...args) => {
+	const typedArgs = args;
+	const eventStart = Date.now();
+	const beforeEvent = {
+		phase: "before",
+		method: "on",
+		channel,
+		args: [...typedArgs],
+		timestamp: eventStart
+	};
+	emitRendererIpcEventSync(beforeEvent);
+	try {
+		const result = callback(...typedArgs);
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "success",
+			durationMs: Date.now() - eventStart,
+			result
+		});
+	} catch (error) {
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "error",
+			durationMs: Date.now() - eventStart,
+			error
+		});
+		throw error;
+	}
+});
+var once = (channel, callback) => ipc.once(channel, (_, ...args) => {
+	const typedArgs = args;
+	const eventStart = Date.now();
+	const beforeEvent = {
+		phase: "before",
+		method: "once",
+		channel,
+		args: [...typedArgs],
+		timestamp: eventStart
+	};
+	emitRendererIpcEventSync(beforeEvent);
+	try {
+		const result = callback(...typedArgs);
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "success",
+			durationMs: Date.now() - eventStart,
+			result
+		});
+	} catch (error) {
+		emitRendererIpcEventSync({
+			...beforeEvent,
+			phase: "after",
+			status: "error",
+			durationMs: Date.now() - eventStart,
+			error
+		});
+		throw error;
+	}
+});
+var lynxIpc = {
+	send,
+	sendSync,
+	on,
+	once,
+	invoke
+};
+//#endregion
+//#region src/renderer/shared/ipc/browser.ts
+var invokeWithSoftTimeout = async (channel, timeoutMessage, ...args) => {
+	try {
+		await Promise.race([lynxIpc.invoke(channel, ...args), new Promise((_, reject) => setTimeout(() => reject(new Error(timeoutMessage)), 8e3))]);
+	} catch {}
+};
+var browserIpc = {
+	send: {
+		resizeLinkPreview: (width) => lynxIpc.send(browserChannels.resizeLinkPreview, width),
+		resizeBrowserView: (data) => lynxIpc.send(browserChannels.resizeBrowserView, data),
+		createBrowser: (id) => lynxIpc.send(browserChannels.createBrowser, id),
+		removeBrowser: (id) => lynxIpc.send(browserChannels.removeBrowser, id),
+		loadURL: (id, url) => lynxIpc.send(browserChannels.loadURL, id, url),
+		setVisible: (id, visible) => lynxIpc.send(browserChannels.setVisible, id, visible),
+		openFindInPage: (id, customPosition) => lynxIpc.send(browserChannels.openFindInPage, id, customPosition),
+		openZoom: (id, customPosition) => lynxIpc.send(browserChannels.openZoom, id, customPosition),
+		openVolume: (data, customPosition) => lynxIpc.send(browserChannels.openVolume, data, customPosition),
+		findInPage: (id, value, options) => lynxIpc.send(browserChannels.findInPage, id, value, options),
+		stopFindInPage: (id, action) => lynxIpc.send(browserChannels.stopFindInPage, id, action),
+		focusWebView: (id) => lynxIpc.send(browserChannels.focusWebView, id),
+		setZoomFactor: (id, factor) => lynxIpc.send(browserChannels.setZoomFactor, id, factor),
+		reload: (id) => lynxIpc.send(browserChannels.reload, id),
+		focus: (id) => lynxIpc.send(browserChannels.focus, id),
+		stop: (id) => lynxIpc.send(browserChannels.stop, id),
+		goBack: (id) => lynxIpc.send(browserChannels.goBack, id),
+		goForward: (id) => lynxIpc.send(browserChannels.goForward, id),
+		toggleDevTools: (id) => lynxIpc.send(browserChannels.toggleDevTools, id),
+		updateUserAgent: () => lynxIpc.send(browserChannels.updateUserAgent),
+		clearHistory: (selected) => lynxIpc.send(browserChannels.clearHistory, selected),
+		updateTabVolume: (tabId, volume) => lynxIpc.send(browserChannels.updateTabVolume, tabId, volume),
+		updateTabMuted: (tabId, muted) => lynxIpc.send(browserChannels.updateTabMuted, tabId, muted)
+	},
+	on: {
+		linkHover: (callback) => lynxIpc.on(browserChannels.onLinkHover, callback),
+		canGoBackForward: (result) => lynxIpc.on(browserChannels.onCanGo, result),
+		loading: (result) => lynxIpc.on(browserChannels.isLoading, result),
+		titleChanged: (result) => lynxIpc.on(browserChannels.onTitleChange, result),
+		favIconChanged: (result) => lynxIpc.on(browserChannels.onFavIconChange, result),
+		urlChanged: (result) => lynxIpc.on(browserChannels.onUrlChange, result),
+		domReady: (result) => lynxIpc.on(browserChannels.onDomReady, result),
+		failedLoadUrl: (result) => lynxIpc.on(browserChannels.onFailedLoadUrl, result),
+		clearFailed: (result) => lynxIpc.on(browserChannels.onClearFailed, result),
+		onAudioStateChange: (callback) => lynxIpc.on(browserChannels.onAudioStateChange, callback),
+		onTabVolumeUpdate: (callback) => lynxIpc.on(browserChannels.onTabVolumeUpdate, callback),
+		onTabMutedUpdate: (callback) => lynxIpc.on(browserChannels.onTabMutedUpdate, callback),
+		foundInPage: (callback) => lynxIpc.on(browserChannels.onFoundInPage, callback),
+		onZoomChanged: (callback) => lynxIpc.on(browserChannels.onZoomChanged, callback)
+	},
+	invoke: {
+		clearCache: () => lynxIpc.invoke(browserChannels.clearCache),
+		clearCookies: () => lynxIpc.invoke(browserChannels.clearCookies),
+		getUserAgent: (type) => lynxIpc.invoke(browserChannels.getUserAgent, type),
+		setVolume: (id, volume) => invokeWithSoftTimeout(browserChannels.setVolume, "Volume set operation timed out", id, volume),
+		setMuted: (id, muted) => invokeWithSoftTimeout(browserChannels.setMuted, "Mute set operation timed out", id, muted)
+	}
+};
+//#endregion
+//#region src/common/consts/ipcChannels/pty.ts
+/**
+* IPC channels for PTY (Pseudo-Terminal) operations.
+* Handles terminal process management, input/output, resizing, and custom commands.
+*/
+var ptyChannels = {
+	process: "pty-process",
+	customProcess: "pty-custom-process",
+	emptyProcess: "pty-custom-process",
+	stopProcess: "pty-stop-process",
+	customCommands: "pty-custom-commands",
+	write: "pty-write",
+	clear: "pty-clear",
+	resize: "pty-resize",
+	onData: "pty-on-data",
+	onTitle: "pty-on-title",
+	onExit: "pty-on-exit-code",
+	onProgress: "pty-on-progress"
+};
+//#endregion
+//#region src/renderer/shared/ipc/pty.ts
+var ptyIpc = {
+	process: (id, cardId) => lynxIpc.send(ptyChannels.process, id, cardId),
+	customProcess: (id, dir, file) => lynxIpc.send(ptyChannels.customProcess, id, dir, file),
+	emptyProcess: (id, dir) => lynxIpc.send(ptyChannels.emptyProcess, id, dir),
+	customCommands: (id, commands, dir) => lynxIpc.send(ptyChannels.customCommands, id, commands, dir),
+	stop: (id) => lynxIpc.send(ptyChannels.stopProcess, id),
+	write: (id, data) => lynxIpc.send(ptyChannels.write, id, data),
+	clear: (id) => lynxIpc.send(ptyChannels.clear, id),
+	resize: (id, cols, rows) => lynxIpc.send(ptyChannels.resize, id, cols, rows),
+	onData: (result) => lynxIpc.on(ptyChannels.onData, result),
+	onTitle: (result) => lynxIpc.on(ptyChannels.onTitle, result),
+	onExit: (result) => lynxIpc.on(ptyChannels.onExit, result)
+};
+//#endregion
+//#region src/renderer/mainWindow/redux/reducers/cards.ts
+var { useSelector } = await importShared("react-redux");
+var buildRunningCardBase = (tabId, id) => ({
+	tabId,
+	id,
+	webUIAddress: "",
+	customAddress: "",
+	currentAddress: "",
+	browserTitle: "Browser",
+	startTime: (/* @__PURE__ */ new Date()).toString()
+});
+var cardsSlice = createSlice({
+	initialState: {
+		autoUpdate: [],
+		installedCards: [],
+		pinnedCards: [],
+		updateAvailable: [],
+		updatingCards: [],
+		runningCard: [],
+		recentlyUsedCards: [],
+		homeCategory: [],
+		autoUpdateExtensions: [],
+		updatingExtensions: void 0,
+		duplicates: [],
+		checkUpdateInterval: 0,
+		activeTab: "",
+		browserDomReadyIds: [],
+		updateChecking: ""
+	},
+	name: "cards",
+	reducers: {
+		addUpdateAvailable: (state, action) => {
+			if (!state.updateAvailable.includes(action.payload)) state.updateAvailable.push(action.payload);
+		},
+		setUpdateAvailable: (state, action) => {
+			state.updateAvailable = action.payload;
+		},
+		setUpdateChecking: (state, action) => {
+			state.updateChecking = action.payload;
+		},
+		removeUpdateAvailable: (state, action) => {
+			state.updateAvailable = state.updateAvailable.filter((card) => card !== action.payload);
+		},
+		setUpdatingExtensions: (state, action) => {
+			state.updatingExtensions = action.payload;
+		},
+		setUpdateInterval: (state, action) => {
+			state.checkUpdateInterval = action.payload;
+		},
+		addUpdatingCard: (state, action) => {
+			if (!state.updatingCards.some((card) => card.id === action.payload.id)) state.updatingCards.push(action.payload);
+		},
+		removeUpdatingCard: (state, action) => {
+			const cardId = action.payload;
+			state.updatingCards = state.updatingCards.filter((card) => card.id !== cardId);
+		},
+		setAutoUpdate: (state, action) => {
+			state.autoUpdate = action.payload;
+		},
+		setAutoUpdateExtensions: (state, action) => {
+			state.autoUpdateExtensions = action.payload;
+		},
+		setInstalledCards: (state, action) => {
+			state.installedCards = action.payload;
+		},
+		setPinnedCards: (state, action) => {
+			state.pinnedCards = action.payload;
+		},
+		setHomeCategory: (state, action) => {
+			state.homeCategory = action.payload;
+		},
+		setRecentlyUsedCards: (state, action) => {
+			state.recentlyUsedCards = action.payload;
+		},
+		setDuplicates: (state, action) => {
+			state.duplicates = action.payload;
+		},
+		addDomReady: (state, action) => {
+			if (!state.browserDomReadyIds.includes(action.payload)) state.browserDomReadyIds.push(action.payload);
+		},
+		addRunningEmpty: (state, action) => {
+			const { tabId, type } = action.payload;
+			const id = `${tabId}_${type}`;
+			const currentView = type === "browser" ? "browser" : "terminal";
+			state.runningCard.push({
+				...buildRunningCardBase(tabId, id),
+				type,
+				currentView,
+				isEmptyRunning: true
+			});
+			if (type !== "terminal") browserIpc.send.createBrowser(id);
+			if (type !== "browser") ptyIpc.emptyProcess(id);
+		},
+		addRunningCard: (state, action) => {
+			const { tabId, id } = action.payload;
+			state.runningCard.push({
+				...buildRunningCardBase(tabId, id),
+				type: "both",
+				currentView: "terminal",
+				isEmptyRunning: false
+			});
+			browserIpc.send.createBrowser(id);
+		},
+		setRunningCardAddress: (state, action) => {
+			const { tabId, address } = action.payload;
+			state.runningCard = state.runningCard.map((card) => card.tabId === tabId ? {
+				...card,
+				webUIAddress: address
+			} : card);
+		},
+		setRunningCardCustomAddress: (state, action) => {
+			const { tabId, address } = action.payload;
+			state.runningCard = state.runningCard.map((card) => card.tabId === tabId ? {
+				...card,
+				customAddress: address
+			} : card);
+		},
+		setRunningCardCurrentAddress: (state, action) => {
+			const { tabId, address } = action.payload;
+			state.runningCard = state.runningCard.map((card) => card.tabId === tabId ? {
+				...card,
+				currentAddress: address
+			} : card);
+		},
+		setRunningCardView: (state, action) => {
+			const { tabId, view } = action.payload;
+			state.runningCard = state.runningCard.map((card) => card.tabId === tabId ? {
+				...card,
+				currentView: view
+			} : card);
+		},
+		setRunningCardBrowserTitle: (state, action) => {
+			const { tabId, title } = action.payload;
+			state.runningCard = state.runningCard.map((card) => card.tabId === tabId ? {
+				...card,
+				browserTitle: title
+			} : card);
+		},
+		toggleRunningCardView: (state, action) => {
+			if (!state.runningCard) return;
+			const { tabId } = action.payload;
+			state.runningCard = state.runningCard.map((card) => {
+				const currentView = card.currentView === "browser" ? "terminal" : "browser";
+				return card.tabId === tabId ? {
+					...card,
+					currentView
+				} : card;
+			});
+		},
+		stopRunningCard: (state, action) => {
+			const id = state.runningCard.find((card) => card.tabId === action.payload.tabId)?.id;
+			if (id) {
+				browserIpc.send.removeBrowser(id);
+				state.browserDomReadyIds = state.browserDomReadyIds.filter((item) => item !== id);
+			}
+			state.runningCard = state.runningCard.filter((card) => card.tabId !== action.payload.tabId);
+		}
+	}
+});
+/**
+* Hook to access a single cards state field with key-safe typing.
+*/
+var useCardsState = (name) => useSelector((state) => state.cards[name]);
+cardsSlice.actions;
+cardsSlice.reducer;
+//#endregion
+//#region src/renderer/mainWindow/utils/hooks.tsx
+var { Fragment, useEffect: useEffect$1, useRef: useRef$1, useState } = await importShared("react");
+/**
+* Hook to check if a card is pinned.
+* @param cardId - The ID of the card to check
+* @returns Boolean indicating if the card is pinned
+*/
+function useIsPinnedCard(cardId) {
+	return useCardsState("pinnedCards").includes(cardId);
+}
+window.isPortable;
+//#endregion
 //#region src/common/utils/strings.ts
 function getFallbackString(value) {
 	return value.replace(/[^a-zA-Z0-9\s]/g, "").split(" ").map((item) => item.slice(0, 1).toUpperCase()).join("");
 }
 //#endregion
+//#region src/common/consts/ipcChannels/storage.ts
+/**
+* IPC channels for storage utility operations.
+* Handles card management, auto-updates, pinned items, and history.
+*/
+var storageUtilsChannels = {
+	setSystemStartup: "storageUtils:setSystemStartup",
+	addInstalledCard: "storageUtils:add-installed-card",
+	removeInstalledCard: "storageUtils:remove-installed-card",
+	onInstalledCards: "storageUtils:on-installed-cards",
+	addAutoUpdateCard: "storageUtils:add-autoUpdate-card",
+	removeAutoUpdateCard: "storageUtils:remove-autoUpdate-card",
+	addAutoUpdateExtensions: "storageUtils:add-autoUpdate-extensions",
+	removeAutoUpdateExtensions: "storageUtils:remove-autoUpdate-extensions",
+	onAutoUpdateCards: "storageUtils:on-autoUpdate-cards",
+	onAutoUpdateExtensions: "storageUtils:on-autoUpdate-extensions",
+	onPinnedCardsChange: "storageUtils:on-pinned-cards",
+	pinnedCards: "storageUtils:pinned-cards",
+	recentlyUsedCards: "storageUtils:recently-used-cards",
+	onRecentlyUsedCardsChange: "storageUtils:on-recently-used-cards",
+	homeCategory: "storageUtils:home-category",
+	onHomeCategory: "storageUtils:on-home-category",
+	preCommands: "storageUtils:pre-commands",
+	onPreCommands: "storageUtils:on-pre-commands",
+	customRun: "storageUtils:custom-run",
+	onCustomRun: "storageUtils:on-custom-run",
+	customRunBehavior: "storageUtils:custom-run-behavior",
+	preOpen: "storageUtils:pre-open",
+	getCardArguments: "storageUtils:get-card-arguments",
+	setCardArguments: "storageUtils:set-card-arguments",
+	addBrowserRecent: "storageUtils:add-browser-recent",
+	addBrowserFavorite: "storageUtils:add-browser-favorite",
+	addBrowserHistory: "storageUtils:add-browser-history",
+	addBrowserRecentFavIcon: "storageUtils:add-browser-recent-favicon",
+	removeBrowserRecent: "storageUtils:remove-browser-recent",
+	removeBrowserFavorite: "storageUtils:remove-browser-favorite",
+	removeBrowserHistory: "storageUtils:remove-browser-favorite",
+	setShowConfirm: "storage:set-show-confirm",
+	onConfirmChange: "storage:on-confirm-change",
+	addReadNotif: "storageUtils:add-read-notif",
+	setCardTerminalPreCommands: "storageUtils:card-terminal-preCommands",
+	unassignCard: "storageUtils:unassign-card",
+	getBrowserHistoryData: "storageUtils:getBrowserHistoryData"
+};
+//#endregion
+//#region src/renderer/shared/ipc/storage.ts
+var storageUtilsIpc = {
+	send: {
+		addInstalledCard: (cardData) => lynxIpc.send(storageUtilsChannels.addInstalledCard, cardData),
+		removeInstalledCard: (cardId) => lynxIpc.send(storageUtilsChannels.removeInstalledCard, cardId),
+		addAutoUpdateCard: (cardId) => lynxIpc.send(storageUtilsChannels.addAutoUpdateCard, cardId),
+		removeAutoUpdateCard: (cardId) => lynxIpc.send(storageUtilsChannels.removeAutoUpdateCard, cardId),
+		addAutoUpdateExtensions: (cardId) => lynxIpc.send(storageUtilsChannels.addAutoUpdateExtensions, cardId),
+		removeAutoUpdateExtensions: (cardId) => lynxIpc.send(storageUtilsChannels.removeAutoUpdateExtensions, cardId),
+		updateCustomRunBehavior: (data) => lynxIpc.send(storageUtilsChannels.customRunBehavior, data),
+		setSystemStartup: (startup) => lynxIpc.send(storageUtilsChannels.setSystemStartup, startup),
+		addBrowserRecent: (recentEntry) => lynxIpc.send(storageUtilsChannels.addBrowserRecent, recentEntry),
+		addBrowserFavorite: (favoriteEntry) => lynxIpc.send(storageUtilsChannels.addBrowserFavorite, favoriteEntry),
+		addBrowserHistory: (historyEntry) => lynxIpc.send(storageUtilsChannels.addBrowserHistory, historyEntry),
+		addBrowserRecentFavIcon: (url, favIcon, title) => lynxIpc.send(storageUtilsChannels.addBrowserRecentFavIcon, url, favIcon, title),
+		removeBrowserRecent: (url) => lynxIpc.send(storageUtilsChannels.removeBrowserRecent, url),
+		removeBrowserFavorite: (url) => lynxIpc.send(storageUtilsChannels.removeBrowserFavorite, url),
+		removeBrowserHistory: (url) => lynxIpc.send(storageUtilsChannels.removeBrowserHistory, url),
+		setShowConfirm: (type, enable) => lynxIpc.send(storageUtilsChannels.setShowConfirm, type, enable),
+		addReadNotif: (id) => lynxIpc.send(storageUtilsChannels.addReadNotif, id),
+		setCardTerminalPreCommands: (id, commands) => lynxIpc.send(storageUtilsChannels.setCardTerminalPreCommands, id, commands)
+	},
+	invoke: {
+		pinnedCards: (opt, id, pinnedCards) => lynxIpc.invoke(storageUtilsChannels.pinnedCards, opt, id, pinnedCards),
+		preCommands: (opt, data) => lynxIpc.invoke(storageUtilsChannels.preCommands, opt, data),
+		customRun: (opt, data) => lynxIpc.invoke(storageUtilsChannels.customRun, opt, data),
+		preOpen: (opt, open) => lynxIpc.invoke(storageUtilsChannels.preOpen, opt, open),
+		getCardArguments: (cardId) => lynxIpc.invoke(storageUtilsChannels.getCardArguments, cardId),
+		setCardArguments: (cardId, args) => lynxIpc.invoke(storageUtilsChannels.setCardArguments, cardId, args),
+		recentlyUsedCards: (opt, id) => lynxIpc.invoke(storageUtilsChannels.recentlyUsedCards, opt, id),
+		homeCategory: (opt, data) => lynxIpc.invoke(storageUtilsChannels.homeCategory, opt, data),
+		unassignCard: (id, clearConfigs) => lynxIpc.invoke(storageUtilsChannels.unassignCard, id, clearConfigs),
+		getBrowserHistoryData: () => lynxIpc.invoke(storageUtilsChannels.getBrowserHistoryData)
+	},
+	on: {
+		onInstalledCards: (result) => lynxIpc.on(storageUtilsChannels.onInstalledCards, result),
+		onAutoUpdateCards: (result) => lynxIpc.on(storageUtilsChannels.onAutoUpdateCards, result),
+		onAutoUpdateExtensions: (result) => lynxIpc.on(storageUtilsChannels.onAutoUpdateExtensions, result),
+		onPinnedCardsChange: (result) => lynxIpc.on(storageUtilsChannels.onPinnedCardsChange, result),
+		onPreCommands: (result) => lynxIpc.on(storageUtilsChannels.onPreCommands, result),
+		onCustomRun: (result) => lynxIpc.on(storageUtilsChannels.onCustomRun, result),
+		onRecentlyUsedCardsChange: (result) => lynxIpc.on(storageUtilsChannels.onRecentlyUsedCardsChange, result),
+		onHomeCategory: (result) => lynxIpc.on(storageUtilsChannels.onHomeCategory, result),
+		onConfirmChange: (result) => lynxIpc.on(storageUtilsChannels.onConfirmChange, result)
+	}
+};
+//#endregion
+//#region src/common/consts/ipcChannels/actions.ts
+/**
+* IPC channels for collecting and transmitting user actions.
+*/
+var actionChannels = { logAction: "actions:logAction" };
+//#endregion
+//#region src/renderer/shared/ipc/actions.ts
+var actionsIpc = { logAction: (payload) => lynxIpc.send(actionChannels.logAction, payload) };
+//#endregion
+//#region src/renderer/shared/sentry/Breadcrumbs.tsx
+var { useEffect, useRef } = await importShared("react");
+var isEnabled = true;
+/**
+* Adds an informational renderer breadcrumb when breadcrumb collection is enabled.
+*/
+function AddBreadcrumb_Renderer(message) {
+	if (isEnabled) actionsIpc.logAction({
+		category: "renderer-actions",
+		message,
+		level: "info"
+	});
+}
+//#endregion
+//#region node_modules/@solar-icons/react-perf/dist/icons/ui/Bold/Pin.mjs
+var { forwardRef: t } = await importShared("react");
+var r = t((t, r) => (0, import_jsx_runtime.jsx)(r$25, {
+	ref: r,
+	...t,
+	children: (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z`,
+		fill: `currentColor`
+	})
+}));
+r.displayName = `Pin`;
+//#endregion
 //#region src/renderer/mainWindow/components/ToolsCard.tsx
-var { Avatar, Card, Description, Label } = await importShared("@heroui/react");
+var { Avatar, Button, Card, Description, Label } = await importShared("@heroui/react");
 /**
 * A card component for the Tools page, featuring a spotlight effect and hover animations.
 */
-function ToolsCard({ title, description, icon, onPress, footer, avatarClassName }) {
+function ToolsCard({ id, title, description, icon, onPress, footer, avatarClassName }) {
+	const isPinned = useIsPinnedCard(id || "");
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
 		className: "w-75 h-46 relative group transform border border-surface  hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer",
-		onClick: onPress,
+		onClick: () => {
+			AddBreadcrumb_Renderer(`Card Interaction: Clicked ToolsCard "${title}"`);
+			if (id) storageUtilsIpc.invoke.recentlyUsedCards("update", id);
+			onPress?.();
+		},
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "inline-flex items-center gap-2",
@@ -6582,14 +7274,32 @@ function ToolsCard({ title, description, icon, onPress, footer, avatarClassName 
 				className: "line-clamp-3 text-xs",
 				children: description
 			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card.Footer, { children: footer })
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Footer, {
+				className: "justify-between flex items-center",
+				children: [id ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					onClick: (e) => e.stopPropagation(),
+					className: "flex items-center gap-x-2",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						className: "shrink-0 -translate-x-2 opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100",
+						onPress: () => {
+							AddBreadcrumb_Renderer(`Pin ToolsCard: id:${id} , ${isPinned ? "remove" : "add"}`);
+							storageUtilsIpc.invoke.pinnedCards(isPinned ? "remove" : "add", id);
+						},
+						size: "sm",
+						variant: "ghost",
+						isIconOnly: true,
+						children: isPinned ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r, { className: "size-3" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$3, { className: "size-3" })
+					})
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {}), footer]
+			})
 		]
 	});
 }
 //#endregion
 //#region extension/src/renderer/ToolsPage.tsx
-function ToolsPage() {
+function SkillsToolkitCard() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToolsCard, {
+		id: "skills-toolkit",
 		onPress: () => {
 			window.dispatchEvent(new CustomEvent("open-skills-manager"));
 		},
@@ -6602,7 +7312,14 @@ function ToolsPage() {
 //#region extension/src/renderer/Extension.tsx
 function InitialExtensions(lynxAPI) {
 	lynxAPI.addModal(SkillsManagerModal);
-	lynxAPI.customizePages.tools.add.cardsContainer(ToolsPage);
+	lynxAPI.cards.registerToolsCard?.({
+		id: "skills-toolkit",
+		title: "Skills Manager",
+		description: "Discover, install, update, and manage agent skills from the Vercel Labs registry.",
+		component: SkillsToolkitCard,
+		where: "tools_page"
+	});
+	if (!lynxAPI.cards.registerToolsCard) lynxAPI.customizePages.tools.add.cardsContainer(SkillsToolkitCard);
 }
 //#endregion
 export { InitialExtensions as t };

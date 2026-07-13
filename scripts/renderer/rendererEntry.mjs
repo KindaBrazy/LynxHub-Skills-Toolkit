@@ -1,4 +1,4 @@
-import { t as __vitePreload } from "./preload-helper-iIio8xkS.js";
+import { t as __vitePreload } from "./preload-helper-ARKYL6bp.js";
 //#region \0virtual:__remoteEntryHelper__rendererEntry.mjs
 var currentImports = {};
 var exportSet = /* @__PURE__ */ new Set([
@@ -8,8 +8,8 @@ var exportSet = /* @__PURE__ */ new Set([
 	"_export_sfc"
 ]);
 var moduleMap = { "Extension": () => {
-	dynamicLoadingCss(["style-BWu-4z0C.css"], false, "Extension");
-	return __federation_import("./__federation_expose_Extension-DbsL-mTi.js").then((module) => Object.keys(module).every((item) => exportSet.has(item)) ? () => module.default : () => module);
+	dynamicLoadingCss(["style-BjQUQVZP.css"], false, "Extension");
+	return __federation_import("./__federation_expose_Extension-DEnin0wX.js").then((module) => Object.keys(module).every((item) => exportSet.has(item)) ? () => module.default : () => module);
 } };
 var seen = {};
 var dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
